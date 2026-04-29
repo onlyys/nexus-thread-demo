@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SSV Nexus · 通知触达配置 Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #FAFAF8; --paper-warm: #F5F3EE; --paper-soft: #F0EEE8;
+    --ink: #1A1918; --ink-2: #3C3A37; --ink-3: #7A7874; --ink-4: #A8A6A2; --ink-5: #CFCCC6;
+    --rule: #EBE8E2; --rule-soft: #F2F0EA;
+    --blue: #2563EB; --blue-soft: #EFF6FF;
+    --green: #059669; --green-soft: #ECFDF5;
+    --orange: #C2410C; --orange-soft: #FFF7ED;
+    --red: #DC2626; --red-soft: #FEF2F2;
+    --r-sm: 4px; --r: 8px; --r-lg: 12px; --r-xl: 16px;
+    --font-zh: "Noto Sans SC", "PingFang SC", -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-en: "DM Sans", "Noto Sans SC", sans-serif;
+    --font-serif: "Noto Serif SC", Georgia, serif;
+    --font-mono: "JetBrains Mono", SFMono-Regular, Consolas, monospace;
+    --ease: cubic-bezier(.3,.7,.4,1);
+    --shadow-sm: 0 1px 3px rgba(20,19,18,0.06);
+    --shadow: 0 4px 12px rgba(20,19,18,0.08);
+    --shadow-lg: 0 12px 32px rgba(20,19,18,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: var(--font-en), var(--font-zh);
+    font-size: 14px; line-height: 1.6;
+    background: var(--paper); color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; padding: 0; }
+  ::selection { background: var(--ink); color: var(--paper); }
+
+  /* Top Nav */
+  .top-nav {
+    height: 56px; background: #fff;
+    border-bottom: 1px solid var(--rule);
+    display: flex; align-items: center;
+    padding: 0 32px; gap: 14px;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-logo { width: 30px; height: 30px; border-radius: var(--r); background: var(--ink); color: var(--paper); display: grid; place-items: center; font-weight: 700; font-size: 13px; }
+  .brand-name { font-family: var(--font-serif); font-size: 15px; font-weight: 500; }
+  .brand-sep { width: 1px; height: 14px; background: var(--rule); }
+  .brand-sub { font-size: 12px; color: var(--ink-4); }
+  .nav-tabs { display: flex; align-items: center; gap: 4px; margin-left: 24px; }
+  .nav-tab { padding: 6px 12px; border-radius: var(--r); font-size: 13px; color: var(--ink-3); transition: all .15s; cursor: pointer; }
+  .nav-tab:hover { background: var(--paper-soft); color: var(--ink-2); }
+  .nav-tab.active { background: var(--ink); color: var(--paper); font-weight: 500; }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .icon-btn { width: 32px; height: 32px; border-radius: var(--r); display: grid; place-items: center; color: var(--ink-3); font-size: 16px; transition: all .15s; cursor: pointer; }
+  .icon-btn:hover { background: var(--paper-soft); color: var(--ink); }
+  .av-me { width: 30px; height: 30px; border-radius: 50%; background: var(--ink); color: var(--paper); display: grid; place-items: center; font-size: 12px; font-weight: 600; }
+
+  .layout { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 56px); }
+  .sidebar { background: #fff; border-right: 1px solid var(--rule); padding: 20px 12px; overflow-y: auto; }
+  .sidebar-section { margin-bottom: 24px; }
+  .sidebar-label { font-size: 10.5px; color: var(--ink-4); letter-spacing: 0.08em; text-transform: uppercase; font-family: var(--font-en); font-weight: 500; padding: 4px 8px 8px; }
+  .sidebar-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: var(--r); font-size: 13px; color: var(--ink-2); cursor: pointer; transition: background .12s; }
+  .sidebar-item:hover { background: var(--paper-soft); }
+  .sidebar-item.active { background: var(--ink); color: #fff; }
+  .sidebar-item .icon { font-size: 15px; width: 20px; text-align: center; }
+  .sidebar-item .desc { font-size: 11.5px; color: var(--ink-4); margin-top: 1px; }
+  .sidebar-item.active .desc { color: rgba(255,255,255,0.6); }
+
+  .main { overflow-y: auto; padding: 32px 40px; }
+  .page-header { margin-bottom: 28px; }
+  .page-title { font-family: var(--font-serif); font-size: 22px; font-weight: 500; letter-spacing: -0.005em; margin-bottom: 4px; }
+  .page-desc { font-size: 13px; color: var(--ink-3); }
+
+  /* Settings card */
+  .settings-card {
+    background: #fff; border: 1px solid var(--rule);
+    border-radius: var(--r-xl); box-shadow: var(--shadow-sm);
+    overflow: hidden; margin-bottom: 20px;
+  }
+  .card-head {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--rule-soft);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .card-head .icon { font-size: 20px; }
+  .card-head .title { font-size: 14px; font-weight: 600; }
+  .card-head .desc { font-size: 12.5px; color: var(--ink-3); margin-left: auto; }
+  .card-body { padding: 20px 24px; }
+
+  /* Toggle row */
+  .toggle-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-icon { font-size: 18px; width: 28px; text-align: center; flex-shrink: 0; }
+  .toggle-info { flex: 1; }
+  .toggle-label { font-size: 13.5px; font-weight: 500; margin-bottom: 2px; }
+  .toggle-desc { font-size: 12px; color: var(--ink-3); }
+  .toggle-badge { font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 500; margin-left: 8px; }
+  .toggle-badge.on { background: var(--green-soft); color: var(--green); }
+  .toggle-badge.off { background: var(--paper-soft); color: var(--ink-4); }
+  .toggle-badge.priority { background: var(--red-soft); color: var(--red); }
+
+  /* Toggle switch */
+  .toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; cursor: pointer; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-track {
+    position: absolute; inset: 0;
+    background: var(--ink-5); border-radius: 11px;
+    transition: background .2s;
+  }
+  .toggle input:checked ~ .toggle-track { background: var(--green); }
+  .toggle-thumb {
+    position: absolute; top: 3px; left: 3px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    transition: transform .2s var(--ease);
+  }
+  .toggle input:checked ~ .toggle-thumb { transform: translateX(18px); }
+
+  /* Channel row */
+  .channel-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 0; border-bottom: 1px solid var(--rule-soft);
+  }
+  .channel-row:last-child { border-bottom: none; }
+  .channel-icon { width: 36px; height: 36px; border-radius: var(--r); display: grid; place-items: center; font-size: 18px; flex-shrink: 0; }
+  .channel-icon.wecom { background: #E8F5E9; }
+  .channel-icon.email { background: #E3F2FD; }
+  .channel-icon.app { background: var(--blue-soft); }
+  .channel-info { flex: 1; }
+  .channel-name { font-size: 13.5px; font-weight: 500; }
+  .channel-desc { font-size: 12px; color: var(--ink-3); }
+  .channel-status { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .status-dot.green { background: var(--green); }
+  .status-dot.gray { background: var(--ink-5); }
+
+  /* Schedule row */
+  .schedule-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--rule-soft); }
+  .schedule-row:last-child { border-bottom: none; }
+  .schedule-label { font-size: 13px; font-weight: 500; min-width: 120px; }
+  .schedule-time { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); }
+  .schedule-time input { border: 1px solid var(--rule); border-radius: var(--r); padding: 4px 8px; font-size: 13px; color: var(--ink); background: #fff; width: 90px; text-align: center; }
+  .schedule-note { font-size: 12px; color: var(--ink-4); margin-left: 12px; }
+
+  /* Priority table */
+  .priority-table { width: 100%; border-collapse: collapse; }
+  .priority-table th { text-align: left; font-size: 11px; font-weight: 500; color: var(--ink-4); letter-spacing: 0.06em; text-transform: uppercase; font-family: var(--font-en); padding: 8px 0; border-bottom: 1px solid var(--rule); }
+  .priority-table td { padding: 12px 0; border-bottom: 1px solid var(--rule-soft); font-size: 13px; vertical-align: middle; }
+  .priority-table tr:last-child td { border-bottom: none; }
+  .priority-name { font-weight: 500; }
+  .priority-channel { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--paper-soft); color: var(--ink-3); }
+  .priority-badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 500; }
+  .priority-badge.p1 { background: var(--red-soft); color: var(--red); }
+  .priority-badge.p2 { background: var(--orange-soft); color: var(--orange); }
+  .priority-badge.p3 { background: var(--blue-soft); color: var(--blue); }
+
+  /* Aggregate */
+  .aggregate-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--rule-soft); }
+  .aggregate-row:last-child { border-bottom: none; }
+  .aggregate-info { flex: 1; }
+  .aggregate-label { font-size: 13.5px; font-weight: 500; }
+  .aggregate-desc { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+  .aggregate-select { border: 1px solid var(--rule); border-radius: var(--r); padding: 5px 10px; font-size: 13px; color: var(--ink); background: #fff; cursor: pointer; }
+
+  /* Save bar */
+  .save-bar {
+    position: sticky; bottom: 0;
+    background: rgba(250,250,248,0.92);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--rule);
+    padding: 14px 24px;
+    display: flex; align-items: center; gap: 12px;
+    margin: 20px -40px -32px;
+  }
+  .save-bar .hint { font-size: 12px; color: var(--ink-4); flex: 1; }
+  .btn { padding: 7px 16px; border-radius: var(--r); font-size: 13px; font-weight: 500; transition: opacity .12s; }
+  .btn:hover { opacity: 0.85; }
+  .btn.primary { background: var(--ink); color: var(--paper); }
+  .btn.ghost { background: transparent; color: var(--ink-3); border: 1px solid var(--rule); }
+  .btn.ghost:hover { background: var(--paper-soft); color: var(--ink-2); }
+
+  /* Toast */
+  #toast-container { position: fixed; top: 72px; right: 24px; z-index: 200; display: flex; flex-direction: column; gap: 8px; }
+  .toast { padding: 10px 16px; background: var(--ink); color: var(--paper); border-radius: var(--r-lg); font-size: 12.5px; box-shadow: var(--shadow-lg); opacity: 0; transform: translateY(-8px); transition: opacity .2s, transform .2s; max-width: 300px; display: flex; align-items: center; gap: 8px; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--paper); flex-shrink: 0; }
+  .toast.success::before { background: #34D399; }
+
+  /* Hint box */
+  .hint-box { background: var(--blue-soft); border: 1px solid #BFDBFE; border-radius: var(--r-lg); padding: 14px 18px; display: flex; gap: 12px; margin-bottom: 24px; }
+  .hint-box .icon { font-size: 18px; flex-shrink: 0; }
+  .hint-box .text { font-size: 13px; color: #1E40AF; line-height: 1.65; }
+  .hint-box .text strong { font-weight: 600; }
+
+  /* Stats row */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: #fff; border: 1px solid var(--rule); border-radius: var(--r-xl); padding: 18px 20px; box-shadow: var(--shadow-sm); }
+  .stat-card .value { font-family: var(--font-mono); font-size: 28px; font-weight: 600; color: var(--ink); }
+  .stat-card .label { font-size: 12.5px; color: var(--ink-3); margin-top: 4px; }
+  .stat-card .sub { font-size: 11.5px; color: var(--green); margin-top: 6px; }
+  .stat-card .sub.neg { color: var(--orange); }
+
+  /* Mention */
+  .mention { color: var(--blue); font-weight: 500; border-bottom: 1px dotted var(--blue); }
+</style>
+</head>
+<body>
+
+<!-- Top Nav -->
+<div class="top-nav">
+  <div class="brand">
+    <div class="brand-logo">N</div>
+    <div class="brand-name">SSV Nexus</div>
+    <div class="brand-sep"></div>
+    <div class="brand-sub">通知触达配置 Demo</div>
+  </div>
+  <div class="nav-tabs">
+    <div class="nav-tab" onclick="location.href='thread-demo.html'">讨论</div>
+    <div class="nav-tab" onclick="location.href='notification-demo.html'">通知</div>
+    <div class="nav-tab active">触达</div>
+  </div>
+  <div class="nav-right">
+    <div class="icon-btn" onclick="location.href='notification-demo.html'" title="通知">🔔</div>
+    <div class="av-me">我</div>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">配置项</div>
+      <div class="sidebar-item active">
+        <span class="icon">🔔</span>
+        <div>
+          <div>通知总开关</div>
+          <div class="desc">开启 / 关闭所有通知</div>
+        </div>
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">📱</span>
+        <div>
+          <div>通知渠道</div>
+          <div class="desc">企微 / 邮件 / 站内</div>
+        </div>
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">⏰</span>
+        <div>
+          <div>免打扰时段</div>
+          <div class="desc">静默时间配置</div>
+        </div>
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">🎯</span>
+        <div>
+          <div>优先级策略</div>
+          <div class="desc">按事件类型分配渠道</div>
+        </div>
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">🔗</span>
+        <div>
+          <div>聚合策略</div>
+          <div class="desc">通知聚合与汇总</div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">数据</div>
+      <div class="sidebar-item">
+        <span class="icon">📊</span>
+        <div>
+          <div>触达统计</div>
+          <div class="desc">本周数据概览</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+
+    <div class="page-header">
+      <div class="page-title">通知触达配置</div>
+      <div class="page-desc">配置通知的接收渠道、优先级和聚合策略</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="value">312</div>
+        <div class="label">本周触达总数</div>
+        <div class="sub">↑ 12% vs 上周</div>
+      </div>
+      <div class="stat-card">
+        <div class="value">94%</div>
+        <div class="label">企微触达率</div>
+        <div class="sub">↑ 3%</div>
+      </div>
+      <div class="stat-card">
+        <div class="value">2.3s</div>
+        <div class="label">平均触达延迟</div>
+        <div class="sub neg">↑ 0.4s</div>
+      </div>
+      <div class="stat-card">
+        <div class="value">87%</div>
+        <div class="label">用户打开率</div>
+        <div class="sub">↑ 5%</div>
+      </div>
+    </div>
+
+    <!-- Hint -->
+    <div class="hint-box">
+      <div class="icon">💡</div>
+      <div class="text">
+        <strong>新版通知策略：</strong>讨论升级后，通知链路已重构为 5 类事件 × 3 个优先级 × 3 条渠道的矩阵。
+        <span class="mention">@提及</span> 触达优先级最高，将绕过静默时段直接推送。
+      </div>
+    </div>
+
+    <!-- 1. Notification Master Toggle -->
+    <div class="settings-card">
+      <div class="card-head">
+        <div class="icon">🔔</div>
+        <div class="title">通知总开关</div>
+        <div class="desc">控制所有通知渠道的总体状态</div>
+      </div>
+      <div class="card-body">
+        <div class="toggle-row">
+          <div class="toggle-icon">🔔</div>
+          <div class="toggle-info">
+            <div class="toggle-label">接收通知 <span class="toggle-badge on">已开启</span></div>
+            <div class="toggle-desc">关闭后将暂停所有站内、企微和邮件通知</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" checked onchange="showToast('🔔 通知已' + (this.checked ? '开启' : '关闭'))">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-icon">💬</div>
+          <div class="toggle-info">
+            <div class="toggle-label">讨论相关通知 <span class="toggle-badge on">已开启</span></div>
+            <div class="toggle-desc">新讨论、回复、@提及、转待办等事件通知</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" checked onchange="showToast('💬 讨论通知已' + (this.checked ? '开启' : '关闭'))">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-icon">🔴</div>
+          <div class="toggle-info">
+            <div class="toggle-label">免打扰模式 <span class="toggle-badge off">已关闭</span></div>
+            <div class="toggle-desc">开启后将在指定时段静默所有普通通知（@提及 除外）</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" onchange="showToast('⏰ 免打扰已' + (this.checked ? '开启' : '关闭'))">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Notification Channels -->
+    <div class="settings-card">
+      <div class="card-head">
+        <div class="icon">📱</div>
+        <div class="title">通知渠道</div>
+        <div class="desc">选择接收通知的渠道</div>
+      </div>
+      <div class="card-body">
+        <div class="channel-row">
+          <div class="channel-icon wecom">💬</div>
+          <div class="channel-info">
+            <div class="channel-name">企业微信 Bot</div>
+            <div class="channel-desc">通过企业微信机器人推送，支持文本、卡片和链接</div>
+          </div>
+          <div class="channel-status">
+            <div class="status-dot green"></div>
+            <span style="font-size:12px;color:var(--green);font-weight:500;">已连接</span>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" checked onchange="showToast('企微 Bot 已' + (this.checked ? '开启' : '关闭'))">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="channel-row">
+          <div class="channel-icon email">✉️</div>
+          <div class="channel-info">
+            <div class="channel-name">邮件通知</div>
+            <div class="channel-desc">发送至你的企业邮箱，支持摘要和详情模式</div>
+          </div>
+          <div class="channel-status">
+            <div class="status-dot green"></div>
+            <span style="font-size:12px;color:var(--green);font-weight:500;">已绑定</span>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" checked onchange="showToast('邮件通知已' + (this.checked ? '开启' : '关闭'))">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="channel-row">
+          <div class="channel-icon app">🔔</div>
+          <div class="channel-info">
+            <div class="channel-name">站内通知</div>
+            <div class="channel-desc">Nexus 内实时通知，红点提醒，支持 @我 筛选</div>
+          </div>
+          <div class="channel-status">
+            <div class="status-dot green"></div>
+            <span style="font-size:12px;color:var(--green);font-weight:500;">始终在线</span>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" checked disabled>
+            <div class="toggle-track" style="background:var(--green);"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Quiet Hours -->
+    <div class="settings-card">
+      <div class="card-head">
+        <div class="icon">🌙</div>
+        <div class="title">免打扰时段</div>
+        <div class="desc">普通通知在此期间静默，<span class="mention">@提及</span> 除外</div>
+      </div>
+      <div class="card-body">
+        <div class="schedule-row">
+          <div class="schedule-label">工作日</div>
+          <div class="schedule-time">
+            <input type="time" value="22:00" /> —
+            <input type="time" value="09:00" />
+          </div>
+          <div class="schedule-note">仅对 P2/P3 级通知生效，P1（@提及高优先）不受影响</div>
+        </div>
+        <div class="schedule-row">
+          <div class="schedule-label">周末</div>
+          <div class="schedule-time">
+            <input type="time" value="23:00" /> —
+            <input type="time" value="10:00" />
+          </div>
+          <div class="schedule-note">全天视为休息时间</div>
+        </div>
+        <div class="schedule-row">
+          <div class="schedule-label">例外日期</div>
+          <div class="schedule-time" style="flex:1;">
+            <input type="date" value="2026-05-01" style="width:140px;" />
+            <span style="font-size:12px;color:var(--ink-4);">节假日自动关闭免打扰</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Priority Matrix -->
+    <div class="settings-card">
+      <div class="card-head">
+        <div class="icon">🎯</div>
+        <div class="title">优先级触达策略</div>
+        <div class="desc">不同事件类型匹配不同触达优先级</div>
+      </div>
+      <div class="card-body">
+        <table class="priority-table">
+          <thead>
+            <tr>
+              <th style="width:25%;">事件类型</th>
+              <th style="width:15%;">优先级</th>
+              <th style="width:35%;">触达渠道</th>
+              <th style="width:25%;">备注</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="priority-name">@提及（被点名）</span></td>
+              <td><span class="priority-badge p1">P1</span></td>
+              <td><span class="priority-channel">💬 企微</span> <span class="priority-channel">🔔 站内</span></td>
+              <td style="font-size:12px;color:var(--ink-3);">绕过免打扰，实时推送</td>
+            </tr>
+            <tr>
+              <td><span class="priority-name">讨论转待办（指派给我）</span></td>
+              <td><span class="priority-badge p1">P1</span></td>
+              <td><span class="priority-channel">💬 企微</span> <span class="priority-channel">🔔 站内</span></td>
+              <td style="font-size:12px;color:var(--ink-3);">立即通知，标注待处理</td>
+            </tr>
+            <tr>
+              <td><span class="priority-name">我参与的讨论有新回复</span></td>
+              <td><span class="priority-badge p2">P2</span></td>
+              <td><span class="priority-channel">💬 企微</span> <span class="priority-channel">✉️ 邮件</span></td>
+              <td style="font-size:12px;color:var(--ink-3);">免打扰时段静默，整点汇总</td>
+            </tr>
+            <tr>
+              <td><span class="priority-name">我订阅的 Topic 有新讨论</span></td>
+              <td><span class="priority-badge p3">P3</span></td>
+              <td><span class="priority-channel">✉️ 邮件</span></td>
+              <td style="font-size:12px;color:var(--ink-3);">每日简报汇总，不打扰</td>
+            </tr>
+            <tr>
+              <td><span class="priority-name">待办完成（关联讨论）</span></td>
+              <td><span class="priority-badge p2">P2</span></td>
+              <td><span class="priority-channel">🔔 站内</span></td>
+              <td style="font-size:12px;color:var(--ink-3);">仅站内通知，不推送</td>
+            </tr>
+            <tr>
+              <td><span class="priority-name">Bot 整点推送</span></td>
+              <td><span class="priority-badge p3">P3</span></td>
+              <td><span class="priority-channel">💬 企微</span></td>
+              <td style="font-size:12px;color:var(--ink-3);">09:00 / 18:00 固定推送</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 5. Aggregation -->
+    <div class="settings-card">
+      <div class="card-head">
+        <div class="icon">🔗</div>
+        <div class="title">通知聚合策略</div>
+        <div class="desc">减少通知轰炸，合并相似事件</div>
+      </div>
+      <div class="card-body">
+        <div class="aggregate-row">
+          <div class="aggregate-info">
+            <div class="aggregate-label">同 Topic 讨论聚合</div>
+            <div class="aggregate-desc">同一 Topic 下 5 分钟内的讨论合并为一条通知</div>
+          </div>
+          <select class="aggregate-select" onchange="showToast('聚合策略已更新')">
+            <option>5 分钟内合并</option>
+            <option>15 分钟内合并</option>
+            <option>30 分钟内合并</option>
+            <option>不合并</option>
+          </select>
+        </div>
+        <div class="aggregate-row">
+          <div class="aggregate-info">
+            <div class="aggregate-label">同 Thread 回复聚合</div>
+            <div class="aggregate-desc">同一讨论串内的连续回复聚合展示</div>
+          </div>
+          <select class="aggregate-select" onchange="showToast('聚合策略已更新')">
+            <option>3 条后合并</option>
+            <option>5 条后合并</option>
+            <option>全部展开</option>
+          </select>
+        </div>
+        <div class="aggregate-row">
+          <div class="aggregate-info">
+            <div class="aggregate-label">企微 Bot 整点推送</div>
+            <div class="aggregate-desc">将整点前的通知汇总为一条卡片推送</div>
+          </div>
+          <select class="aggregate-select" onchange="showToast('聚合策略已更新')">
+            <option>09:00 / 18:00</option>
+            <option>每日 18:00 一次</option>
+            <option>实时推送（不聚合）</option>
+          </select>
+        </div>
+        <div class="aggregate-row">
+          <div class="aggregate-info">
+            <div class="aggregate-label">每日讨论简报</div>
+            <div class="aggregate-desc">每日 09:00 发送前一天的讨论参与摘要</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" checked onchange="showToast('每日简报已' + (this.checked ? '开启' : '关闭'))">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Save bar -->
+    <div class="save-bar">
+      <div class="hint">有未保存的更改</div>
+      <button class="btn ghost" onclick="resetConfig()">重置</button>
+      <button class="btn primary" onclick="saveConfig()">保存配置</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast-container"></div>
+
+<script>
+function showToast(msg, type) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + (type || '');
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => toast.classList.add('show'), 10);
+  setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 200); }, 2500);
+}
+
+function saveConfig() {
+  showToast('✓ 配置已保存', 'success');
+}
+
+function resetConfig() {
+  showToast('配置已重置为默认值');
+}
+</script>
+</body>
+</html>
