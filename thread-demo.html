@@ -3,1942 +3,1090 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>SSV Nexus · 讨论模块升级 Demo</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@500;700&display=swap" rel="stylesheet" />
+<title>SSV Nexus · 讨论模块升级（Thread）交互演示</title>
 <style>
-  /* ============================================================
-   *  Nexus Design Tokens (from ssv-nexus-prototype)
-   * ============================================================ */
-  :root {
-    --paper:        #FAFAF8;
-    --paper-warm:   #F5F3EE;
-    --paper-soft:   #F0EEE8;
-    --ink:          #1A1918;
-    --ink-2:        #3C3A37;
-    --ink-3:        #7A7874;
-    --ink-4:        #A8A6A2;
-    --ink-5:        #CFCCC6;
-    --rule:         #EBE8E2;
-    --rule-soft:    #F2F0EA;
-    --accent:       #1F1D1B;
-    --accent-soft:  #EDEAE3;
-    --danger:       #9E3C36;
-    --danger-soft:  #F8EDEB;
-    --like:         #C74A3E;
-    --blue:         #2563EB;
-    --blue-soft:    #EFF6FF;
-    --green:        #059669;
-    --green-soft:   #ECFDF5;
-    --orange:       #C2410C;
-    --orange-soft:  #FFF7ED;
-
-    --r-sm: 4px;
-    --r:    8px;
-    --r-lg: 12px;
-    --r-xl: 16px;
-
-    --font-zh: "Noto Sans SC", "PingFang SC", -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-en: "DM Sans", "Noto Sans SC", sans-serif;
-    --font-serif: "Noto Serif SC", Georgia, serif;
-    --font-mono: "JetBrains Mono", SFMono-Regular, Consolas, monospace;
-
-    --ease: cubic-bezier(.3,.7,.4,1);
-    --ease-spring: cubic-bezier(.2,.9,.3,1.2);
-
-    --shadow-sm: 0 1px 3px rgba(20,19,18,0.06), 0 1px 2px rgba(20,19,18,0.04);
-    --shadow:    0 4px 12px rgba(20,19,18,0.08), 0 1px 3px rgba(20,19,18,0.04);
-    --shadow-lg: 0 12px 32px rgba(20,19,18,0.10), 0 4px 8px rgba(20,19,18,0.05);
-  }
-
+  /* 基底：继承自 ssv-nexus-prototype/mention-visibility-demo.html */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
   body {
-    font-family: var(--font-en), var(--font-zh);
-    font-size: 14px;
-    line-height: 1.6;
-    background: var(--paper);
-    color: var(--ink);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    background: #f5f6f8; color: #1f2328; font-size: 14px; line-height: 1.6; overflow: hidden;
   }
-  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; padding: 0; }
-  a { color: inherit; text-decoration: none; }
-  input, textarea { font-family: inherit; outline: none; }
-  ::selection { background: var(--ink); color: var(--paper); }
+  .topbar { height: 56px; background: #fff; border-bottom: 1px solid #e6e8eb; display: flex; align-items: center; padding: 0 20px; position: relative; z-index: 50; }
+  .logo { width: 32px; height: 32px; border-radius: 8px; background: #1f2328; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 10px; }
+  .brand { font-weight: 600; font-size: 15px; margin-right: 16px; }
+  .slogan { color: #6b7280; font-size: 12px; border-left: 1px solid #e6e8eb; padding-left: 12px; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+  .bell { position: relative; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #f5f6f8; cursor: pointer; font-size: 18px; }
+  .bell:hover { background:#eef2ff; }
+  .bell .dot { position: absolute; top: 8px; right: 8px; width: 10px; height: 10px; border-radius: 50%; background: #ef4444; border: 2px solid #f5f6f8; display:none; }
+  .bell.has-unread .dot { display:block; }
+  .me { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .me .avatar { width: 30px; height: 30px; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; background:#bbf7d0; color:#065f46; }
 
-  /* ==================== Top Nav ==================== */
-  .top-nav {
-    height: 56px;
-    background: #fff;
-    border-bottom: 1px solid var(--rule);
-    display: flex; align-items: center;
-    padding: 0 32px; gap: 14px;
-    position: sticky; top: 0; z-index: 50;
-  }
-  .brand {
-    display: flex; align-items: center; gap: 10px;
-  }
-  .brand-logo {
-    width: 30px; height: 30px; border-radius: var(--r);
-    background: var(--ink); color: var(--paper);
-    display: grid; place-items: center;
-    font-weight: 700; font-size: 13px;
-    font-family: var(--font-en);
-    letter-spacing: -0.02em;
-  }
-  .brand-name {
-    font-family: var(--font-serif);
-    font-size: 15px; font-weight: 500;
-    letter-spacing: 0.01em;
-  }
-  .brand-sep {
-    width: 1px; height: 14px;
-    background: var(--rule);
-  }
-  .brand-sub {
-    font-size: 12px; color: var(--ink-4);
-    letter-spacing: 0.02em;
-  }
-  .nav-tabs {
-    display: flex; align-items: center; gap: 4px;
-    margin-left: 24px;
-  }
-  .nav-tab {
-    padding: 6px 12px; border-radius: var(--r);
-    font-size: 13px; color: var(--ink-3);
-    transition: background .15s, color .15s;
-    cursor: pointer;
-    letter-spacing: 0.01em;
-  }
-  .nav-tab:hover { background: var(--paper-soft); color: var(--ink-2); }
-  .nav-tab.active { background: var(--ink); color: var(--paper); font-weight: 500; }
-  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-  .icon-btn {
-    width: 32px; height: 32px; border-radius: var(--r);
-    display: grid; place-items: center;
-    color: var(--ink-3); font-size: 16px;
-    transition: background .15s, color .15s;
-    cursor: pointer; position: relative;
-  }
-  .icon-btn:hover { background: var(--paper-soft); color: var(--ink); }
-  .icon-btn .badge {
-    position: absolute; top: 5px; right: 5px;
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--like);
-    border: 2px solid #fff;
-  }
-
-  /* ==================== Layout ==================== */
-  .layout {
-    display: grid;
-    grid-template-columns: 240px 1fr;
-    min-height: calc(100vh - 56px);
-  }
-
-  /* ==================== Sidebar ==================== */
-  .sidebar {
-    background: #fff;
-    border-right: 1px solid var(--rule);
-    padding: 20px 12px;
-    overflow-y: auto;
-  }
-  .sidebar-section { margin-bottom: 24px; }
-  .sidebar-label {
-    font-size: 10.5px; color: var(--ink-4);
-    letter-spacing: 0.08em; text-transform: uppercase;
-    font-family: var(--font-en);
-    padding: 4px 8px 8px;
-    font-weight: 500;
-  }
-  .sidebar-item {
-    display: flex; align-items: center; gap: 9px;
-    padding: 8px 10px; border-radius: var(--r);
-    font-size: 13px; color: var(--ink-2);
-    cursor: pointer; transition: background .12s;
-    letter-spacing: 0.01em;
-  }
-  .sidebar-item:hover { background: var(--paper-soft); }
-  .sidebar-item.active { background: var(--ink); color: #fff; }
-  .sidebar-item .icon { font-size: 15px; width: 20px; text-align: center; }
-  .sidebar-item .count {
-    margin-left: auto;
-    font-family: var(--font-mono);
-    font-size: 11px; color: var(--ink-4);
-    background: var(--paper-soft);
-    padding: 1px 6px; border-radius: 999px;
-  }
-  .sidebar-item.active .count { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); }
-
-  /* ==================== Main Content ==================== */
-  .main { overflow-y: auto; padding: 32px 40px; }
+  .layout { display: grid; grid-template-columns: 220px 1fr; height: calc(100vh - 56px); }
+  .sidebar { background: #fff; border-right: 1px solid #e6e8eb; padding: 18px 12px; overflow-y:auto; }
+  .sidebar h4 { font-size: 11px; color: #9ca3af; letter-spacing: 1px; padding: 8px 10px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; color: #4b5563; cursor: pointer; font-size: 13px; margin-bottom: 2px; }
+  .nav-item:hover { background: #f5f6f8; }
+  .nav-item.active { background: #1f2328; color: #fff; }
+  .main { overflow-y: auto; padding: 28px 36px 80px; position: relative; }
   .page { display: none; }
-  .page.active { display: block; }
+  .page.active { display: block; animation: fade .25s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px);} to {opacity:1; transform:none;} }
 
-  /* ==================== Page Header ==================== */
-  .page-header {
-    margin-bottom: 28px;
-  }
-  .page-title {
-    font-family: var(--font-serif);
-    font-size: 22px; font-weight: 500;
-    letter-spacing: -0.005em;
-    color: var(--ink);
-    margin-bottom: 4px;
-  }
-  .page-desc {
-    font-size: 13px; color: var(--ink-3);
-    letter-spacing: 0.01em;
-  }
+  .guide { background:#1f2328; color:#fff; border-radius:10px; padding:12px 16px; font-size:13px; margin-bottom: 18px; display:flex; align-items:center; gap:12px; }
+  .guide .step { background:#fff; color:#1f2328; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; }
+  .guide .tip { color:#d1d5db; font-size:12px; margin-left:auto; }
+  .guide strong { color: #fff; }
+  .guide code { background: rgba(255,255,255,.12); padding: 1px 6px; border-radius: 4px; color: #fff; font-size: 11.5px; }
 
-  /* ==================== Topic List ==================== */
-  .topic-list {
-    background: #fff;
-    border: 1px solid var(--rule);
-    border-radius: var(--r-xl);
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-  }
-  .topic-row {
-    padding: 18px 22px;
-    border-bottom: 1px solid var(--rule-soft);
-    display: flex; align-items: center; gap: 14px;
-    cursor: pointer;
-    transition: background .12s;
-  }
-  .topic-row:last-child { border-bottom: none; }
-  .topic-row:hover { background: var(--paper-soft); }
-  .topic-icon {
-    width: 40px; height: 40px; border-radius: var(--r);
-    display: grid; place-items: center;
-    font-size: 20px; flex-shrink: 0;
-  }
-  .topic-icon.bug    { background: #FEE2E2; }
-  .topic-icon.feat   { background: #DBEAFE; }
-  .topic-icon.design { background: #F3E8FF; }
-  .topic-icon.ops    { background: #D1FAE5; }
-  .topic-icon.doc    { background: #FEF3C7; }
-  .topic-body { flex: 1; min-width: 0; }
-  .topic-title {
-    font-size: 14px; font-weight: 600;
-    color: var(--ink);
-    margin-bottom: 3px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .topic-meta {
-    font-size: 12px; color: var(--ink-4);
-    display: flex; align-items: center; gap: 8px;
-  }
-  .topic-meta .dot { color: var(--ink-5); }
-  .topic-stat {
-    display: flex; align-items: center; gap: 14px;
-    font-size: 12px; color: var(--ink-4);
-    font-family: var(--font-mono);
-    flex-shrink: 0;
-  }
-  .topic-stat .item { display: flex; align-items: center; gap: 4px; }
+  .scene-tabs { display: flex; gap: 6px; margin-bottom: 18px; border-bottom: 1px solid #e6e8eb; }
+  .scene-tab { padding: 8px 14px; font-size: 13px; color: #6b7280; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .scene-tab:hover { color: #1f2328; }
+  .scene-tab.active { color: #1f2328; border-bottom-color: #1f2328; font-weight: 500; }
 
-  /* ==================== Event Detail ==================== */
-  .breadcrumb {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 12px; color: var(--ink-4);
-    margin-bottom: 18px;
-  }
-  .breadcrumb a { cursor: pointer; color: var(--ink-4); transition: color .12s; }
-  .breadcrumb a:hover { color: var(--ink); }
-  .breadcrumb .sep { color: var(--ink-5); }
-  .breadcrumb .current { color: var(--ink-2); font-weight: 500; }
+  .topic-list { background:#fff; border:1px solid #e6e8eb; border-radius:12px; overflow:hidden; }
+  .topic-row { padding: 16px 20px; border-bottom: 1px solid #f1f3f5; display:flex; align-items:flex-start; gap:14px; cursor:pointer; transition: background .15s; }
+  .topic-row:last-child { border-bottom:0; }
+  .topic-row:hover { background:#f9fafb; }
+  .topic-row.highlight { background:#fffbeb; outline:2px solid #fde68a; outline-offset:-2px; }
+  .topic-emoji { font-size:22px; }
+  .topic-meta { flex:1; }
+  .topic-title { font-size:14.5px; font-weight:600; margin-bottom:4px; }
+  .topic-sub { font-size:12px; color:#6b7280; }
+  .topic-badges { display:flex; gap:6px; margin-top:8px; flex-wrap: wrap; }
+  .topic-badges span { background:#f5f6f8; color:#4b5563; font-size:11.5px; padding:2px 8px; border-radius:999px; }
+  .topic-badges span.hot { background:#fef2f2; color:#b91c1c; }
+  .topic-arrow { color:#9ca3af; align-self:center; }
 
-  .event-card {
-    background: #fff;
-    border: 1px solid var(--rule);
-    border-radius: var(--r-xl);
-    padding: 26px 28px;
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 20px;
-  }
-  .event-title {
-    font-family: var(--font-serif);
-    font-size: 18px; font-weight: 500;
-    letter-spacing: -0.005em;
-    line-height: 1.4;
-    margin-bottom: 10px;
-  }
-  .event-meta {
-    font-size: 12.5px; color: var(--ink-4);
-    display: flex; align-items: center; gap: 8px;
-    margin-bottom: 14px;
-  }
-  .event-meta .dot { color: var(--ink-5); }
-  .event-body {
-    font-size: 14px; line-height: 1.8;
-    color: var(--ink-2);
-    white-space: pre-wrap;
-  }
-  .event-tags { display: flex; gap: 6px; margin-top: 14px; flex-wrap: wrap; }
-  .tag {
-    font-size: 11.5px; padding: 3px 9px;
-    border-radius: 999px;
-    background: var(--paper-soft);
-    color: var(--ink-3);
-    letter-spacing: 0.02em;
-  }
+  .breadcrumb { font-size:12.5px; color:#6b7280; margin-bottom:14px; }
+  .breadcrumb a { color:#6b7280; cursor:pointer; }
+  .breadcrumb a:hover { color:#1f2328; }
+  .event-card { background: #fff; border: 1px solid #e6e8eb; border-radius: 12px; padding: 22px 24px; margin-bottom: 16px; }
+  .event-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+  .event-meta { font-size: 12px; color: #6b7280; margin-bottom: 14px; }
+  .event-body { font-size: 13.5px; color: #374151; line-height: 1.8; }
+  .event-body ol { padding-left: 20px; margin: 10px 0; }
+  .event-body ol li { margin: 6px 0; }
+  .reactions { display: flex; gap: 8px; margin: 16px 0 6px; }
+  .reaction { background: #f5f6f8; border-radius: 999px; padding: 5px 12px; font-size: 12.5px; cursor: pointer; user-select: none; }
+  .reaction:hover { background: #eef2ff; }
+  .reaction.active { background:#eff6ff; color:#2563eb; }
 
-  /* ==================== Reactions ==================== */
-  .reactions { display: flex; gap: 6px; margin: 18px 0 0; flex-wrap: wrap; }
-  .reaction {
-    display: inline-flex; align-items: center; gap: 5px;
-    background: #fff;
-    border: 1px solid var(--rule);
-    border-radius: 999px;
-    padding: 5px 12px;
-    font-size: 12.5px;
-    cursor: pointer;
-    transition: border-color .12s, background .12s, color .12s;
-    user-select: none;
-    color: var(--ink-3);
-  }
-  .reaction:hover { border-color: var(--ink-4); background: var(--paper-soft); color: var(--ink-2); }
-  .reaction.active { border-color: var(--blue); background: var(--blue-soft); color: var(--blue); }
-  .reaction .emoji { font-size: 14px; }
-  .reaction .count { font-family: var(--font-mono); font-size: 11.5px; }
+  .discuss-title { font-size: 14px; font-weight: 600; color: #1f2328; margin: 26px 0 14px; display:flex; align-items:center; gap:8px; }
+  .discuss-title .count { color:#9ca3af; font-weight:400; font-size: 13px; }
+  .discuss-title .rename-tag { margin-left: auto; font-size: 11px; font-weight: 500; background:#eff6ff; color:#2563eb; padding:2px 8px; border-radius: 999px; }
 
-  /* ==================== Thread Section ==================== */
-  .thread-section {
-    background: #fff;
-    border: 1px solid var(--rule);
-    border-radius: var(--r-xl);
-    box-shadow: var(--shadow-sm);
-    overflow: hidden;
-  }
-  .thread-header {
-    padding: 20px 24px 18px;
-    border-bottom: 1px solid var(--rule-soft);
-    display: flex; align-items: center; gap: 10px;
-  }
-  .thread-header-title {
-    font-family: var(--font-serif);
-    font-size: 15px; font-weight: 500;
-    color: var(--ink);
-  }
-  .thread-header-count {
-    font-family: var(--font-mono);
-    font-size: 11.5px; color: var(--ink-4);
-    background: var(--paper-soft);
-    padding: 2px 8px; border-radius: 999px;
-  }
-  .thread-header-actions { margin-left: auto; display: flex; gap: 6px; }
+  .thread { background:#fff; border: 1px solid #e6e8eb; border-radius: 12px; margin-bottom: 12px; overflow: hidden; transition: box-shadow .2s, border-color .2s; }
+  .thread:hover { border-color: #d1d5db; box-shadow: 0 2px 8px rgba(0,0,0,.04); }
+  .thread.expanded { border-color: #c7d2fe; box-shadow: 0 2px 12px rgba(99,102,241,.08); }
+  .thread-head { padding: 14px 18px; display: flex; align-items: flex-start; gap: 12px; cursor: pointer; }
+  .thread-head .avatar-sm { width: 36px; height: 36px; font-size: 13px; }
+  .thread-head .tbody { flex: 1; min-width: 0; }
+  .thread-head .t-line1 { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; font-size: 13.5px; }
+  .thread-head .t-author { font-weight: 600; color: #1f2328; }
+  .thread-head .t-dept { color: #9ca3af; font-size: 12px; font-weight: 400; }
+  .thread-head .t-time { color: #9ca3af; font-size: 12px; margin-left: auto; }
+  .thread-head .t-preview { font-size: 13.5px; color: #374151; line-height: 1.65; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .thread.expanded .thread-head .t-preview { -webkit-line-clamp: unset; display: block; }
+  .thread-foot { display: flex; align-items: center; gap: 14px; padding: 0 18px 12px; font-size: 12px; color: #6b7280; flex-wrap: wrap; }
+  .thread-foot .chip { display:inline-flex; align-items:center; gap:4px; padding: 2px 8px; border-radius: 999px; background: #f5f6f8; }
+  .thread-foot .chip.reply-count { background: #eff6ff; color: #2563eb; font-weight: 500; }
+  .thread-foot .chip.todo-done { background:#ecfdf5; color:#059669; }
+  .thread-foot .chip.waiting { background:#fff7ed; color:#c2410c; }
+  .thread-foot .reply-btn { margin-left: auto; color: #2563eb; cursor: pointer; font-weight: 500; }
+  .thread-foot .reply-btn:hover { text-decoration: underline; }
 
-  /* Thread Item */
-  .thread-item {
-    border-bottom: 1px solid var(--rule-soft);
-    transition: background .12s;
-  }
-  .thread-item:last-child { border-bottom: none; }
-  .thread-item:hover { background: var(--paper-soft); }
-  .thread-item.highlight {
-    background: #FFFBEB;
-    outline: 2px solid #FDE68A;
-    outline-offset: -2px;
-  }
+  .thread-replies { display: none; padding: 0 18px 6px; border-top: 1px dashed #e6e8eb; margin-top: 4px; padding-top: 10px; }
+  .thread.expanded .thread-replies { display: block; animation: fade .2s ease; }
+  .reply { display: flex; gap: 10px; padding: 10px 0; position: relative; transition: background .2s; border-radius: 6px; }
+  .reply.focused { background:#fffbeb; outline:2px solid #fde68a; padding: 10px; }
+  .reply + .reply { border-top: 1px solid #f1f3f5; }
+  .reply .avatar-sm { width: 30px; height: 30px; font-size: 12px; flex-shrink: 0; }
+  .reply-body { flex: 1; min-width: 0; position: relative; }
+  .reply-author { font-size: 13px; font-weight: 600; }
+  .reply-author .dept { color: #9ca3af; font-weight: 400; font-size: 12px; margin-left: 6px; }
+  .reply-author .time { color: #9ca3af; font-weight: 400; font-size: 11.5px; margin-left: 6px; }
+  .reply-text { font-size: 13.5px; color:#374151; margin-top: 2px; line-height: 1.65; }
+  .reply-text .mention-tag { color: #2563eb; background: #eff6ff; padding: 0 4px; border-radius: 4px; font-weight: 500; }
+  .reply-actions { opacity: 0; transition: opacity .15s; display: flex; gap: 6px; align-items: center; position: absolute; top: 6px; right: 0; background:#fff; border:1px solid #e6e8eb; border-radius: 6px; padding: 2px; }
+  .reply:hover .reply-actions { opacity: 1; }
+  .reply-actions button { background: none; border: 0; cursor: pointer; padding: 4px 8px; font-size: 12.5px; color: #6b7280; border-radius: 4px; }
+  .reply-actions button:hover { background:#f5f6f8; color:#1f2328; }
+  .sys-msg { text-align: center; font-size: 12px; color: #9ca3af; padding: 10px 0; }
+  .sys-msg::before, .sys-msg::after { content: ''; display: inline-block; width: 40px; border-top: 1px dashed #e6e8eb; vertical-align: middle; margin: 0 10px; }
+  .sys-msg.todo-created { color: #059669; }
+  .sys-msg.todo-done { color: #2563eb; }
 
-  .thread-main {
-    padding: 16px 24px;
-    display: flex; gap: 12px;
-  }
-  .thread-avatar {
-    width: 32px; height: 32px; border-radius: 50%;
-    display: grid; place-items: center;
-    font-family: var(--font-zh);
-    font-weight: 500; font-size: 12.5px;
-    flex-shrink: 0;
-  }
-  .thread-body { flex: 1; min-width: 0; }
-  .thread-meta {
-    display: flex; align-items: baseline; gap: 8px;
-    margin-bottom: 5px;
-  }
-  .thread-author { font-size: 13.5px; font-weight: 600; }
-  .thread-dept { font-size: 12px; color: var(--ink-3); font-weight: 400; }
-  .thread-time { margin-left: auto; font-size: 11.5px; color: var(--ink-4); font-family: var(--font-mono); }
-  .thread-title {
-    font-size: 13.5px; font-weight: 500;
-    color: var(--ink);
-    margin-bottom: 6px;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .thread-title .dot-icon {
-    width: 16px; height: 16px; border-radius: 50%;
-    background: var(--ink-5);
-    display: grid; place-items: center;
-    font-size: 9px; color: #fff; flex-shrink: 0;
-  }
-  .thread-text {
-    font-size: 13px; line-height: 1.7;
-    color: var(--ink-2);
-    white-space: pre-wrap;
-  }
-  .mention {
-    color: var(--blue); font-weight: 500;
-    border-bottom: 1px dotted var(--blue);
-    padding-bottom: 0;
-    cursor: default;
-  }
-  .thread-images {
-    display: flex; gap: 8px; margin-top: 10px;
-    flex-wrap: wrap;
-  }
-  .thread-images img {
-    max-width: 200px; max-height: 140px;
-    border-radius: var(--r);
-    border: 1px solid var(--rule);
-    cursor: zoom-in;
-    transition: opacity .15s;
-  }
-  .thread-images img:hover { opacity: 0.88; }
+  .thread-reply-box { display: none; padding: 8px 18px 14px; background:#fafbfc; border-top: 1px solid #f1f3f5; }
+  .thread.expanded .thread-reply-box { display: block; }
+  .thread-reply-box .rbox { background:#fff; border:1px solid #e6e8eb; border-radius: 8px; padding: 8px 10px; display:flex; align-items:center; gap:8px; }
+  .thread-reply-box input { flex: 1; border: 0; outline: none; font-size: 13px; background: transparent; }
+  .thread-reply-box .at-btn, .thread-reply-box .send-btn-sm { background: none; border: 0; cursor: pointer; font-size: 13px; color: #6b7280; padding: 4px 10px; border-radius: 6px; }
+  .thread-reply-box .at-btn:hover { background:#f5f6f8; color:#1f2328; }
+  .thread-reply-box .send-btn-sm { background:#1f2328; color:#fff; font-weight: 500; font-size: 12.5px; }
+  .thread-reply-box .send-btn-sm:hover { background:#000; }
 
-  .thread-actions {
-    display: flex; align-items: center; gap: 4px;
-    margin-top: 10px; flex-wrap: wrap;
-  }
-  .act-btn {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 3px 0;
-    font-size: 12px; color: var(--ink-3);
-    letter-spacing: 0.01em;
-    transition: color .12s;
-  }
-  .act-btn:hover { color: var(--ink); }
-  .act-btn.active { color: var(--ink); font-weight: 500; }
-  .act-btn.danger:hover { color: var(--danger); }
-  .act-btn .cnt {
-    font-family: var(--font-mono);
-    font-size: 11px; color: var(--ink-4);
-    margin-left: 2px;
-  }
-  .act-sep {
-    display: inline-block; margin: 0 8px;
-    color: var(--ink-5); font-size: 12px;
-  }
-  .own-actions {
-    display: inline-flex; align-items: center;
-    opacity: 0; pointer-events: none;
-    transition: opacity .15s;
-  }
-  .thread-item:hover .own-actions { opacity: 1; pointer-events: auto; }
+  .new-thread { background:#fff; border: 1.5px dashed #d1d5db; border-radius: 12px; padding: 14px 18px; display:flex; gap: 12px; align-items: flex-start; margin-top: 14px; transition: border-color .2s, background .2s; }
+  .new-thread:focus-within { border-color: #2563eb; background:#fff; border-style: solid; }
+  .new-thread .avatar-sm { width: 36px; height: 36px; font-size: 13px; flex-shrink: 0; }
+  .new-thread .nt-body { flex: 1; }
+  .new-thread textarea { width: 100%; border: 0; outline: none; font-family: inherit; font-size: 13.5px; resize: none; line-height: 1.6; min-height: 24px; background: transparent; padding: 4px 0; }
+  .new-thread .nt-foot { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+  .new-thread .nt-hint { font-size: 12px; color: #9ca3af; }
+  .new-thread .nt-hint kbd { background:#f5f6f8; border:1px solid #e6e8eb; border-radius: 4px; padding: 0 5px; font-size: 11px; font-family: monospace; }
+  .new-thread .send-btn { margin-left: auto; background: #1f2328; color: #fff; border: 0; padding: 7px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight:500; }
+  .new-thread .send-btn:hover { background:#000; }
+  .new-thread .send-btn:disabled { background:#d1d5db; cursor: not-allowed; }
 
-  /* Task badge */
-  .task-badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 11px; padding: 2px 8px;
-    border-radius: 999px;
-    background: var(--green-soft);
-    color: var(--green);
-    font-weight: 500;
-    letter-spacing: 0.02em;
-  }
-  .task-badge .icon { font-size: 10px; }
+  .avatar-sm { width: 32px; height: 32px; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; flex-shrink:0; }
 
-  /* Thread replies (collapsed) */
-  .thread-replies-preview {
-    padding: 0 24px 14px 68px;
-  }
-  .replies-chips {
-    display: flex; flex-direction: column; gap: 5px;
-  }
-  .reply-chip {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 12px; color: var(--ink-3);
-    padding: 5px 10px;
-    background: var(--paper-soft);
-    border-radius: var(--r);
-    transition: background .12s;
-  }
-  .reply-chip:hover { background: var(--paper-warm); }
-  .reply-chip .avatar-sm {
-    width: 20px; height: 20px; border-radius: 50%;
-    display: grid; place-items: center;
-    font-size: 9px; font-weight: 600;
-    flex-shrink: 0;
-  }
-  .reply-chip .text { flex: 1; min-width: 0; }
-  .reply-chip .name { font-weight: 500; color: var(--ink-2); }
-  .reply-chip .content { color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .reply-chip .time { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-4); flex-shrink: 0; }
-  .expand-thread {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 5px 10px;
-    font-size: 12px; color: var(--blue);
-    border-radius: var(--r);
-    transition: background .12s;
-    cursor: pointer;
-    font-weight: 500;
-  }
-  .expand-thread:hover { background: var(--blue-soft); }
+  .ctx-menu { position: fixed; background: #fff; border: 1px solid #e6e8eb; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.1); z-index: 100; min-width: 160px; padding: 4px 0; display: none; }
+  .ctx-menu.show { display: block; animation: fade .12s; }
+  .ctx-menu .mi { padding: 8px 14px; font-size: 13px; color: #374151; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .ctx-menu .mi:hover { background:#f5f6f8; }
+  .ctx-menu .mi.danger { color: #dc2626; }
+  .ctx-menu .sep { height: 1px; background:#f1f3f5; margin: 4px 0; }
 
-  /* Expanded Thread replies */
-  .thread-replies-full {
-    display: none;
-    padding: 0 24px 18px 68px;
-  }
-  .thread-replies-full.expanded { display: block; }
-  .thread-replies-full.collapsed { display: none; }
+  .modal-mask { position: fixed; inset: 0; background: rgba(31,35,40,.3); z-index: 300; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+  .modal-mask.show { display: flex; animation: fade .2s; }
+  .modal { background:#fff; border-radius: 14px; width: 440px; max-width: 90vw; box-shadow: 0 20px 60px rgba(0,0,0,.2); overflow: hidden; }
+  .modal-head { padding: 18px 22px 12px; }
+  .modal-head h3 { font-size: 16px; font-weight: 600; }
+  .modal-head .sub { color: #6b7280; font-size: 12.5px; margin-top: 4px; }
+  .modal-body { padding: 6px 22px 18px; }
+  .modal-body .quoted { background:#f9fafb; border-left: 3px solid #d1d5db; padding: 8px 12px; font-size: 12.5px; color: #4b5563; border-radius: 4px; margin-bottom: 14px; }
+  .modal-body label { display: block; font-size: 12px; color: #6b7280; margin: 10px 0 4px; letter-spacing: .5px; }
+  .modal-body input, .modal-body select { width: 100%; border: 1px solid #e6e8eb; border-radius: 8px; padding: 8px 12px; font-size: 13.5px; font-family: inherit; background:#fff; outline: none; }
+  .modal-body input:focus, .modal-body select:focus { border-color: #2563eb; }
+  .modal-foot { padding: 12px 22px 18px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #f1f3f5; }
+  .modal-foot .btn-ghost { background:#fff; color:#4b5563; border:1px solid #d1d5db; padding: 7px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+  .modal-foot .btn-ghost:hover { background:#f5f6f8; }
+  .modal-foot .btn-primary { background:#1f2328; color:#fff; border:0; padding: 7px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 500; }
+  .modal-foot .btn-primary:hover { background:#000; }
 
-  .reply-item {
-    display: flex; gap: 10px;
-    padding: 10px 0;
-    border-top: 1px solid var(--rule-soft);
-  }
-  .reply-item:first-child { border-top: none; }
-  .reply-item .avatar {
-    width: 26px; height: 26px; border-radius: 50%;
-    display: grid; place-items: center;
-    font-size: 11px; font-weight: 600;
-    flex-shrink: 0;
-  }
-  .reply-body { flex: 1; min-width: 0; }
-  .reply-meta {
-    display: flex; align-items: baseline; gap: 6px;
-    margin-bottom: 3px;
-  }
-  .reply-author { font-size: 12.5px; font-weight: 600; }
-  .reply-dept { font-size: 11.5px; color: var(--ink-3); }
-  .reply-time { margin-left: auto; font-size: 11px; color: var(--ink-4); font-family: var(--font-mono); }
-  .reply-content { font-size: 13px; line-height: 1.7; color: var(--ink-2); white-space: pre-wrap; }
-  .reply-actions { margin-top: 6px; display: flex; gap: 4px; }
-  .reply-actions .act-btn { font-size: 11.5px; }
+  .todo-block { background:#fff; border: 1px solid #e6e8eb; border-radius: 12px; padding: 16px 20px; margin-top: 20px; }
+  .todo-block h4 { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .todo-block h4 .tag-count { background:#f5f6f8; color:#4b5563; font-size: 11.5px; padding: 2px 8px; border-radius: 999px; font-weight: 500; }
+  .todo-item { display: flex; gap: 10px; padding: 10px 0; align-items: flex-start; border-top: 1px solid #f1f3f5; }
+  .todo-item:first-of-type { border-top: 0; }
+  .todo-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; margin-top: 3px; accent-color: #1f2328; }
+  .todo-item .ti-body { flex: 1; font-size: 13.5px; }
+  .todo-item .ti-meta { font-size: 12px; color: #6b7280; margin-top: 4px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .todo-item .ti-meta .src-tag { background:#eff6ff; color:#2563eb; font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 500; }
+  .todo-item .ti-meta .src-tag a { color: #2563eb; text-decoration: underline; cursor: pointer; }
+  .todo-item.done .ti-body { color: #9ca3af; text-decoration: line-through; }
+  .todo-item.done .src-tag { opacity: .6; }
 
-  /* ==================== Inline Reply Composer ==================== */
-  .inline-reply-composer {
-    margin-top: 12px;
-    display: none;
-    padding: 12px 14px;
-    background: var(--paper-warm);
-    border-radius: var(--r-lg);
-    border: 1px solid var(--rule);
-  }
-  .inline-reply-composer.active { display: block; }
-  .inline-reply-composer textarea {
-    width: 100%; border: none; resize: none;
-    min-height: 52px;
-    font-size: 13px; line-height: 1.65;
-    background: transparent; color: var(--ink);
-  }
-  .inline-reply-composer textarea::placeholder { color: var(--ink-4); }
-  .inline-reply-composer .composer-footer {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-top: 8px; padding-top: 8px;
-    border-top: 1px solid var(--rule);
-  }
-  .inline-reply-composer .composer-tools { display: flex; gap: 2px; }
-  .inline-reply-composer .tool-btn {
-    width: 24px; height: 24px; border-radius: var(--r-sm);
-    display: grid; place-items: center;
-    color: var(--ink-3); font-size: 13px; font-weight: 500;
-    transition: background .12s, color .12s;
-  }
-  .inline-reply-composer .tool-btn:hover { background: var(--paper-soft); color: var(--ink); }
-  .inline-reply-composer .composer-right { display: flex; align-items: center; gap: 6px; }
-  .btn-sm {
-    padding: 5px 12px; border-radius: var(--r-sm);
-    font-size: 12px; font-weight: 500;
-    letter-spacing: 0.02em;
-    transition: opacity .12s;
-  }
-  .btn-sm:hover { opacity: 0.85; }
-  .btn-sm.primary { background: var(--ink); color: var(--paper); }
-  .btn-sm.ghost { background: transparent; color: var(--ink-3); }
-  .btn-sm.ghost:hover { color: var(--ink); background: var(--paper-soft); }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .compare .col { background: #fff; border: 1px solid #e6e8eb; border-radius: 12px; padding: 16px 18px; }
+  .compare .col.old { background:#fafafa; }
+  .compare .col.new { border-color: #c7d2fe; }
+  .col-head { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #f1f3f5; }
+  .col-head .badge-old { background:#f3f4f6; color:#6b7280; font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 500; }
+  .col-head .badge-new { background:#eff6ff; color:#2563eb; font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 500; }
+  .old-comment { display: flex; gap: 10px; padding: 8px 0; border-top: 1px solid #f1f3f5; }
+  .old-comment:first-of-type { border-top: 0; }
+  .old-comment .avatar-sm { width: 26px; height: 26px; font-size: 11px; }
+  .old-comment .ob { flex: 1; font-size: 12.5px; line-height: 1.6; }
+  .old-comment .oa { font-weight: 600; font-size: 12.5px; }
+  .old-comment .oa .d { color: #9ca3af; font-weight: 400; font-size: 11.5px; margin-left: 4px; }
+  .old-comment .txt { color: #374151; margin-top: 1px; }
+  .old-comment .tm { color: #9ca3af; font-size: 11px; margin-top: 2px; }
+  .mini-thread { border: 1px solid #e6e8eb; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; background:#fff; }
+  .mini-thread .mh { font-size: 12.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+  .mini-thread .mh .d { color: #9ca3af; font-weight: 400; font-size: 11.5px; }
+  .mini-thread .mt { font-size: 12.5px; color: #374151; margin: 4px 0 6px; line-height: 1.55; }
+  .mini-thread .mf { font-size: 11.5px; color: #6b7280; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .mini-thread .mf .chip { background:#eff6ff; color:#2563eb; padding: 1px 6px; border-radius: 999px; font-weight: 500; }
+  .mini-thread .mf .chip.done { background:#ecfdf5; color:#059669; }
 
-  /* ==================== New Thread Composer ==================== */
-  .new-thread-btn {
-    display: flex; align-items: center; gap: 8px;
-    width: 100%; padding: 14px 24px;
-    border-top: 1px solid var(--rule-soft);
-    font-size: 13px; color: var(--ink-3);
-    cursor: pointer;
-    transition: background .12s, color .12s;
-    letter-spacing: 0.01em;
-  }
-  .new-thread-btn:hover { background: var(--paper-soft); color: var(--ink); }
-  .new-thread-btn .icon { font-size: 16px; }
+  .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); background: #1f2328; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 13px; z-index: 999; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .toast.show { opacity: 1; }
 
-  .new-thread-composer {
-    display: none;
-    padding: 16px 24px 20px;
-    background: var(--paper-warm);
-    border-top: 1px solid var(--rule);
-  }
-  .new-thread-composer.active { display: block; }
-  .new-thread-composer textarea {
-    width: 100%; border: 1px solid var(--rule);
-    border-radius: var(--r-lg);
-    padding: 10px 14px;
-    font-size: 13.5px; line-height: 1.7;
-    background: #fff; color: var(--ink);
-    resize: none; min-height: 72px;
-    transition: border-color .15s;
-  }
-  .new-thread-composer textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
-  .new-thread-composer textarea::placeholder { color: var(--ink-4); }
-  .new-thread-composer .composer-footer {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-top: 10px;
-  }
-  .new-thread-composer .composer-tools { display: flex; gap: 2px; }
-
-  /* ==================== Avatar Colors ==================== */
-  .av-suri       { background: #E3DCCE; color: #5C4E36; }
-  .av-liufang    { background: #DEDAD2; color: #4F4C45; }
-  .av-zhaoyu     { background: #E8D8D3; color: #6C4A43; }
-  .av-sunjian    { background: #D9E0D6; color: #4C5B4C; }
-  .av-zhangming  { background: #DAD9E0; color: #4E4C66; }
-  .av-wangqiang  { background: #E6DBCE; color: #6F5D42; }
-  .av-me         { background: var(--ink); color: var(--paper); }
-
-  /* ==================== Toast ==================== */
-  #toast-container {
-    position: fixed; top: 72px; right: 24px;
-    z-index: 200;
-    display: flex; flex-direction: column; gap: 8px;
-  }
-  .toast {
-    padding: 10px 16px;
-    background: var(--ink); color: var(--paper);
-    border-radius: var(--r-lg);
-    font-size: 12.5px; letter-spacing: 0.01em;
-    box-shadow: var(--shadow-lg);
-    opacity: 0; transform: translateY(-8px);
-    transition: opacity .2s var(--ease), transform .2s var(--ease);
-    max-width: 300px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .toast.show { opacity: 1; transform: translateY(0); }
-  .toast::before {
-    content: "";
-    width: 5px; height: 5px; border-radius: 50%;
-    background: var(--paper); flex-shrink: 0;
-  }
-  .toast.success::before { background: #34D399; }
-  .toast.warn::before { background: #FBBF24; }
-
-  /* ==================== Convert to Task Modal ==================== */
-  .modal-backdrop {
-    position: fixed; inset: 0;
-    background: rgba(20,19,18,0.32);
-    backdrop-filter: blur(2px);
-    display: none; place-items: center;
-    z-index: 300;
-  }
-  .modal-backdrop.active { display: grid; }
-  .modal-box {
-    background: var(--paper);
-    border: 1px solid var(--rule);
-    border-radius: var(--r-xl);
-    padding: 28px 32px 24px;
-    min-width: 400px; max-width: 480px;
-    box-shadow: var(--shadow-lg);
-  }
-  .modal-box h3 {
-    font-family: var(--font-serif);
-    font-size: 16px; font-weight: 500;
-    margin-bottom: 6px;
-    letter-spacing: -0.003em;
-  }
-  .modal-box .desc {
-    font-size: 13px; color: var(--ink-3);
-    line-height: 1.65;
-    margin-bottom: 18px;
-  }
-  .form-row {
-    margin-bottom: 14px;
-  }
-  .form-label {
-    display: block; font-size: 12px; font-weight: 500;
-    color: var(--ink-3); margin-bottom: 6px;
-    letter-spacing: 0.02em;
-  }
-  .form-input {
-    width: 100%; border: 1px solid var(--rule);
-    border-radius: var(--r);
-    padding: 8px 12px;
-    font-size: 13.5px; color: var(--ink);
-    background: #fff;
-    transition: border-color .15s, box-shadow .15s;
-  }
-  .form-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
-  .modal-actions {
-    display: flex; justify-content: flex-end; gap: 6px;
-    margin-top: 20px;
-  }
-  .btn-modal {
-    padding: 7px 16px; border-radius: var(--r);
-    font-size: 13px; font-weight: 500;
-    letter-spacing: 0.02em;
-    transition: opacity .12s, transform .1s;
-  }
-  .btn-modal:hover { opacity: 0.85; }
-  .btn-modal:active { transform: scale(0.98); }
-  .btn-modal.primary { background: var(--ink); color: var(--paper); }
-  .btn-modal.ghost { color: var(--ink-3); }
-  .btn-modal.ghost:hover { color: var(--ink); background: var(--paper-soft); }
-
-  /* ==================== Mode Switch Banner ==================== */
-  .mode-switch {
-    background: linear-gradient(135deg, #1f2328 0%, #2d3138 100%);
-    border-radius: var(--r-lg);
-    padding: 14px 20px;
-    margin-bottom: 28px;
-    display: flex; align-items: center; gap: 16px;
-  }
-  .mode-switch-label {
-    font-size: 11.5px; color: rgba(255,255,255,0.6);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    font-family: var(--font-en);
-    flex-shrink: 0;
-  }
-  .mode-switch-btns { display: flex; gap: 6px; }
-  .mode-btn {
-    padding: 5px 14px; border-radius: 999px;
-    font-size: 12.5px; font-weight: 500;
-    color: rgba(255,255,255,0.5);
-    border: 1px solid rgba(255,255,255,0.12);
-    cursor: pointer;
-    transition: all .2s;
-    letter-spacing: 0.01em;
-  }
-  .mode-btn:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
-  .mode-btn.active {
-    background: #fff; color: var(--ink);
-    border-color: #fff;
-  }
-  .mode-switch-hint {
-    margin-left: auto;
-    font-size: 12px; color: rgba(255,255,255,0.4);
-    font-style: italic;
-  }
-
-  /* ==================== Diff Banner ==================== */
-  .diff-banner {
-    background: #FFFBEB;
-    border: 1px solid #FDE68A;
-    border-radius: var(--r-lg);
-    padding: 14px 18px;
-    margin-bottom: 20px;
-    display: flex; align-items: flex-start; gap: 12px;
-  }
-  .diff-banner .icon { font-size: 18px; flex-shrink: 0; }
-  .diff-banner .text { font-size: 13px; color: #92400E; line-height: 1.6; }
-  .diff-banner .text strong { font-weight: 600; }
-  .diff-banner .text ul { margin-top: 6px; padding-left: 16px; }
-  .diff-banner .text li { margin-bottom: 3px; }
-
-  /* ==================== Notification ==================== */
-  .notif-pop {
-    position: fixed; top: 72px; right: 20px; width: 360px;
-    background: #fff; border: 1px solid var(--rule);
-    border-radius: var(--r-xl);
-    box-shadow: var(--shadow-lg);
-    padding: 16px 18px;
-    z-index: 200;
-    transform: translateX(400px); opacity: 0;
-    transition: transform .35s var(--ease-spring), opacity .25s;
-  }
+  .notif-pop { position: fixed; top: 72px; right: 20px; width: 360px; background:#fff; border:1px solid #e6e8eb; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,.15); padding: 14px 16px; z-index: 200; transform: translateX(420px); opacity: 0; transition: transform .35s cubic-bezier(.2,.9,.3,1.2), opacity .25s; }
   .notif-pop.show { transform: translateX(0); opacity: 1; }
-  .notif-pop .head {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 13px; color: var(--ink-3);
-    margin-bottom: 10px;
-  }
-  .notif-pop .head strong { color: var(--ink); }
-  .notif-pop .close {
-    margin-left: auto; cursor: pointer;
-    color: var(--ink-4); font-size: 18px; line-height: 1;
-  }
-  .notif-pop .body { font-size: 13.5px; color: var(--ink-2); line-height: 1.65; }
-  .notif-pop .preview {
-    font-size: 12.5px; color: var(--ink-3);
-    background: var(--paper-soft);
-    border-left: 3px solid var(--rule);
-    padding: 6px 10px; margin-top: 8px;
-    border-radius: 0 var(--r-sm) var(--r-sm) 0;
-    font-style: italic;
-  }
-  .notif-pop .cta { margin-top: 12px; display: flex; gap: 6px; }
+  .notif-pop .np-head { display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:12.5px; color:#6b7280; }
+  .notif-pop .np-head strong { color:#1f2328; }
+  .notif-pop .np-head .close { margin-left:auto; cursor:pointer; color:#9ca3af; font-size: 18px; line-height: 1; }
+  .notif-pop .np-body { font-size: 13.5px; color:#374151; line-height: 1.65; }
+  .notif-pop .np-body .preview { color:#6b7280; font-size:12.5px; background:#f9fafb; border-left:3px solid #d1d5db; padding:6px 10px; margin-top:8px; border-radius:4px; }
+  .notif-pop .np-cta { margin-top: 10px; display:flex; gap:6px; }
+  .notif-pop button { font-size: 12.5px; padding: 6px 12px; border-radius: 6px; cursor: pointer; border:0; font-weight: 500; }
+  .btn-primary-pop { background:#1f2328; color:#fff; }
+  .btn-primary-pop:hover { background:#000; }
 
-  /* ==================== Mention Popup ==================== */
-  #mention-popup {
-    position: absolute;
-    z-index: 100;
-    background: var(--paper);
-    border: 1px solid var(--rule);
-    border-radius: var(--r-lg);
-    box-shadow: var(--shadow-lg);
-    padding: 4px;
-    min-width: 220px;
-    max-height: 240px;
-    overflow-y: auto;
-    display: none;
-  }
-  #mention-popup.active { display: block; }
-  .mention-item {
-    display: flex; align-items: center; gap: 8px;
-    padding: 7px 10px;
-    border-radius: var(--r);
-    cursor: pointer;
-    transition: background .1s;
-  }
-  .mention-item:hover, .mention-item.focus { background: var(--paper-warm); }
-  .mention-item .avatar { width: 22px; height: 22px; font-size: 10px; }
-  .mention-item .name { font-size: 12.5px; font-weight: 500; }
-  .mention-item .dept { color: var(--ink-4); font-size: 11px; }
+  .flow-step { background:#fff; border:1px solid #e6e8eb; border-radius: 12px; padding: 16px 18px; margin-bottom: 10px; display: flex; gap: 14px; align-items: flex-start; position: relative; }
+  .flow-step::before { content: ''; position: absolute; left: 34px; top: 100%; width: 2px; height: 12px; background: #d1d5db; }
+  .flow-step:last-of-type::before { display: none; }
+  .flow-num { flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; background:#1f2328; color:#fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+  .flow-num.done { background:#059669; }
+  .flow-body { flex: 1; }
+  .flow-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .flow-desc { font-size: 12.5px; color: #6b7280; line-height: 1.6; }
+  .flow-desc code { background:#f5f6f8; padding: 1px 6px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 11.5px; }
 
-  /* ==================== Comparison ==================== */
-  .comparison-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
-    margin-top: 24px;
-  }
-  .comparison-card {
-    background: #fff; border: 1px solid var(--rule);
-    border-radius: var(--r-xl);
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-  }
-  .comparison-card .card-header {
-    padding: 14px 18px;
-    font-size: 12px; font-weight: 600;
-    letter-spacing: 0.04em; text-transform: uppercase;
-    font-family: var(--font-en);
-    display: flex; align-items: center; gap: 8px;
-  }
-  .comparison-card.old .card-header { background: #FEF2F2; color: #991B1B; }
-  .comparison-card.new .card-header { background: #F0FDF4; color: #166534; }
-  .comparison-card .card-body { padding: 16px 18px; }
-  .comparison-item {
-    display: flex; align-items: flex-start; gap: 10px;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--rule-soft);
-    font-size: 13px;
-  }
-  .comparison-item:last-child { border-bottom: none; }
-  .comparison-item .icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
-  .comparison-item .label { font-weight: 500; color: var(--ink-2); min-width: 70px; }
-  .comparison-item .old { color: var(--ink-3); text-decoration: line-through; }
-  .comparison-item .new { color: var(--green); font-weight: 500; }
-
-  /* ==================== Flow Diagram ==================== */
-  .flow-section {
-    background: #fff; border: 1px solid var(--rule);
-    border-radius: var(--r-xl); padding: 24px;
-    box-shadow: var(--shadow-sm); margin-top: 24px;
-  }
-  .flow-title {
-    font-family: var(--font-serif);
-    font-size: 15px; font-weight: 500;
-    margin-bottom: 20px;
-  }
-  .flow-row {
-    display: flex; align-items: center; gap: 0;
-    flex-wrap: wrap;
-  }
-  .flow-node {
-    padding: 8px 16px;
-    background: var(--paper-soft);
-    border: 1px solid var(--rule);
-    border-radius: var(--r);
-    font-size: 13px; font-weight: 500;
-    color: var(--ink-2);
-    white-space: nowrap;
-  }
-  .flow-node.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-  .flow-node.blue { background: var(--blue-soft); color: var(--blue); border-color: #BFDBFE; }
-  .flow-node.green { background: var(--green-soft); color: var(--green); border-color: #A7F3D0; }
-  .flow-arrow {
-    font-size: 18px; color: var(--ink-4);
-    padding: 0 8px;
-  }
-  .flow-sub {
-    margin-top: 12px;
-    display: flex; align-items: center; gap: 0;
-  }
-  .flow-sub .flow-node { font-size: 12px; padding: 6px 12px; }
-  .flow-sub .flow-arrow { font-size: 14px; padding: 0 6px; }
-
-  /* ==================== Animations ==================== */
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: none; }
-  }
-  .page.active { animation: fadeIn .2s var(--ease); }
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateX(12px); }
-    to   { opacity: 1; transform: none; }
-  }
-  .thread-item { animation: slideIn .15s var(--ease); }
+  .section-head { font-size: 18px; font-weight: 600; margin: 8px 0 14px; }
+  .section-head .sub { font-size: 13px; color: #6b7280; font-weight: 400; margin-left: 10px; }
 </style>
 </head>
 <body>
 
-<!-- ==================== Top Navigation ==================== -->
-<div class="top-nav">
-  <div class="brand">
-    <div class="brand-logo">N</div>
-    <div class="brand-name">SSV Nexus</div>
-    <div class="brand-sep"></div>
-    <div class="brand-sub">讨论模块升级 Demo</div>
-  </div>
-  <div class="nav-tabs">
-    <div class="nav-tab active" onclick="switchTab('topic-list', this)">话题列表</div>
-    <div class="nav-tab" onclick="switchTab('event-detail', this)">Event 详情</div>
-    <div class="nav-tab" onclick="switchTab('comparison', this)">新旧对比</div>
-    <div class="nav-tab" onclick="switchTab('flow', this)">交互流程</div>
-  </div>
-  <div class="nav-right">
-    <div class="icon-btn" onclick="toggleNotif()" title="通知">
-      🔔
-      <div class="badge"></div>
-    </div>
-    <div class="avatar av-me" style="width:30px;height:30px;font-size:12px;border-radius:50%;display:grid;place-items:center;font-weight:600;">我</div>
+<div class="topbar">
+  <div class="logo">N</div>
+  <div class="brand">SSV Nexus</div>
+  <div class="slogan">透明即上下文，上下文即生产力</div>
+  <div class="topbar-right">
+    <div class="bell" id="bell" onclick="toast('通知中心见 notification-demo.html')">🔔<span class="dot"></span></div>
+    <div class="me"><div class="avatar">钟</div><span>钟嘉辉</span></div>
   </div>
 </div>
 
 <div class="layout">
+  <aside class="sidebar">
+    <h4>TOPICS</h4>
+    <div class="nav-item active" onclick="goScene('topicList')">● ALL</div>
+    <div class="nav-item" onclick="toast('MY 页面未覆盖')">◎ MY</div>
+    <h4 style="margin-top:14px;">TOOLS</h4>
+    <div class="nav-item" onclick="toast('Skills 见参考原型')">⚡ Skills</div>
+    <div class="nav-item" onclick="toast('插件未覆盖')">🧩 插件</div>
+    <h4 style="margin-top:14px;">ADMIN</h4>
+    <div class="nav-item" onclick="toast('定位未覆盖')">💡 定位</div>
+    <div class="nav-item" onclick="toast('宪章未覆盖')">📜 宪章</div>
+    <div class="nav-item" onclick="toast('设置未覆盖')">⚙️ 设置</div>
+  </aside>
 
-  <!-- ==================== Sidebar ==================== -->
-  <div class="sidebar">
-    <div class="sidebar-section">
-      <div class="sidebar-label">筛选</div>
-      <div class="sidebar-item active">
-        <span class="icon">📋</span> 全部
-        <span class="count">24</span>
-      </div>
-      <div class="sidebar-item">
-        <span class="icon">⚡</span> 待处理
-        <span class="count">8</span>
-      </div>
-      <div class="sidebar-item">
-        <span class="icon">✅</span> 已完成
-        <span class="count">12</span>
-      </div>
-      <div class="sidebar-item">
-        <span class="icon">🔄</span> 关注中
-        <span class="count">4</span>
-      </div>
+  <main class="main">
+
+    <div class="scene-tabs">
+      <div class="scene-tab active" data-scene="topicList" onclick="goScene('topicList')">话题列表</div>
+      <div class="scene-tab" data-scene="event" onclick="goScene('event')">Event 讨论区</div>
+      <div class="scene-tab" data-scene="compare" onclick="goScene('compare')">新旧模式对比</div>
+      <div class="scene-tab" data-scene="flow" onclick="goScene('flow')">全链路流程</div>
     </div>
-    <div class="sidebar-section">
-      <div class="sidebar-label">分类</div>
-      <div class="sidebar-item">
-        <span class="icon">🐛</span> Bug
-        <span class="count">6</span>
-      </div>
-      <div class="sidebar-item">
-        <span class="icon">✨</span> 功能
-        <span class="count">10</span>
-      </div>
-      <div class="sidebar-item">
-        <span class="icon">🎨</span> 设计
-        <span class="count">5</span>
-      </div>
-      <div class="sidebar-item">
-        <span class="icon">📖</span> 文档
-        <span class="count">3</span>
-      </div>
-    </div>
-  </div>
 
-  <!-- ==================== Main ==================== -->
-  <div class="main">
-
-    <!-- ===== PAGE: Topic List ===== -->
-    <div class="page active" id="page-topic-list">
-      <div class="page-header">
-        <div class="page-title">话题列表</div>
-        <div class="page-desc">共有 24 个话题，其中 8 个有待处理讨论</div>
+    <!-- ===== 页面 1：Topic 列表 ===== -->
+    <section class="page active" id="page-topicList">
+      <div class="guide">
+        <span class="step">1 / 4</span>
+        <span>你是 <strong>钟嘉辉</strong>（技术架构）。点下方 <strong>SSV Nexus 产品进展</strong> 体验 Thread 讨论。</span>
+        <span class="tip">评论 → 讨论</span>
       </div>
-
-      <!-- Mode switch -->
-      <div class="mode-switch">
-        <div class="mode-switch-label">视图模式</div>
-        <div class="mode-switch-btns">
-          <div class="mode-btn active" onclick="setMode('thread', this)">🧵 Thread 模式</div>
-          <div class="mode-btn" onclick="setMode('classic', this)">💬 经典模式</div>
-        </div>
-        <div class="mode-switch-hint">Thread 模式：每个讨论独立成串，互不干扰</div>
-      </div>
-
       <div class="topic-list">
-        <div class="topic-row" onclick="viewEvent(1)">
-          <div class="topic-icon bug">🐛</div>
-          <div class="topic-body">
-            <div class="topic-title">文档上传 OCR 识别失败</div>
-            <div class="topic-meta">
-              发起人：Suri · 基础产品组
-              <span class="dot">·</span> 5 个讨论
-              <span class="dot">·</span> 2 个子任务
+        <div class="topic-row highlight" onclick="goScene('event')">
+          <div class="topic-emoji">📄</div>
+          <div class="topic-meta">
+            <div class="topic-title">SSV Nexus 产品进展和一些思考</div>
+            <div class="topic-sub">suriwang(王昕) · SSV 产品 · 最近更新 刚刚</div>
+            <div class="topic-badges">
+              <span>3 事件</span>
+              <span>3 条讨论</span>
+              <span class="hot">🔥 1 讨论激增</span>
+              <span>2 条待办</span>
             </div>
           </div>
-          <div class="topic-stat">
-            <span class="item">💬 <strong>5</strong></span>
-            <span class="item">📌 <strong>2</strong></span>
-          </div>
+          <div class="topic-arrow">→</div>
         </div>
-        <div class="topic-row" onclick="viewEvent(2)">
-          <div class="topic-icon feat">✨</div>
-          <div class="topic-body">
-            <div class="topic-title">讨论模块升级：Thread 机制引入</div>
-            <div class="topic-meta">
-              发起人：Suri · 基础产品组
-              <span class="dot">·</span> 3 个讨论
-              <span class="dot">·</span> 1 个子任务
-            </div>
+        <div class="topic-row" onclick="toast('该 Topic Demo 未覆盖')">
+          <div class="topic-emoji">📊</div>
+          <div class="topic-meta">
+            <div class="topic-title">Q2 产品路线图</div>
+            <div class="topic-sub">李四 · 战略中心 · 2 天前</div>
+            <div class="topic-badges"><span>3 事件</span><span>5 条讨论</span></div>
           </div>
-          <div class="topic-stat">
-            <span class="item">💬 <strong>3</strong></span>
-            <span class="item">📌 <strong>1</strong></span>
-          </div>
+          <div class="topic-arrow">→</div>
         </div>
-        <div class="topic-row" onclick="viewEvent(3)">
-          <div class="topic-icon design">🎨</div>
-          <div class="topic-body">
-            <div class="topic-title">Nexus 交互规范 v2.0 修订</div>
-            <div class="topic-meta">
-              发起人：赵宇 · 设计组
-              <span class="dot">·</span> 7 个讨论
-              <span class="dot">·</span> 3 个子任务
-            </div>
+        <div class="topic-row" onclick="toast('该 Topic Demo 未覆盖')">
+          <div class="topic-emoji">🌱</div>
+          <div class="topic-meta">
+            <div class="topic-title">乡村振兴 · 试点复盘</div>
+            <div class="topic-sub">张三 · 为村发展实验室 · 4 天前</div>
+            <div class="topic-badges"><span>2 事件</span><span>8 条讨论</span></div>
           </div>
-          <div class="topic-stat">
-            <span class="item">💬 <strong>7</strong></span>
-            <span class="item">📌 <strong>3</strong></span>
-          </div>
-        </div>
-        <div class="topic-row" onclick="viewEvent(4)">
-          <div class="topic-icon ops">🚀</div>
-          <div class="topic-body">
-            <div class="topic-title">通知触达链路性能优化</div>
-            <div class="topic-meta">
-              发起人：刘芳 · 后端开发组
-              <span class="dot">·</span> 4 个讨论
-              <span class="dot">·</span> 0 个子任务
-            </div>
-          </div>
-          <div class="topic-stat">
-            <span class="item">💬 <strong>4</strong></span>
-            <span class="item">📌 <strong>0</strong></span>
-          </div>
-        </div>
-        <div class="topic-row" onclick="viewEvent(5)">
-          <div class="topic-icon doc">📖</div>
-          <div class="topic-body">
-            <div class="topic-title">API 文档更新与接入指南</div>
-            <div class="topic-meta">
-              发起人：王强 · 技术运营组
-              <span class="dot">·</span> 2 个讨论
-              <span class="dot">·</span> 1 个子任务
-            </div>
-          </div>
-          <div class="topic-stat">
-            <span class="item">💬 <strong>2</strong></span>
-            <span class="item">📌 <strong>1</strong></span>
-          </div>
+          <div class="topic-arrow">→</div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- ===== PAGE: Event Detail ===== -->
-    <div class="page" id="page-event-detail">
+    <!-- ===== 页面 2：Event 讨论区 ===== -->
+    <section class="page" id="page-event">
       <div class="breadcrumb">
-        <a onclick="switchTab('topic-list')">话题列表</a>
-        <span class="sep">›</span>
-        <span class="current">文档上传 OCR 识别失败</span>
+        <a onclick="goScene('topicList')">ALL</a>
+        › <a onclick="goScene('topicList')">SSV Nexus 产品进展和一些思考</a>
+        › #3 一些新的思考
+      </div>
+
+      <div class="guide">
+        <span class="step">2 / 4</span>
+        <span>试试 <strong>展开 Thread</strong>、<strong>发起新讨论</strong>、点消息的 <strong>···</strong> 菜单把它 <strong>📌 转为待办</strong>。</span>
+        <span class="tip" onclick="goScene('compare')" style="cursor:pointer;text-decoration:underline;">对比旧模式 →</span>
       </div>
 
       <div class="event-card">
-        <div class="event-title">文档上传后 OCR 识别结果异常，建议优化识别链路</div>
-        <div class="event-meta">
-          <span>Suri</span><span class="dot">·</span>
-          <span>基础产品组</span><span class="dot">·</span>
-          <span>04-17 14:22</span><span class="dot">·</span>
-          <span>5 个讨论</span><span class="dot">·</span>
-          <span>2 个子任务</span>
-        </div>
-        <div class="event-body">在上传包含中文表格的 PDF 文件后，OCR 识别结果出现乱序和字段缺失。建议优化识别链路，对表格结构进行专项处理，同时增加识别置信度提示。</div>
-        <div class="event-tags">
-          <span class="tag">🐛 Bug</span>
-          <span class="tag">OCR</span>
-          <span class="tag">优先级：高</span>
+        <h3>#3 一些新的思考，即将到来的新体验</h3>
+        <div class="event-meta">suriwang(王昕) · 2026-04-29 17:27 · 可见范围：SSV 全体员工</div>
+        <div class="event-body">
+          收到很多同事的体验反馈，如下是近期的思考，我们会这么做下去：
+          <ol>
+            <li><strong>通知、触达、移动化</strong>：nexus 偏严肃场景，以 PC 为主，但移动端同样重要，企微 Bot + 移动端适配会分两期推进。</li>
+            <li><strong>AI 从单 topic 到交叉分析到纵深使用</strong>：单 topic 总结 → 交叉分析 → 放开 chat 输入框。</li>
+            <li><strong>评论具备局限性，讨论能放大可能性</strong>：评论回复区会做一次升级改造，营造讨论氛围。</li>
+          </ol>
         </div>
 
-        <!-- Reactions -->
         <div class="reactions">
-          <div class="reaction active" onclick="toggleReaction(this)">
-            <span class="emoji">👍</span><span class="count">3</span>
-          </div>
-          <div class="reaction" onclick="toggleReaction(this)">
-            <span class="emoji">👀</span><span class="count">5</span>
-          </div>
-          <div class="reaction" onclick="toggleReaction(this)">
-            <span class="emoji">🔥</span><span class="count">1</span>
-          </div>
-          <div class="reaction" onclick="toggleReaction(this)">
-            <span class="emoji">🚀</span><span class="count">2</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- ==================== Thread Section ==================== -->
-      <div class="diff-banner">
-        <div class="icon">💡</div>
-        <div class="text">
-          <strong>升级说明：</strong>每个讨论独立成串，可单独转化为子任务。
-          <ul>
-            <li>点击讨论卡片右侧「📌 转子任务」可创建关联任务</li>
-            <li>已有子任务的讨论右上角显示绿色徽章</li>
-            <li>讨论内容发布后，@提及对象会收到通知</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="thread-section" id="thread-section">
-        <div class="thread-header">
-          <div class="thread-header-title">讨论</div>
-          <div class="thread-header-count" id="thread-count">5</div>
-          <div class="thread-header-actions">
-            <button class="btn-sm ghost" onclick="sortThreads()" title="排序">↕ 排序</button>
-          </div>
+          <div class="reaction active">👍 赞 2</div>
+          <div class="reaction">👎 踩</div>
+          <div class="reaction">🤔 疑惑</div>
         </div>
 
-        <!-- Thread 1 (has task) -->
-        <div class="thread-item" id="thread-1">
-          <div class="thread-main">
-            <div class="thread-avatar av-liufang">刘</div>
-            <div class="thread-body">
-              <div class="thread-meta">
-                <span class="thread-author">刘芳</span>
-                <span class="thread-dept">后端开发组</span>
-                <span class="task-badge"><span class="icon">📌</span>子任务 #128</span>
-                <span class="thread-time">04-17 09:45</span>
-              </div>
-              <div class="thread-title">
-                <span class="dot-icon">●</span>
-                关于 OCR 服务选型的技术方案
-              </div>
-              <div class="thread-text">
-                建议引入腾讯云 OCR 服务，支持表格结构化输出，识别准确率可达 95% 以上。<span class="mention">@Suri</span> 请确认预算是否在季度额度内？
-              </div>
-              <div class="thread-actions">
-                <button class="act-btn" onclick="toggleLikeT('t1')">👍 <span class="cnt">1</span></button>
-                <span class="act-sep">·</span>
-                <button class="act-btn" onclick="toggleReply('thread-1')">💬 回复</button>
-                <span class="act-sep">·</span>
-                <button class="act-btn active">📌 已转任务</button>
-                <span class="own-actions">
-                  <span class="act-sep">·</span>
-                  <button class="act-btn" onclick="startEdit('thread-1')">编辑</button>
-                </span>
-              </div>
+        <div class="discuss-title">
+          💬 讨论 <span class="count" id="discussCount">3</span>
+          <span class="rename-tag">v1.0 · 评论 → 讨论</span>
+        </div>
 
-              <!-- Inline reply composer -->
-              <div id="reply-composer-thread-1" class="inline-reply-composer">
-                <textarea placeholder="写下你的讨论..." id="reply-text-thread-1" oninput="maybeShowMention(this, event)"></textarea>
-                <div class="composer-footer">
-                  <div class="composer-tools">
-                    <button class="tool-btn" onmousedown="event.preventDefault()" onclick="insertAt('reply-text-thread-1')">@</button>
-                  </div>
-                  <div class="composer-right">
-                    <button class="btn-sm ghost" onclick="closeReply('thread-1')">取消</button>
-                    <button class="btn-sm primary" onclick="submitReply('thread-1')">发布</button>
+        <div id="threadList">
+
+          <!-- Thread 1（已转为待办） -->
+          <div class="thread" data-tid="t1">
+            <div class="thread-head" onclick="toggleThread('t1')">
+              <div class="avatar-sm" style="background:#bbf7d0;color:#065f46;">钟</div>
+              <div class="tbody">
+                <div class="t-line1">
+                  <span class="t-author">钟嘉辉</span>
+                  <span class="t-dept">· 技术架构</span>
+                  <span class="t-time">2 小时前</span>
+                </div>
+                <div class="t-preview">想再讨论下红点消失逻辑：现在是用户点击 Topic 即清除未读，但如果他只是一扫而过没真正阅读，红点就丢了，后续新增动态他反而感知不到。我倾向"停留 &gt; 3s 或滚动到底部"才算已读。</div>
+              </div>
+            </div>
+            <div class="thread-foot">
+              <span class="chip reply-count">💬 4 条回复</span>
+              <span class="chip todo-done" id="t1-todo-chip">✅ 已转为待办</span>
+              <span>最新：肖迈 · 30 分钟前</span>
+              <span class="reply-btn" onclick="expandThread('t1')">展开讨论</span>
+            </div>
+            <div class="thread-replies" id="replies-t1">
+              <div class="reply" data-mid="t1-r1">
+                <div class="avatar-sm" style="background:#c7d2fe;color:#3730a3;">王</div>
+                <div class="reply-body">
+                  <div class="reply-author">王昕<span class="dept">· SSV 产品</span><span class="time">1 小时前</span></div>
+                  <div class="reply-text">同感。红点本身意义也要重新定义——是"有未读新内容"还是"有需要你处理的事"，前者靠滚动/停留就能清，后者必须主动行为才能清。</div>
+                  <div class="reply-actions">
+                    <button onclick="toast('已点赞 👍')">👍</button>
+                    <button onclick="openMenuAt(event, this, 't1-r1')">···</button>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <!-- Replies preview (collapsed) -->
-          <div class="thread-replies-preview" id="replies-preview-thread-1">
-            <div class="replies-chips">
-              <div class="reply-chip" onclick="expandThread('thread-1')">
-                <div class="avatar-sm av-suri">S</div>
-                <div class="text">
-                  <span class="name">Suri：</span>
-                  <span class="content">好的，我查一下云服务账单</span>
-                </div>
-                <span class="time">04-17 10:00</span>
-              </div>
-            </div>
-            <button class="expand-thread" onclick="expandThread('thread-1')">
-              展开 1 条回复 ↓
-            </button>
-          </div>
-
-          <!-- Full replies (expanded) -->
-          <div class="thread-replies-full collapsed" id="replies-full-thread-1">
-            <div class="reply-item">
-              <div class="avatar av-suri">S</div>
-              <div class="reply-body">
-                <div class="reply-meta">
-                  <span class="reply-author">Suri</span>
-                  <span class="reply-dept">基础产品组</span>
-                  <span class="reply-time">04-17 10:00</span>
-                </div>
-                <div class="reply-content">好的，我查一下云服务账单，下周给答复。</div>
-                <div class="reply-actions">
-                  <button class="act-btn">👍 <span class="cnt">1</span></button>
-                  <span class="act-sep">·</span>
-                  <button class="act-btn" onclick="toggleReply('thread-1')">💬 回复</button>
-                </div>
-              </div>
-            </div>
-            <div id="reply-composer-thread-1-2" class="inline-reply-composer" style="margin-top:8px;display:block;">
-              <textarea placeholder="写下你的讨论..." id="reply-text-thread-1-2" style="display:none;"></textarea>
-            </div>
-            <button class="expand-thread" onclick="collapseThread('thread-1')" style="margin-top:8px;">
-              收起回复 ↑
-            </button>
-          </div>
-        </div>
-
-        <!-- Thread 2 (highlighted, has task) -->
-        <div class="thread-item highlight" id="thread-2">
-          <div class="thread-main">
-            <div class="thread-avatar av-zhaoyu">赵</div>
-            <div class="thread-body">
-              <div class="thread-meta">
-                <span class="thread-author">赵宇</span>
-                <span class="thread-dept">设计组</span>
-                <span class="task-badge"><span class="icon">📌</span>子任务 #131</span>
-                <span class="thread-time">04-17 10:15</span>
-              </div>
-              <div class="thread-title">
-                <span class="dot-icon">●</span>
-                表格识别结果的 UI 展示方案
-              </div>
-              <div class="thread-text">
-                识别后的表格数据建议用卡片形式展示，支持横向滚动和复制。对于置信度低于 80% 的字段，标红提示用户确认。<span class="mention">@刘芳</span> 后端能否返回置信度字段？
-              </div>
-              <div class="thread-actions">
-                <button class="act-btn" onclick="toggleLikeT('t2')">👍 <span class="cnt">2</span></button>
-                <span class="act-sep">·</span>
-                <button class="act-btn" onclick="toggleReply('thread-2')">💬 回复</button>
-                <span class="act-sep">·</span>
-                <button class="act-btn active">📌 已转任务</button>
-                <span class="own-actions">
-                  <span class="act-sep">·</span>
-                  <button class="act-btn" onclick="startEdit('thread-2')">编辑</button>
-                </span>
-              </div>
-
-              <div id="reply-composer-thread-2" class="inline-reply-composer">
-                <textarea placeholder="写下你的讨论..." id="reply-text-thread-2"></textarea>
-                <div class="composer-footer">
-                  <div class="composer-tools">
-                    <button class="tool-btn" onmousedown="event.preventDefault()" onclick="insertAt('reply-text-thread-2')">@</button>
+              <div class="reply" data-mid="t1-r2">
+                <div class="avatar-sm" style="background:#fecaca;color:#991b1b;">丹</div>
+                <div class="reply-body">
+                  <div class="reply-author">李丹阳<span class="dept">· 前端</span><span class="time">1 小时前</span></div>
+                  <div class="reply-text">技术上可以做：停留 3s + 可见范围 ≥60% 计为已读。用 IntersectionObserver 实现，成本不高。</div>
+                  <div class="reply-actions">
+                    <button onclick="toast('已点赞 👍')">👍</button>
+                    <button onclick="openMenuAt(event, this, 't1-r2')">···</button>
                   </div>
-                  <div class="composer-right">
-                    <button class="btn-sm ghost" onclick="closeReply('thread-2')">取消</button>
-                    <button class="btn-sm primary" onclick="submitReply('thread-2')">发布</button>
+                </div>
+              </div>
+              <div class="reply" data-mid="t1-r3">
+                <div class="avatar-sm" style="background:#ddd6fe;color:#5b21b6;">培</div>
+                <div class="reply-body">
+                  <div class="reply-author">李培轮<span class="dept">· 后端</span><span class="time">50 分钟前</span></div>
+                  <div class="reply-text">后端也可以加一个"最后阅读位点"字段，滚动到底就持久化。配合前端 observer 双保险。</div>
+                  <div class="reply-actions">
+                    <button onclick="toast('已点赞 👍')">👍</button>
+                    <button onclick="openMenuAt(event, this, 't1-r3')">···</button>
+                  </div>
+                </div>
+              </div>
+              <div class="reply" data-mid="t1-r4">
+                <div class="avatar-sm" style="background:#fde68a;color:#92400e;">肖</div>
+                <div class="reply-body">
+                  <div class="reply-author">肖迈<span class="dept">· 维护者</span><span class="time">30 分钟前</span></div>
+                  <div class="reply-text">结论确认：前端 observer + 后端位点。<span class="mention-tag">@钟嘉辉</span> 这个作为一项子任务跟进下？</div>
+                  <div class="reply-actions">
+                    <button onclick="toast('已点赞 👍')">👍</button>
+                    <button onclick="openMenuAt(event, this, 't1-r4')">···</button>
+                  </div>
+                </div>
+              </div>
+              <div class="sys-msg todo-created" id="t1-sys">
+                ✅ 肖迈 已将本条讨论转为待办 · 指派给 钟嘉辉 · 30 分钟前
+              </div>
+            </div>
+            <div class="thread-reply-box">
+              <div class="rbox">
+                <button class="at-btn" onclick="toast('@ 菜单：见 mention-visibility-demo')">@</button>
+                <input type="text" placeholder="回复此讨论..." />
+                <button class="send-btn-sm" onclick="toast('已发送（Demo）')">发送</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Thread 2（等待回复中） -->
+          <div class="thread" data-tid="t2">
+            <div class="thread-head" onclick="toggleThread('t2')">
+              <div class="avatar-sm" style="background:#c7d2fe;color:#3730a3;">王</div>
+              <div class="tbody">
+                <div class="t-line1">
+                  <span class="t-author">王昕</span>
+                  <span class="t-dept">· SSV 产品</span>
+                  <span class="t-time">5 小时前</span>
+                </div>
+                <div class="t-preview">移动端 Bot 通知卡片的"查看原文"跳转现在是深链打开 PC 站，移动端体验割裂。一期先兜底 H5 只读版，还是直接等移动端原生页面？</div>
+              </div>
+            </div>
+            <div class="thread-foot">
+              <span class="chip reply-count">💬 2 条回复</span>
+              <span class="chip waiting">⏳ 等待回复中</span>
+              <span>最新：李培轮 · 3 小时前</span>
+              <span class="reply-btn" onclick="expandThread('t2')">展开讨论</span>
+            </div>
+            <div class="thread-replies" id="replies-t2">
+              <div class="reply" data-mid="t2-r1">
+                <div class="avatar-sm" style="background:#fde68a;color:#92400e;">肖</div>
+                <div class="reply-body">
+                  <div class="reply-author">肖迈<span class="dept">· 维护者</span><span class="time">4 小时前</span></div>
+                  <div class="reply-text">一期先兜底 H5 只读版吧，否则 Bot 推送落地体验残。</div>
+                  <div class="reply-actions">
+                    <button onclick="toast('已点赞 👍')">👍</button>
+                    <button onclick="openMenuAt(event, this, 't2-r1')">···</button>
+                  </div>
+                </div>
+              </div>
+              <div class="reply" data-mid="t2-r2">
+                <div class="avatar-sm" style="background:#ddd6fe;color:#5b21b6;">培</div>
+                <div class="reply-body">
+                  <div class="reply-author">李培轮<span class="dept">· 后端</span><span class="time">3 小时前</span></div>
+                  <div class="reply-text">H5 只读版接口已经具备，接一层 rewrite 就行。预计 1 天出方案。</div>
+                  <div class="reply-actions">
+                    <button onclick="toast('已点赞 👍')">👍</button>
+                    <button onclick="openMenuAt(event, this, 't2-r2')">···</button>
                   </div>
                 </div>
               </div>
             </div>
+            <div class="thread-reply-box">
+              <div class="rbox">
+                <button class="at-btn" onclick="toast('@ 菜单')">@</button>
+                <input type="text" placeholder="回复此讨论..." />
+                <button class="send-btn-sm" onclick="toast('已发送（Demo）')">发送</button>
+              </div>
+            </div>
           </div>
 
-          <div class="thread-replies-preview" id="replies-preview-thread-2">
-            <div class="replies-chips">
-              <div class="reply-chip" onclick="expandThread('thread-2')">
-                <div class="avatar-sm av-sunjian">孙</div>
-                <div class="text">
-                  <span class="name">孙健：</span>
-                  <span class="content">+1，期待这个功能</span>
+          <!-- Thread 3（无回复） -->
+          <div class="thread" data-tid="t3">
+            <div class="thread-head" onclick="toggleThread('t3')">
+              <div class="avatar-sm" style="background:#fed7aa;color:#9a3412;">李</div>
+              <div class="tbody">
+                <div class="t-line1">
+                  <span class="t-author">李四</span>
+                  <span class="t-dept">· 战略中心</span>
+                  <span class="t-time">10 分钟前</span>
                 </div>
-                <span class="time">04-17 17:10</span>
-              </div>
-              <div class="reply-chip" onclick="expandThread('thread-2')">
-                <div class="avatar-sm av-zhangming">张</div>
-                <div class="text">
-                  <span class="name">张明：</span>
-                  <span class="content">OCR API 已支持置信度字段</span>
-                </div>
-                <span class="time">04-17 17:40</span>
+                <div class="t-preview">AI 简报能不能把"讨论激增"作为首屏热词之一？每天早上点开 ALL 只想知道昨天哪几个 Topic 被激烈讨论，不想逐个点进去看。</div>
               </div>
             </div>
-            <button class="expand-thread" onclick="expandThread('thread-2')">
-              展开 2 条回复 ↓
-            </button>
+            <div class="thread-foot">
+              <span class="chip">💬 暂无回复</span>
+              <span class="reply-btn" onclick="expandThread('t3')">首个回复</span>
+            </div>
+            <div class="thread-replies" id="replies-t3">
+              <div style="color:#9ca3af; font-size: 13px; padding: 16px 0; text-align: center;">
+                还没有人回复，来抢首个回复吧
+              </div>
+            </div>
+            <div class="thread-reply-box">
+              <div class="rbox">
+                <button class="at-btn" onclick="toast('@ 菜单')">@</button>
+                <input type="text" placeholder="回复此讨论..." />
+                <button class="send-btn-sm" onclick="toast('已发送（Demo）')">发送</button>
+              </div>
+            </div>
           </div>
 
-          <div class="thread-replies-full collapsed" id="replies-full-thread-2">
-            <div class="reply-item">
-              <div class="avatar av-sunjian">孙</div>
-              <div class="reply-body">
-                <div class="reply-meta">
-                  <span class="reply-author">孙健</span>
-                  <span class="reply-dept">前端开发组</span>
-                  <span class="reply-time">04-17 17:10</span>
-                </div>
-                <div class="reply-content">+1，期待这个功能，上线后我来对接前端。</div>
-                <div class="reply-actions">
-                  <button class="act-btn">👍 <span class="cnt">1</span></button>
-                  <span class="act-sep">·</span>
-                  <button class="act-btn" onclick="toggleReply('thread-2')">💬 回复</button>
-                </div>
-              </div>
-            </div>
-            <div class="reply-item">
-              <div class="avatar av-zhangming">张</div>
-              <div class="reply-body">
-                <div class="reply-meta">
-                  <span class="reply-author">张明</span>
-                  <span class="reply-dept">基础产品组</span>
-                  <span class="reply-time">04-17 17:40</span>
-                </div>
-                <div class="reply-content">OCR API 已支持置信度字段，返回字段名为 <code style="background:var(--paper-soft);padding:1px 5px;border-radius:3px;font-family:var(--font-mono);font-size:11px;">confidence</code>，范围 0~1。</div>
-                <div class="reply-actions">
-                  <button class="act-btn">👍</button>
-                  <span class="act-sep">·</span>
-                  <button class="act-btn" onclick="toggleReply('thread-2')">💬 回复</button>
-                </div>
-              </div>
-            </div>
-            <button class="expand-thread" onclick="collapseThread('thread-2')" style="margin-top:8px;">
-              收起回复 ↑
-            </button>
-          </div>
         </div>
 
-        <!-- Thread 3 (no task, can convert) -->
-        <div class="thread-item" id="thread-3">
-          <div class="thread-main">
-            <div class="thread-avatar av-sunjian">孙</div>
-            <div class="thread-body">
-              <div class="thread-meta">
-                <span class="thread-author">孙健</span>
-                <span class="thread-dept">前端开发组</span>
-                <span class="thread-time">04-17 18:05</span>
+        <!-- 发起新讨论 -->
+        <div class="new-thread" id="newThread">
+          <div class="avatar-sm" style="background:#bbf7d0;color:#065f46;">钟</div>
+          <div class="nt-body">
+            <textarea id="newThreadInput" placeholder="发起讨论... 输入 @ 可提及同事，Enter 发送"
+              oninput="autoGrow(this); toggleSend()"
+              onkeydown="handleNewThreadKey(event)"></textarea>
+            <div class="nt-foot">
+              <div class="nt-hint">
+                提示：输入 <kbd>@</kbd> 提及 · <kbd>Enter</kbd> 发送 · <kbd>Shift+Enter</kbd> 换行
               </div>
-              <div class="thread-title">
-                <span class="dot-icon">●</span>
-                上传进度 UI 优化建议
-              </div>
-              <div class="thread-text">
-                大文件上传建议增加分段上传和断点续传，进度条需要显示每个分段的完成状态。
-              </div>
-              <div class="thread-images">
-                <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&q=80" alt="进度条参考" />
-              </div>
-              <div class="thread-actions">
-                <button class="act-btn" onclick="toggleLikeT('t3')">👍</button>
-                <span class="act-sep">·</span>
-                <button class="act-btn" onclick="toggleReply('thread-3')">💬 回复</button>
-                <span class="act-sep">·</span>
-                <button class="act-btn" onclick="openConvertModal('thread-3')">📌 转子任务</button>
-                <span class="own-actions">
-                  <span class="act-sep">·</span>
-                  <button class="act-btn" onclick="startEdit('thread-3')">编辑</button>
-                  <span class="act-sep">·</span>
-                  <button class="act-btn danger">删除</button>
-                </span>
-              </div>
-
-              <div id="reply-composer-thread-3" class="inline-reply-composer">
-                <textarea placeholder="写下你的讨论..." id="reply-text-thread-3"></textarea>
-                <div class="composer-footer">
-                  <div class="composer-tools">
-                    <button class="tool-btn" onmousedown="event.preventDefault()" onclick="insertAt('reply-text-thread-3')">@</button>
-                  </div>
-                  <div class="composer-right">
-                    <button class="btn-sm ghost" onclick="closeReply('thread-3')">取消</button>
-                    <button class="btn-sm primary" onclick="submitReply('thread-3')">发布</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="thread-replies-preview" id="replies-preview-thread-3">
-            <div class="replies-chips">
-              <div class="reply-chip" onclick="expandThread('thread-3')">
-                <div class="avatar-sm av-me">我</div>
-                <div class="text">
-                  <span class="name">我：</span>
-                  <span class="content">好的，我来评估一下实现成本</span>
-                </div>
-                <span class="time">04-17 18:30</span>
-              </div>
-            </div>
-            <button class="expand-thread" onclick="expandThread('thread-3')">
-              展开 1 条回复 ↓
-            </button>
-          </div>
-          <div class="thread-replies-full collapsed" id="replies-full-thread-3">
-            <div class="reply-item">
-              <div class="avatar av-me">我</div>
-              <div class="reply-body">
-                <div class="reply-meta">
-                  <span class="reply-author">我</span>
-                  <span class="reply-dept">基础产品组</span>
-                  <span class="reply-time">04-17 18:30</span>
-                </div>
-                <div class="reply-content">好的，我来评估一下实现成本，下周同步。</div>
-                <div class="reply-actions">
-                  <button class="act-btn">👍</button>
-                  <span class="act-sep">·</span>
-                  <button class="act-btn" onclick="toggleReply('thread-3')">💬 回复</button>
-                </div>
-              </div>
-            </div>
-            <button class="expand-thread" onclick="collapseThread('thread-3')" style="margin-top:8px;">
-              收起回复 ↑
-            </button>
-          </div>
-        </div>
-
-        <!-- New Thread Button -->
-        <div class="new-thread-btn" onclick="openNewThread()">
-          <span class="icon">💬</span>
-          <span>发起新讨论...</span>
-        </div>
-
-        <!-- New Thread Composer -->
-        <div class="new-thread-composer" id="new-thread-composer">
-          <textarea placeholder="描述你的讨论主题（必填）..." id="new-thread-title-input"></textarea>
-          <div style="margin-top:8px;">
-            <textarea placeholder="补充说明（可选）..." id="new-thread-content-input" style="width:100%;border:1px solid var(--rule);border-radius:var(--r);padding:8px 12px;font-size:13px;line-height:1.7;background:#fff;color:var(--ink);resize:none;min-height:60px;transition:border-color .15s;" onfocus="this.style.borderColor='var(--blue)';this.style.boxShadow='0 0 0 3px rgba(37,99,235,0.08)'" onblur="this.style.borderColor='var(--rule)';this.style.boxShadow='none'"></textarea>
-          </div>
-          <div class="composer-footer">
-            <div class="composer-tools">
-              <button class="tool-btn" title="@提及">@</button>
-              <button class="tool-btn" title="上传图片">🖼</button>
-            </div>
-            <div class="composer-right">
-              <button class="btn-sm ghost" onclick="closeNewThread()">取消</button>
-              <button class="btn-sm primary" onclick="submitNewThread()">发布讨论</button>
+              <button class="send-btn" id="newThreadSend" disabled onclick="sendNewThread()">发起讨论</button>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Event 待办列表（与 Thread 双向链接） -->
+      <div class="todo-block">
+        <h4>📋 Event 待办 <span class="tag-count" id="todoCount">2</span></h4>
+        <div id="todoList">
+          <div class="todo-item" data-todo="td-1" data-mid="t1-r4">
+            <input type="checkbox" onchange="toggleTodo(this,'td-1','t1-r4')" />
+            <div class="ti-body">
+              红点已读机制：前端 observer + 后端阅读位点
+              <div class="ti-meta">
+                <span class="src-tag">来自讨论 · <a onclick="jumpToMessage('t1-r4')">查看原讨论 →</a></span>
+                <span>指派：钟嘉辉</span>
+                <span>截止：下周三</span>
+              </div>
+            </div>
+          </div>
+          <div class="todo-item" data-todo="td-2">
+            <input type="checkbox" />
+            <div class="ti-body">
+              Event #3 发布后收集二次反馈
+              <div class="ti-meta">
+                <span>指派：王昕</span>
+                <span>截止：本周五</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 页面 3：新旧模式对比 ===== -->
+    <section class="page" id="page-compare">
+      <div class="guide">
+        <span class="step">3 / 4</span>
+        <span>左：旧评论扁平混排（不同议题互相干扰）。右：Thread 每议题独立成线 + 可转待办。</span>
+      </div>
+      <div class="section-head">新旧模式对比 <span class="sub">同样的 3 组讨论内容：左边混杂，右边清晰</span></div>
+
+      <div class="compare">
+        <div class="col old">
+          <div class="col-head">💬 评论区 <span class="badge-old">旧</span></div>
+          <div class="old-comment">
+            <div class="avatar-sm" style="background:#bbf7d0;color:#065f46;">钟</div>
+            <div class="ob">
+              <div class="oa">钟嘉辉<span class="d">· 技术架构</span></div>
+              <div class="txt">想讨论下红点消失逻辑：点了就清感觉不太对，应该按停留时间。</div>
+              <div class="tm">2 小时前</div>
+            </div>
+          </div>
+          <div class="old-comment">
+            <div class="avatar-sm" style="background:#c7d2fe;color:#3730a3;">王</div>
+            <div class="ob">
+              <div class="oa">王昕<span class="d">· SSV 产品</span></div>
+              <div class="txt">移动端跳转的事情我也想聊——现在 Bot 通知卡片跳 PC 体验割裂。</div>
+              <div class="tm">5 小时前</div>
+            </div>
+          </div>
+          <div class="old-comment">
+            <div class="avatar-sm" style="background:#c7d2fe;color:#3730a3;">王</div>
+            <div class="ob">
+              <div class="oa">王昕<span class="d">· SSV 产品</span></div>
+              <div class="txt">@钟嘉辉 你那个红点问题我同意，需要重新定义红点含义。</div>
+              <div class="tm">1 小时前</div>
+            </div>
+          </div>
+          <div class="old-comment">
+            <div class="avatar-sm" style="background:#fde68a;color:#92400e;">肖</div>
+            <div class="ob">
+              <div class="oa">肖迈<span class="d">· 维护者</span></div>
+              <div class="txt">移动端一期先兜底 H5。</div>
+              <div class="tm">4 小时前</div>
+            </div>
+          </div>
+          <div class="old-comment">
+            <div class="avatar-sm" style="background:#fecaca;color:#991b1b;">丹</div>
+            <div class="ob">
+              <div class="oa">李丹阳<span class="d">· 前端</span></div>
+              <div class="txt">红点这个技术上好做，IntersectionObserver 就行。</div>
+              <div class="tm">1 小时前</div>
+            </div>
+          </div>
+          <div class="old-comment">
+            <div class="avatar-sm" style="background:#fed7aa;color:#9a3412;">李</div>
+            <div class="ob">
+              <div class="oa">李四<span class="d">· 战略中心</span></div>
+              <div class="txt">AI 简报能不能把"讨论激增"作为首屏热词。</div>
+              <div class="tm">10 分钟前</div>
+            </div>
+          </div>
+          <div class="old-comment">
+            <div class="avatar-sm" style="background:#ddd6fe;color:#5b21b6;">培</div>
+            <div class="ob">
+              <div class="oa">李培轮<span class="d">· 后端</span></div>
+              <div class="txt">回钟嘉辉的红点：后端可以加"最后阅读位点"字段。</div>
+              <div class="tm">50 分钟前</div>
+            </div>
+          </div>
+          <div class="old-comment">
+            <div class="avatar-sm" style="background:#ddd6fe;color:#5b21b6;">培</div>
+            <div class="ob">
+              <div class="oa">李培轮<span class="d">· 后端</span></div>
+              <div class="txt">回王昕的移动端：H5 只读版接口已经具备，1 天出方案。</div>
+              <div class="tm">3 小时前</div>
+            </div>
+          </div>
+          <div style="margin-top: 14px; padding: 10px; background:#fef3c7; border-radius: 8px; font-size: 12.5px; color: #92400e;">
+            ⚠️ 问题：3 个议题（红点/移动端/AI 简报）发言交叉混排，需要靠 @人名 猜测在回应谁，也没法把"结论"变成待办。
+          </div>
+        </div>
+
+        <div class="col new">
+          <div class="col-head">💬 讨论区 <span class="badge-new">新 · Thread</span></div>
+          <div class="mini-thread">
+            <div class="mh">钟嘉辉<span class="d">· 技术架构 · 2 小时前</span></div>
+            <div class="mt">想讨论下红点消失逻辑：点了就清感觉不太对，应该按停留时间。</div>
+            <div class="mf">
+              <span class="chip">💬 4 条</span>
+              <span class="chip done">✅ 已转为待办</span>
+            </div>
+          </div>
+          <div class="mini-thread">
+            <div class="mh">王昕<span class="d">· SSV 产品 · 5 小时前</span></div>
+            <div class="mt">移动端跳转现在是深链打开 PC 站，体验割裂。一期兜底 H5 还是等原生？</div>
+            <div class="mf">
+              <span class="chip">💬 2 条</span>
+              <span class="chip" style="background:#fff7ed;color:#c2410c;">⏳ 等待回复</span>
+            </div>
+          </div>
+          <div class="mini-thread">
+            <div class="mh">李四<span class="d">· 战略中心 · 10 分钟前</span></div>
+            <div class="mt">AI 简报能不能把"讨论激增"作为首屏热词？</div>
+            <div class="mf">
+              <span class="chip" style="background:#f5f6f8; color:#6b7280;">💬 暂无回复</span>
+            </div>
+          </div>
+          <div style="margin-top: 14px; padding: 10px; background:#ecfdf5; border-radius: 8px; font-size: 12.5px; color: #059669;">
+            ✅ 收益：每议题一条 Thread，参与者、结论、待办一目了然；新人进来也能顺脉络读。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 页面 4：全链路流程 ===== -->
+    <section class="page" id="page-flow">
+      <div class="guide">
+        <span class="step">4 / 4</span>
+        <span>Thread 从发起到闭环的 6 步全流程。每步对应需求文档 §5。</span>
+      </div>
+      <div class="section-head">全链路流程 <span class="sub">以"红点消失逻辑讨论"为例</span></div>
+
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-body">
+          <div class="flow-title">发起讨论</div>
+          <div class="flow-desc">钟嘉辉在 Event 讨论区输入问题 → 点击 <code>发起讨论</code> → 讨论区顶部新增 Thread 卡片（收起态）。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-body">
+          <div class="flow-title">触发通知（新 Thread 发起）</div>
+          <div class="flow-desc">系统向 Topic 订阅者/维护人推送 <code>站内 Topic 动态 Tab</code> + <code>企微 Bot 聚合推送</code>。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-body">
+          <div class="flow-title">多人参与（Thread 内线性回复）</div>
+          <div class="flow-desc">王昕、李丹阳、李培轮点击通知进入 → 展开 Thread → 在 Thread 内回复。每次新回复自动通知 Thread 所有参与者。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-body">
+          <div class="flow-title">产出结论 + @ 指派（高优通知）</div>
+          <div class="flow-desc">肖迈总结讨论 → <code>@钟嘉辉</code> → 被 @ 者收到 <code>站内 @我 Tab</code> + <code>企微 Bot（高优）</code> 双通道通知。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">5</div>
+        <div class="flow-body">
+          <div class="flow-title">📌 讨论转为待办（关键差异点）</div>
+          <div class="flow-desc">肖迈点击消息 <code>···</code> 菜单 → <code>转为待办</code> → 指派钟嘉辉。Thread 卡片出现 <code>✅ 已转为待办</code>；Event 待办列表新增一条并链回原 Thread。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num done">✓</div>
+        <div class="flow-body">
+          <div class="flow-title">待办完成 → 状态同步回 Thread</div>
+          <div class="flow-desc">钟嘉辉勾选完成 → Thread 底部系统消息 <code>钟嘉辉 已完成关联待办</code> → 所有参与者收到通知。<strong>闭环。</strong></div>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px; padding: 14px 18px; background:#fff; border:1px dashed #c7d2fe; border-radius: 10px; font-size: 13px; color: #4b5563;">
+        💡 配套交付物：<a style="color:#2563eb;" href="notification-demo.html">通知中心 Demo</a> · <a style="color:#2563eb;" href="reach-demo.html">通知触达配置 Demo</a> · <a style="color:#2563eb;" href="docs/requirement-v1.0.md">需求文档 v1.0</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ··· 上下文菜单 -->
+<div class="ctx-menu" id="ctxMenu">
+  <div class="mi" onclick="onMenuAction('todo')">📌 <span>转为待办</span></div>
+  <div class="mi" onclick="onMenuAction('copy')">🔗 <span>复制链接</span></div>
+  <div class="sep"></div>
+  <div class="mi" onclick="onMenuAction('edit')">✏️ <span>编辑</span></div>
+  <div class="mi danger" onclick="onMenuAction('delete')">🗑️ <span>删除</span></div>
+</div>
+
+<!-- 转待办弹窗 -->
+<div class="modal-mask" id="todoModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>📌 将此讨论转为待办</h3>
+      <div class="sub">待办将挂在当前 Event 下，并与原讨论消息双向链接。</div>
     </div>
-
-    <!-- ===== PAGE: Comparison ===== -->
-    <div class="page" id="page-comparison">
-      <div class="page-header">
-        <div class="page-title">新旧模式对比</div>
-        <div class="page-desc">评论 → 讨论，两代产品的核心差异一览</div>
-      </div>
-      <div class="comparison-grid">
-        <div class="comparison-card old">
-          <div class="card-header">
-            <span>💬</span> 经典评论模式（升级前）
-          </div>
-          <div class="card-body">
-            <div class="comparison-item">
-              <span class="icon">📝</span>
-              <span class="label">名称</span>
-              <span class="old">评论 / 回复</span>
-            </div>
-            <div class="comparison-item">
-              <span class="icon">🔗</span>
-              <span class="label">结构</span>
-              <span class="old">混排线性，所有讨论堆叠在一起</span>
-            </div>
-            <div class="comparison-item">
-              <span class="icon">🧵</span>
-              <span class="label">话题性</span>
-              <span class="old">无，一个 Event 下讨论混杂</span>
-            </div>
-            <div class="comparison-item">
-              <span class="icon">📌</span>
-              <span class="label">转任务</span>
-              <span class="old">只能针对整条评论，无法精准拆解</span>
-            </div>
-            <div class="comparison-item">
-              <span class="icon">👀</span>
-              <span class="label">可见性</span>
-              <span class="old">所有回复默认全部展开</span>
-            </div>
-            <div class="comparison-item">
-              <span class="icon">⚡</span>
-              <span class="label">@提及</span>
-              <span class="old">提及即通知，无法区分范围</span>
-            </div>
-          </div>
-        </div>
-        <div class="comparison-card new">
-          <div class="card-header">
-            <span>🧵</span> Thread 讨论模式（升级后）
-          </div>
-          <div class="card-body">
-            <div class="comparison-item">
-              <span class="icon">📝</span>
-              <span class="label">名称</span>
-              <span class="new">讨论 / 回复</span>
-            </div>
-            <div class="comparison-item">
-              <span class="icon">🔗</span>
-              <span class="label">结构</span>
-              <span class="new">每个讨论独立成串，互不干扰</span>
-            </div>
-            <div class="comparison-item">
-              <span class="icon">🧵</span>
-              <span class="label">话题性</span>
-              <span class="new">强，每个 Thread 有独立标题</span>
-            </div>
-            <div class="comparison-item">
-              <span class="icon">📌</span>
-              <span class="label">转任务</span>
-              <span class="new">可针对单个讨论精准创建子任务</span>
-            </div>
-            <div class="comparison-item">
-              <span class="icon">👀</span>
-              <span class="label">可见性</span>
-              <span class="new">默认折叠，点击展开，沉浸式阅读</span>
-            </div>
-            <div class="comparison-item">
-              <span class="icon">⚡</span>
-              <span class="label">@提及</span>
-              <span class="new">提及 + 范围标注，精准触达</span>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="modal-body">
+      <div class="quoted" id="todoQuoted">— 原消息 —</div>
+      <label>待办内容</label>
+      <input type="text" id="todoTitle" placeholder="请输入待办标题" />
+      <label>指派给</label>
+      <select id="todoAssignee">
+        <option value="钟嘉辉">钟嘉辉（技术架构）</option>
+        <option value="王昕">王昕（SSV 产品）</option>
+        <option value="李丹阳">李丹阳（前端）</option>
+        <option value="李培轮">李培轮（后端）</option>
+        <option value="肖迈">肖迈（维护者）</option>
+      </select>
+      <label>截止</label>
+      <input type="text" id="todoDue" placeholder="例如：下周三" value="下周三" />
     </div>
-
-    <!-- ===== PAGE: Flow ===== -->
-    <div class="page" id="page-flow">
-      <div class="page-header">
-        <div class="page-title">交互全链路</div>
-        <div class="page-desc">从发起讨论到转化子任务的完整流程</div>
-      </div>
-
-      <div class="flow-section">
-        <div class="flow-title">讨论生命周期</div>
-        <div class="flow-row">
-          <div class="flow-node primary">发起讨论</div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-node">@提及通知</div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-node blue">回复讨论</div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-node blue">折叠 / 展开</div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-node green">📌 转子任务</div>
-        </div>
-        <div class="flow-sub">
-          <div class="flow-node">创建任务</div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-node blue">指派负责人</div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-node green">设置截止日期</div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-node">任务状态同步</div>
-        </div>
-      </div>
-
-      <div class="flow-section" style="margin-top:16px;">
-        <div class="flow-title">快捷键支持</div>
-        <div class="comparison-grid" style="grid-template-columns: repeat(3, 1fr);">
-          <div style="background:#fff;border:1px solid var(--rule);border-radius:var(--r-lg);padding:16px;">
-            <div style="font-size:13px;font-weight:600;margin-bottom:10px;">⌘ K</div>
-            <div style="font-size:12.5px;color:var(--ink-3);">唤起快捷指令面板，可快速发起讨论或搜索</div>
-          </div>
-          <div style="background:#fff;border:1px solid var(--rule);border-radius:var(--r-lg);padding:16px;">
-            <div style="font-size:13px;font-weight:600;margin-bottom:10px;">⌘ ↵</div>
-            <div style="font-size:12.5px;color:var(--ink-3);">在输入框内按 Command + 回车发布当前讨论</div>
-          </div>
-          <div style="background:#fff;border:1px solid var(--rule);border-radius:var(--r-lg);padding:16px;">
-            <div style="font-size:13px;font-weight:600;margin-bottom:10px;">@ + 关键字</div>
-            <div style="font-size:12.5px;color:var(--ink-3);">输入 @ 触发成员搜索，精准 @提及并通知</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="flow-section" style="margin-top:16px;">
-        <div class="flow-title">通知触达链路</div>
-        <div style="background:#fff;border:1px solid var(--rule);border-radius:var(--r-lg);overflow:hidden;">
-          <div style="display:flex;align-items:center;padding:14px 20px;border-bottom:1px solid var(--rule-soft);gap:12px;">
-            <div style="font-size:12px;font-weight:600;color:var(--ink-4);width:80px;flex-shrink:0;">触发时机</div>
-            <div style="font-size:12px;font-weight:600;color:var(--ink-4);flex:1;">通知内容</div>
-            <div style="font-size:12px;font-weight:600;color:var(--ink-4);width:60px;text-align:right;">通道</div>
-          </div>
-          <div style="display:flex;align-items:center;padding:12px 20px;border-bottom:1px solid var(--rule-soft);gap:12px;">
-            <div style="font-size:12px;color:var(--ink-3);width:80px;flex-shrink:0;">被 @提及</div>
-            <div style="font-size:12.5px;color:var(--ink-2);flex:1;"><span class="mention">@Suri</span> 在讨论「OCR方案」中提到了你</div>
-            <div style="font-size:11px;color:var(--ink-4);width:60px;">🔔 站内</div>
-          </div>
-          <div style="display:flex;align-items:center;padding:12px 20px;border-bottom:1px solid var(--rule-soft);gap:12px;">
-            <div style="font-size:12px;color:var(--ink-3);width:80px;flex-shrink:0;">讨论新增</div>
-            <div style="font-size:12.5px;color:var(--ink-2);flex:1;">刘芳 在「文档上传OCR」下发起了新讨论</div>
-            <div style="font-size:11px;color:var(--ink-4);width:60px;">🔔 邮件</div>
-          </div>
-          <div style="display:flex;align-items:center;padding:12px 20px;border-bottom:1px solid var(--rule-soft);gap:12px;">
-            <div style="font-size:12px;color:var(--ink-3);width:80px;flex-shrink:0;">转子任务</div>
-            <div style="font-size:12.5px;color:var(--ink-2);flex:1;">讨论「表格UI」已转化为子任务 #131</div>
-            <div style="font-size:11px;color:var(--ink-4);width:60px;">🔔 企业微信</div>
-          </div>
-          <div style="display:flex;align-items:center;padding:12px 20px;gap:12px;">
-            <div style="font-size:12px;color:var(--ink-3);width:80px;flex-shrink:0;">回复通知</div>
-            <div style="font-size:12.5px;color:var(--ink-2);flex:1;">孙健 回复了你参与讨论的「上传进度」</div>
-            <div style="font-size:11px;color:var(--ink-4);width:60px;">🔔 站内</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- end main -->
-</div><!-- end layout -->
-
-<!-- Toast -->
-<div id="toast-container"></div>
-
-<!-- Convert to Task Modal -->
-<div class="modal-backdrop" id="convert-modal">
-  <div class="modal-box">
-    <h3>📌 将讨论转化为子任务</h3>
-    <div class="desc">该讨论将自动创建一条子任务，关联到当前 Event，并同步通知相关成员。</div>
-    <div class="form-row">
-      <label class="form-label">任务名称</label>
-      <input class="form-input" id="task-name-input" value="上传进度 UI 优化" />
-    </div>
-    <div class="form-row">
-      <label class="form-label">负责人</label>
-      <input class="form-input" id="task-owner-input" placeholder="搜索成员..." />
-    </div>
-    <div class="form-row">
-      <label class="form-label">截止日期</label>
-      <input class="form-input" type="date" id="task-date-input" />
-    </div>
-    <div class="modal-actions">
-      <button class="btn-modal ghost" onclick="closeConvertModal()">取消</button>
-      <button class="btn-modal primary" onclick="confirmConvert()">创建子任务</button>
+    <div class="modal-foot">
+      <button class="btn-ghost" onclick="closeTodoModal()">取消</button>
+      <button class="btn-primary" onclick="confirmTodo()">转为待办</button>
     </div>
   </div>
 </div>
 
-<!-- Notification Pop -->
-<div class="notif-pop" id="notif-pop">
-  <div class="head">
-    <strong>新通知</strong>
-    <span class="close" onclick="toggleNotif()">×</span>
-  </div>
-  <div class="body">
-    <span class="mention">@孙健</span> 在讨论「表格识别结果的UI展示方案」中提到了你。
-    <div class="preview">赵宇：后端能否返回置信度字段？<span class="mention">@刘芳</span> <span class="mention">@孙健</span></div>
-    <div class="cta">
-      <button class="btn-sm primary" onclick="goToThread()">查看</button>
-      <button class="btn-sm ghost" onclick="toggleNotif()">忽略</button>
-    </div>
-  </div>
-</div>
-
-<!-- Mention Popup -->
-<div id="mention-popup"></div>
+<!-- 右上角弹出式通知 -->
+<div class="notif-pop" id="notifPop"></div>
+<div class="toast" id="toast"></div>
 
 <script>
-/* ============================================================
- *  Tab Navigation
- * ============================================================ */
-function switchTab(pageId, el) {
+/* ==========================================================
+   场景切换
+   ========================================================== */
+function goScene(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page-' + pageId).classList.add('active');
-  if (el) el.classList.add('active');
+  const target = document.getElementById('page-' + name);
+  if (target) target.classList.add('active');
+  document.querySelectorAll('.scene-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.scene === name);
+  });
+  document.querySelector('.main').scrollTop = 0;
+  closeCtxMenu();
 }
 
-function viewEvent(id) {
-  switchTab('event-detail', document.querySelectorAll('.nav-tab')[1]);
-}
-
-/* ============================================================
- *  Mode Switch
- * ============================================================ */
-function setMode(mode, el) {
-  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  if (mode === 'thread') {
-    showToast('🧵 Thread 模式已开启', 'success');
-  } else {
-    showToast('💬 经典评论模式（仅供参考）', 'warn');
-  }
-}
-
-/* ============================================================
- *  Thread Expand / Collapse
- * ============================================================ */
-function expandThread(id) {
-  const preview = document.getElementById('replies-preview-' + id);
-  const full = document.getElementById('replies-full-' + id);
-  if (preview) preview.style.display = 'none';
-  if (full) full.classList.remove('collapsed');
-}
-
-function collapseThread(id) {
-  const preview = document.getElementById('replies-preview-' + id);
-  const full = document.getElementById('replies-full-' + id);
-  if (preview) preview.style.display = 'block';
-  if (full) full.classList.add('collapsed');
-}
-
-/* ============================================================
- *  Reply Toggle
- * ============================================================ */
-function toggleReply(threadId) {
-  const composer = document.getElementById('reply-composer-' + threadId);
-  if (!composer) return;
-  const isActive = composer.classList.contains('active');
-  document.querySelectorAll('.inline-reply-composer').forEach(c => c.classList.remove('active'));
-  if (!isActive) {
-    composer.classList.add('active');
-    const textarea = composer.querySelector('textarea');
-    if (textarea) { textarea.style.display = 'block'; textarea.focus(); }
-  }
-}
-
-function closeReply(threadId) {
-  const composer = document.getElementById('reply-composer-' + threadId);
-  if (composer) composer.classList.remove('active');
-}
-
-function submitReply(threadId) {
-  const composer = document.getElementById('reply-composer-' + threadId);
-  const textarea = composer ? composer.querySelector('textarea') : null;
-  const content = textarea ? textarea.value.trim() : '';
-  if (!content) { showToast('讨论内容不能为空'); return; }
-  composer.classList.remove('active');
-  if (textarea) textarea.value = '';
-  showToast('💬 回复已发布', 'success');
-  // Simulate adding to thread
-  const preview = document.getElementById('replies-preview-' + threadId);
-  const full = document.getElementById('replies-full-' + threadId);
-  if (preview) {
-    const chips = preview.querySelector('.replies-chips');
-    if (chips) {
-      const newChip = document.createElement('div');
-      newChip.className = 'reply-chip';
-      newChip.innerHTML = `<div class="avatar-sm av-me">我</div><div class="text"><span class="name">我：</span><span class="content">${content.slice(0, 20)}${content.length > 20 ? '...' : ''}</span></div><span class="time">刚刚</span>`;
-      chips.appendChild(newChip);
-    }
-    const expandBtn = preview.querySelector('.expand-thread');
-    if (expandBtn) {
-      const match = expandBtn.textContent.match(/展开 (\d+) 条/);
-      if (match) {
-        const count = parseInt(match[1]) + 1;
-        expandBtn.textContent = `展开 ${count} 条回复 ↓`;
-      }
-    }
-  }
-  if (full) {
-    const newReply = document.createElement('div');
-    newReply.className = 'reply-item';
-    newReply.innerHTML = `
-      <div class="avatar av-me">我</div>
-      <div class="reply-body">
-        <div class="reply-meta">
-          <span class="reply-author">我</span>
-          <span class="reply-dept">基础产品组</span>
-          <span class="reply-time">刚刚</span>
-        </div>
-        <div class="reply-content">${content.replace(/@(\S+)/g, '<span class="mention">@$1</span>')}</div>
-        <div class="reply-actions">
-          <button class="act-btn">👍</button>
-          <span class="act-sep">·</span>
-          <button class="act-btn" onclick="toggleReply('${threadId}')">💬 回复</button>
-        </div>
-      </div>
-    `;
-    const collapseBtn = full.querySelector('.expand-thread');
-    full.insertBefore(newReply, collapseBtn);
-  }
-}
-
-/* ============================================================
- *  New Thread
- * ============================================================ */
-function openNewThread() {
-  document.getElementById('new-thread-composer').classList.add('active');
-  document.getElementById('new-thread-title-input').focus();
-}
-
-function closeNewThread() {
-  document.getElementById('new-thread-composer').classList.remove('active');
-  document.getElementById('new-thread-title-input').value = '';
-  document.getElementById('new-thread-content-input').value = '';
-}
-
-function submitNewThread() {
-  const title = document.getElementById('new-thread-title-input').value.trim();
-  if (!title) { showToast('讨论主题不能为空'); return; }
-  closeNewThread();
-  showToast('🧵 新讨论已发布', 'success');
-  // Simulate adding thread
-  setTimeout(() => {
-    const section = document.getElementById('thread-section');
-    const newBtn = section.querySelector('.new-thread-btn');
-    const newThread = document.createElement('div');
-    newThread.className = 'thread-item';
-    newThread.style.animation = 'fadeIn .2s';
-    newThread.innerHTML = `
-      <div class="thread-main">
-        <div class="thread-avatar av-me">我</div>
-        <div class="thread-body">
-          <div class="thread-meta">
-            <span class="thread-author">我</span>
-            <span class="thread-dept">基础产品组</span>
-            <span class="thread-time">刚刚</span>
-          </div>
-          <div class="thread-title"><span class="dot-icon">●</span>${title}</div>
-          <div class="thread-actions">
-            <button class="act-btn" onclick="toggleLikeT('new')">👍</button>
-            <span class="act-sep">·</span>
-            <button class="act-btn" onclick="toggleReply('new')">💬 回复</button>
-            <span class="act-sep">·</span>
-            <button class="act-btn" onclick="openConvertModal('new')">📌 转子任务</button>
-          </div>
-        </div>
-      </div>
-    `;
-    section.insertBefore(newThread, newBtn);
-    const countEl = document.getElementById('thread-count');
-    if (countEl) countEl.textContent = parseInt(countEl.textContent) + 1;
-  }, 100);
-}
-
-/* ============================================================
- *  Convert to Task Modal
- * ============================================================ */
-let pendingThreadId = null;
-
-function openConvertModal(threadId) {
-  pendingThreadId = threadId;
-  const modal = document.getElementById('convert-modal');
-  modal.classList.add('active');
-  // Auto-fill task name from thread title
-  const threadEl = document.getElementById('thread-' + threadId);
-  if (threadEl) {
-    const titleEl = threadEl.querySelector('.thread-title');
-    if (titleEl) {
-      document.getElementById('task-name-input').value = titleEl.textContent.replace('●', '').trim().slice(0, 30);
-    }
-  }
-}
-
-function closeConvertModal() {
-  document.getElementById('convert-modal').classList.remove('active');
-  pendingThreadId = null;
-}
-
-function confirmConvert() {
-  if (!pendingThreadId) return;
-  const taskName = document.getElementById('task-name-input').value.trim();
-  if (!taskName) { showToast('任务名称不能为空'); return; }
-  const threadEl = document.getElementById('thread-' + pendingThreadId);
-  closeConvertModal();
-  showToast(`📌 子任务「${taskName}」已创建`, 'success');
-  // Simulate updating thread with task badge
-  if (threadEl) {
-    const meta = threadEl.querySelector('.thread-meta');
-    if (meta) {
-      // Remove existing task badge
-      const existing = meta.querySelector('.task-badge');
-      if (existing) existing.remove();
-      // Add new task badge
-      const badge = document.createElement('span');
-      badge.className = 'task-badge';
-      badge.innerHTML = '<span class="icon">📌</span>子任务 #' + (128 + Math.floor(Math.random() * 10));
-      meta.appendChild(badge);
-    }
-    // Update action button
-    const actions = threadEl.querySelector('.thread-actions');
-    if (actions) {
-      const convertBtn = actions.querySelector('button[onclick*="openConvertModal"]');
-      if (convertBtn) {
-        convertBtn.classList.add('active');
-        convertBtn.textContent = '📌 已转任务';
-        convertBtn.disabled = true;
-      }
-    }
-  }
-}
-
-/* ============================================================
- *  Toast
- * ============================================================ */
-function showToast(msg, type) {
-  const container = document.getElementById('toast-container');
-  const toast = document.createElement('div');
-  toast.className = 'toast ' + (type || '');
-  toast.textContent = msg;
-  container.appendChild(toast);
-  setTimeout(() => toast.classList.add('show'), 10);
-  setTimeout(() => {
-    toast.classList.remove('show');
-    setTimeout(() => toast.remove(), 200);
-  }, 2500);
-}
-
-/* ============================================================
- *  Reaction Toggle
- * ============================================================ */
-function toggleReaction(el) {
-  el.classList.toggle('active');
-  const count = el.querySelector('.count');
-  if (count) {
-    const n = parseInt(count.textContent);
-    count.textContent = el.classList.contains('active') ? n + 1 : Math.max(0, n - 1);
-  }
-  if (el.classList.contains('active')) {
-    showToast('👍 已表态', 'success');
-  }
-}
-
-function toggleLikeT(id) {
-  showToast('👍 已表态', 'success');
-}
-
-/* ============================================================
- *  Notification Pop
- * ============================================================ */
-function toggleNotif() {
-  document.getElementById('notif-pop').classList.toggle('show');
-}
-
-function goToThread() {
-  toggleNotif();
-  switchTab('event-detail', document.querySelectorAll('.nav-tab')[1]);
-  setTimeout(() => {
-    expandThread('thread-2');
-    document.getElementById('thread-2').scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 100);
-}
-
-/* ============================================================
- *  Mention Popup
- * ============================================================ */
-const users = [
-  { name: 'Suri', dept: '基础产品组', avatar: 'av-suri', initial: 'S' },
-  { name: '刘芳', dept: '后端开发组', avatar: 'av-liufang', initial: '刘' },
-  { name: '赵宇', dept: '设计组', avatar: 'av-zhaoyu', initial: '赵' },
-  { name: '孙健', dept: '前端开发组', avatar: 'av-sunjian', initial: '孙' },
-  { name: '张明', dept: '基础产品组', avatar: 'av-zhangming', initial: '张' },
-  { name: '王强', dept: '技术运营组', avatar: 'av-wangqiang', initial: '王' },
-];
-
-function insertAt(inputId) {
-  const el = document.getElementById(inputId);
+/* ==========================================================
+   Thread 展开 / 收起
+   ========================================================== */
+function toggleThread(tid) {
+  const el = document.querySelector('.thread[data-tid="' + tid + '"]');
   if (!el) return;
-  el.focus();
-  const pos = el.selectionStart;
-  el.value = el.value.slice(0, pos) + '@' + el.value.slice(pos);
-  el.selectionStart = el.selectionEnd = pos + 1;
+  el.classList.toggle('expanded');
+}
+function expandThread(tid) {
+  const el = document.querySelector('.thread[data-tid="' + tid + '"]');
+  if (!el) return;
+  el.classList.add('expanded');
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-/* ============================================================
- *  Init
- * ============================================================ */
-// Auto-show notification after 1.5s for demo
-setTimeout(() => {
-  // Uncomment to auto-show: toggleNotif();
-}, 1500);
+/* ==========================================================
+   发起新 Thread
+   ========================================================== */
+function autoGrow(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+}
+function toggleSend() {
+  const ta = document.getElementById('newThreadInput');
+  document.getElementById('newThreadSend').disabled = !ta.value.trim();
+}
+function handleNewThreadKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendNewThread();
+  }
+}
+let newThreadIdx = 0;
+function sendNewThread() {
+  const ta = document.getElementById('newThreadInput');
+  const text = ta.value.trim();
+  if (!text) return;
+  newThreadIdx += 1;
+  const tid = 'new' + newThreadIdx;
+  const html = [
+    '<div class="thread expanded" data-tid="' + tid + '">',
+    '  <div class="thread-head" onclick="toggleThread(\'' + tid + '\')">',
+    '    <div class="avatar-sm" style="background:#bbf7d0;color:#065f46;">钟</div>',
+    '    <div class="tbody">',
+    '      <div class="t-line1">',
+    '        <span class="t-author">钟嘉辉</span>',
+    '        <span class="t-dept">· 技术架构</span>',
+    '        <span class="t-time">刚刚</span>',
+    '      </div>',
+    '      <div class="t-preview">' + escapeHtml(text) + '</div>',
+    '    </div>',
+    '  </div>',
+    '  <div class="thread-foot">',
+    '    <span class="chip">💬 暂无回复</span>',
+    '    <span class="chip" style="background:#eff6ff;color:#2563eb;">✨ 新讨论</span>',
+    '    <span class="reply-btn">首个回复</span>',
+    '  </div>',
+    '  <div class="thread-replies">',
+    '    <div style="color:#9ca3af; font-size: 13px; padding: 16px 0; text-align: center;">',
+    '      讨论已发起 · 系统已向 Topic 订阅者推送通知（站内 + 企微 Bot）',
+    '    </div>',
+    '  </div>',
+    '  <div class="thread-reply-box">',
+    '    <div class="rbox">',
+    '      <button class="at-btn" onclick="toast(\'@ 菜单\')">@</button>',
+    '      <input type="text" placeholder="回复此讨论..." />',
+    '      <button class="send-btn-sm" onclick="toast(\'已发送（Demo）\')">发送</button>',
+    '    </div>',
+    '  </div>',
+    '</div>'
+  ].join('');
+  document.getElementById('threadList').insertAdjacentHTML('beforeend', html);
+
+  const cnt = document.getElementById('discussCount');
+  cnt.textContent = parseInt(cnt.textContent) + 1;
+
+  ta.value = '';
+  ta.style.height = 'auto';
+  toggleSend();
+
+  toast('讨论已发起 · 已通知 Topic 订阅者');
+
+  setTimeout(function() {
+    showNotifPop({
+      title: '新讨论推送',
+      body: '你参与的 Topic <strong>SSV Nexus 产品进展</strong> · Event#3 有新讨论：<div class="preview">' + escapeHtml(text) + '</div>',
+    });
+  }, 600);
+}
+
+/* ==========================================================
+   ··· 上下文菜单
+   ========================================================== */
+let ctxCurrentMid = null;
+function openMenuAt(ev, btn, mid) {
+  ev.stopPropagation();
+  ctxCurrentMid = mid;
+  const menu = document.getElementById('ctxMenu');
+  const rect = btn.getBoundingClientRect();
+  menu.style.top = (rect.bottom + 4) + 'px';
+  menu.style.left = Math.max(8, rect.right - 170) + 'px';
+  menu.classList.add('show');
+}
+function closeCtxMenu() {
+  document.getElementById('ctxMenu').classList.remove('show');
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.ctx-menu') && !e.target.closest('.reply-actions')) {
+    closeCtxMenu();
+  }
+});
+
+function onMenuAction(type) {
+  closeCtxMenu();
+  if (type === 'todo') {
+    openTodoModal(ctxCurrentMid);
+  } else if (type === 'copy') {
+    toast('已复制讨论链接');
+  } else if (type === 'edit') {
+    toast('编辑模式（Demo 未覆盖）');
+  } else if (type === 'delete') {
+    toast('删除该消息（Demo 未覆盖）');
+  }
+}
+
+/* ==========================================================
+   转待办弹窗
+   ========================================================== */
+function openTodoModal(mid) {
+  const reply = document.querySelector('.reply[data-mid="' + mid + '"]');
+  const text = reply ? reply.querySelector('.reply-text').innerText : '';
+  document.getElementById('todoQuoted').textContent = text.length > 120 ? text.slice(0, 120) + '…' : text;
+  document.getElementById('todoTitle').value = suggestTodoTitle(text);
+
+  // 默认指派：取文本中 @ 的第一个，否则 Thread 发起者
+  const atMatch = text.match(/@([\u4e00-\u9fa5A-Za-z0-9_]+)/);
+  const sel = document.getElementById('todoAssignee');
+  if (atMatch) {
+    const name = atMatch[1];
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === name) { sel.selectedIndex = i; break; }
+    }
+  }
+  document.getElementById('todoModal').classList.add('show');
+  document.getElementById('todoModal').dataset.mid = mid;
+}
+function closeTodoModal() {
+  document.getElementById('todoModal').classList.remove('show');
+}
+function suggestTodoTitle(text) {
+  const cleaned = text.replace(/@[\u4e00-\u9fa5A-Za-z0-9_]+\s*/g, '').trim();
+  return cleaned.length > 30 ? cleaned.slice(0, 30) + '…' : cleaned;
+}
+
+let todoIdx = 2;
+function confirmTodo() {
+  const mid = document.getElementById('todoModal').dataset.mid;
+  const title = document.getElementById('todoTitle').value.trim();
+  const assignee = document.getElementById('todoAssignee').value;
+  const due = document.getElementById('todoDue').value.trim();
+  if (!title) { toast('请填写待办标题'); return; }
+
+  todoIdx += 1;
+  const tdId = 'td-' + todoIdx;
+
+  // 1) Event 待办列表新增一条
+  const tdHtml = [
+    '<div class="todo-item" data-todo="' + tdId + '" data-mid="' + mid + '">',
+    '  <input type="checkbox" onchange="toggleTodo(this,\'' + tdId + '\',\'' + mid + '\')" />',
+    '  <div class="ti-body">',
+    '    ' + escapeHtml(title),
+    '    <div class="ti-meta">',
+    '      <span class="src-tag">来自讨论 · <a onclick="jumpToMessage(\'' + mid + '\')">查看原讨论 →</a></span>',
+    '      <span>指派：' + escapeHtml(assignee) + '</span>',
+    '      <span>截止：' + escapeHtml(due || '未设置') + '</span>',
+    '    </div>',
+    '  </div>',
+    '</div>'
+  ].join('');
+  document.getElementById('todoList').insertAdjacentHTML('beforeend', tdHtml);
+  const todoCnt = document.getElementById('todoCount');
+  todoCnt.textContent = parseInt(todoCnt.textContent) + 1;
+
+  // 2) Thread 卡片：回复下方插入系统消息 + 卡片 foot 加"已转为待办"chip
+  const reply = document.querySelector('.reply[data-mid="' + mid + '"]');
+  if (reply) {
+    const thread = reply.closest('.thread');
+    const repliesBox = reply.closest('.thread-replies');
+    // 避免重复添加系统消息
+    const already = repliesBox.querySelector('.sys-msg.todo-created[data-for-mid="' + mid + '"]');
+    if (!already) {
+      const sys = document.createElement('div');
+      sys.className = 'sys-msg todo-created';
+      sys.setAttribute('data-for-mid', mid);
+      sys.textContent = '✅ 你已将该讨论转为待办 · 指派给 ' + assignee + ' · 刚刚';
+      repliesBox.appendChild(sys);
+    }
+    // thread-foot 追加 chip
+    const foot = thread.querySelector('.thread-foot');
+    if (foot && !foot.querySelector('.chip.todo-done')) {
+      const chip = document.createElement('span');
+      chip.className = 'chip todo-done';
+      chip.textContent = '✅ 已转为待办';
+      // 插到 reply-btn 之前
+      const replyBtn = foot.querySelector('.reply-btn');
+      if (replyBtn) foot.insertBefore(chip, replyBtn);
+      else foot.appendChild(chip);
+    }
+    thread.classList.add('expanded');
+  }
+
+  closeTodoModal();
+  toast('已转为待办 · 指派给 ' + assignee);
+}
+
+/* ==========================================================
+   待办勾选完成 → Thread 系统消息同步
+   ========================================================== */
+function toggleTodo(chk, tdId, mid) {
+  const item = chk.closest('.todo-item');
+  if (chk.checked) {
+    item.classList.add('done');
+    if (mid) {
+      const reply = document.querySelector('.reply[data-mid="' + mid + '"]');
+      if (reply) {
+        const repliesBox = reply.closest('.thread-replies');
+        const thread = reply.closest('.thread');
+        // 追加完成系统消息
+        const flag = '[data-todo-done="' + tdId + '"]';
+        if (!repliesBox.querySelector(flag)) {
+          const sys = document.createElement('div');
+          sys.className = 'sys-msg todo-done';
+          sys.setAttribute('data-todo-done', tdId);
+          const assignee = item.querySelector('.ti-meta span:nth-of-type(2)')
+            ? item.querySelector('.ti-meta span:nth-of-type(2)').textContent.replace('指派：','').trim()
+            : '用户';
+          sys.textContent = '✓ ' + assignee + ' 已完成关联待办 · 刚刚';
+          repliesBox.appendChild(sys);
+        }
+        thread.classList.add('expanded');
+        setTimeout(() => {
+          thread.scrollIntoView({ behavior:'smooth', block:'center' });
+        }, 150);
+      }
+    }
+    toast('待办已完成 · Thread 参与者已收到同步通知');
+  } else {
+    item.classList.remove('done');
+  }
+}
+
+/* ==========================================================
+   从待办跳到原讨论消息
+   ========================================================== */
+function jumpToMessage(mid) {
+  const reply = document.querySelector('.reply[data-mid="' + mid + '"]');
+  if (!reply) { toast('原讨论消息未找到'); return; }
+  const thread = reply.closest('.thread');
+  thread.classList.add('expanded');
+  goScene('event');
+  setTimeout(() => {
+    reply.classList.add('focused');
+    reply.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => reply.classList.remove('focused'), 2400);
+  }, 180);
+}
+
+/* ==========================================================
+   右上角弹出式通知
+   ========================================================== */
+function showNotifPop(opt) {
+  const pop = document.getElementById('notifPop');
+  pop.innerHTML = [
+    '<div class="np-head">💬 <strong>' + (opt.title || '新通知') + '</strong>',
+    '  <span class="close" onclick="hideNotifPop()">×</span>',
+    '</div>',
+    '<div class="np-body">' + (opt.body || '') + '</div>',
+    '<div class="np-cta">',
+    '  <button class="btn-primary-pop" onclick="hideNotifPop()">知道了</button>',
+    '</div>'
+  ].join('');
+  pop.classList.add('show');
+  document.getElementById('bell').classList.add('has-unread');
+  setTimeout(hideNotifPop, 5000);
+}
+function hideNotifPop() {
+  document.getElementById('notifPop').classList.remove('show');
+}
+
+/* ==========================================================
+   工具
+   ========================================================== */
+let toastTimer = null;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 </script>
 </body>
 </html>
