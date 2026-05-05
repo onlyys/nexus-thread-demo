@@ -263,6 +263,7 @@
       <div class="scene-tab active" data-scene="topicList" onclick="goScene('topicList')">话题列表</div>
       <div class="scene-tab" data-scene="event" onclick="goScene('event')">Event 讨论区</div>
       <div class="scene-tab" data-scene="compare" onclick="goScene('compare')">新旧模式对比</div>
+      <div class="scene-tab" data-scene="empty" onclick="goScene('empty')">空态文案替换</div>
       <div class="scene-tab" data-scene="flow" onclick="goScene('flow')">全链路流程</div>
     </div>
 
@@ -664,6 +665,87 @@
           <div style="margin-top: 14px; padding: 10px; background:#ecfdf5; border-radius: 8px; font-size: 12.5px; color: #059669;">
             ✅ 收益：每议题一条 Thread，参与者、结论、待办一目了然；新人进来也能顺脉络读。
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 页面 3.5：空态文案替换 ===== -->
+    <section class="page" id="page-empty">
+      <div class="guide">
+        <span class="step">+1</span>
+        <span>基于业务方截图：旧评论空态 vs 新讨论空态。<strong>文案 + 占位</strong>对应 v1.0 §3.2 的 9 处改动之 3。</span>
+      </div>
+      <div class="section-head">空态对比 <span class="sub">当一个 Event 还没有任何发言时，用户看到什么</span></div>
+
+      <div class="compare">
+        <!-- 旧：评论空态（完全还原业务方截图） -->
+        <div class="col old">
+          <div class="col-head">
+            <span style="display:inline-flex;align-items:center;gap:6px;">💬 评论 <span class="count" style="color:#9ca3af;font-weight:400;font-size:12.5px;background:#f5f6f8;padding:1px 8px;border-radius:999px;">0</span></span>
+            <span class="badge-old" style="margin-left:auto;">旧 · 现网</span>
+          </div>
+
+          <div style="border:1px solid #e6e8eb; border-radius:10px; padding:14px 16px; background:#fff;">
+            <textarea readonly placeholder="写下你的评论" style="width:100%; min-height:70px; border:0; outline:none; font-family:inherit; font-size:13.5px; resize:none; color:#9ca3af; background:transparent;"></textarea>
+            <div style="display:flex; align-items:center; margin-top:8px;">
+              <button style="font-size:16px; color:#9ca3af; background:transparent; border:0; cursor:default;">📎</button>
+              <button style="margin-left:auto; background:#c7d2fe; color:#fff; border:0; padding:6px 16px; border-radius:8px; font-size:13px; cursor:default;">发送</button>
+            </div>
+          </div>
+
+          <div style="margin-top:14px; text-align:center; padding:28px 0; color:#9ca3af; font-size:13px; border-top:1px solid #f1f3f5;">
+            暂无评论，来发表第一条吧
+          </div>
+
+          <div style="margin-top:14px; padding: 10px 12px; background:#fef3c7; border-radius: 8px; font-size: 12.5px; color: #92400e;">
+            ⚠️ 问题：文案"留言板"感强，<strong>行为预期=随口一说</strong>；且空态不暗示「讨论」的价值——用户不知道在这里该做什么。
+          </div>
+        </div>
+
+        <!-- 新：讨论空态 -->
+        <div class="col new">
+          <div class="col-head">
+            <span style="display:inline-flex;align-items:center;gap:6px;">💬 讨论 <span class="count" style="color:#9ca3af;font-weight:400;font-size:12.5px;background:#f5f6f8;padding:1px 8px;border-radius:999px;">0</span></span>
+            <span class="badge-new" style="margin-left:auto;">新 · v1.0</span>
+          </div>
+
+          <div class="new-thread" style="margin-top:0;">
+            <div class="avatar-sm" style="background:#bbf7d0;color:#065f46;">钟</div>
+            <div class="nt-body">
+              <textarea readonly placeholder="发起讨论... 输入 @ 可提及同事，Enter 发送" style="color:#9ca3af;"></textarea>
+              <div class="nt-foot">
+                <div class="nt-hint">提示：输入 <kbd>@</kbd> 提及 · <kbd>Enter</kbd> 发送</div>
+                <button class="send-btn" disabled>发起讨论</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:18px; display:flex; flex-direction:column; align-items:center; padding:24px 16px; color:#6b7280; font-size:13px; gap:8px; background:#fff; border:1px dashed #e6e8eb; border-radius:10px;">
+            <div style="font-size:28px;">💡</div>
+            <div style="font-weight:500; color:#1f2328;">还没有人发起讨论</div>
+            <div style="font-size:12.5px; color:#9ca3af;">来开启第一条 · 有结论时可以一键 📌 转为待办</div>
+          </div>
+
+          <div style="margin-top:14px; padding: 10px 12px; background:#ecfdf5; border-radius: 8px; font-size: 12.5px; color: #059669;">
+            ✅ 收益：文案「发起讨论」+ 提示「输入 @ / Enter 发送」+ 空态图示「转待办」——<strong>行为预期=围绕议题深入</strong>，降低 0→1 参与门槛。
+          </div>
+        </div>
+      </div>
+
+      <!-- 9 处文案改动速览（从需求文档 §3.2 提取） -->
+      <div style="margin-top: 22px; background:#fff; border:1px solid #e6e8eb; border-radius: 12px; padding: 16px 20px;">
+        <div style="font-size: 14px; font-weight: 600; margin-bottom: 10px;">📝 全量文案改动（v1.0 · §3.2）</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px 20px; font-size: 12.5px;">
+          <div style="color:#9ca3af;">位置</div><div style="color:#9ca3af;">旧</div><div style="color:#9ca3af;">新</div>
+          <div>Event 底部入口</div><div style="color:#6b7280;text-decoration:line-through;">评论 3</div><div style="color:#1f2328;font-weight:500;">讨论 3</div>
+          <div>输入框占位</div><div style="color:#6b7280;text-decoration:line-through;">写下你的评论</div><div style="color:#1f2328;font-weight:500;">发起讨论...</div>
+          <div>评论区标题</div><div style="color:#6b7280;text-decoration:line-through;">评论区</div><div style="color:#1f2328;font-weight:500;">讨论区</div>
+          <div>空态文案</div><div style="color:#6b7280;text-decoration:line-through;">暂无评论，来发表第一条吧</div><div style="color:#1f2328;font-weight:500;">还没有人发起讨论，来开启第一条</div>
+          <div>站内通知（新发言）</div><div style="color:#6b7280;text-decoration:line-through;">xx 评论了你的 Event</div><div style="color:#1f2328;font-weight:500;">xx 在讨论中发言</div>
+          <div>站内通知（新回复）</div><div style="color:#6b7280;text-decoration:line-through;">xx 回复了你的评论</div><div style="color:#1f2328;font-weight:500;">xx 回复了你的讨论</div>
+          <div>企微 Bot 汇总</div><div style="color:#6b7280;text-decoration:line-through;">有 3 条新评论</div><div style="color:#1f2328;font-weight:500;">有 3 条新讨论</div>
+          <div>AI 总结用词</div><div style="color:#6b7280;text-decoration:line-through;">新评论</div><div style="color:#1f2328;font-weight:500;">新讨论</div>
+          <div>My 页面板块</div><div style="color:#6b7280;text-decoration:line-through;">我评论过的 Topics</div><div style="color:#1f2328;font-weight:500;">我参与讨论的 Topics</div>
         </div>
       </div>
     </section>
