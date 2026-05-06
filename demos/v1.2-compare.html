@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>SSV Nexus · v1.2 视觉方向对比（A 扁平 vs D 竖线）</title>
+<title>SSV Nexus · v1.2 视觉方向对比 v2（A 全扁平 vs B 模块化+竖线串联）</title>
 <style>
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: #f5f6f8;
@@ -13,10 +13,10 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* ========== 外层框架 ========== */
+  /* ========== 顶栏 ========== */
   .page-head {
     background: #fff; border-bottom: 1px solid #e6e8eb;
-    padding: 20px 36px;
+    padding: 18px 36px;
   }
   .page-head h1 {
     margin: 0 0 6px; font-size: 17px; font-weight: 600; letter-spacing: -0.01em;
@@ -31,6 +31,7 @@
     font-size: 11.5px; margin-left: 10px; border: 1px solid #fde68a;
   }
 
+  /* ========== 双栏 ========== */
   .compare-wrap {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -39,7 +40,7 @@
   }
   .col {
     background: #fff;
-    padding: 28px 32px 60px;
+    padding: 28px 32px 80px;
     border-right: 1px solid #e6e8eb;
     overflow: hidden;
   }
@@ -48,7 +49,7 @@
   /* ========== 方案说明卡 ========== */
   .pitch {
     border: 1px solid #e6e8eb; border-radius: 10px;
-    padding: 14px 16px; margin-bottom: 32px;
+    padding: 14px 16px; margin-bottom: 28px;
     background: #fafbfc;
   }
   .pitch .tag {
@@ -56,7 +57,7 @@
     font-size: 11px; font-weight: 500; letter-spacing: 0.04em;
     padding: 2px 8px; border-radius: 4px; margin-right: 8px;
   }
-  .col.d .pitch .tag { background: #2563eb; }
+  .col.b .pitch .tag { background: #2563eb; }
   .pitch h3 {
     display: inline; margin: 0; font-size: 14px; font-weight: 600;
   }
@@ -71,27 +72,52 @@
   .pitch .pros-cons .pro { color: #059669; }
   .pitch .pros-cons .con { color: #c2410c; }
 
-  /* ========== 讨论区 title ========== */
+  /* ========== 通用样式 ========== */
   .discuss-title {
-    font-size: 13px; font-weight: 600; color: #6b7280;
+    font-size: 12px; font-weight: 600; color: #9ca3af;
     text-transform: uppercase; letter-spacing: 0.08em;
-    margin: 0 0 20px;
+    margin: 0 0 18px;
+  }
+  .mention {
+    color: #2563eb; background: #eff6ff;
+    padding: 1px 5px; border-radius: 4px;
+    font-weight: 500;
+  }
+  .link {
+    color: #2563eb; text-decoration: none;
+    border-bottom: 1px solid #bfdbfe;
+  }
+  .link:hover { border-bottom-color: #2563eb; }
+  .attach {
+    margin-top: 8px;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px;
+    border: 1px solid #e6e8eb; border-radius: 6px;
+    font-size: 12.5px; color: #4b5563;
+    background: #fff;
+    text-decoration: none;
+  }
+  .attach .ico { font-size: 14px; }
+  .attach .size { color: #9ca3af; font-size: 11.5px; }
+  .author {
+    font-size: 13px; font-weight: 600; color: #1F2328;
+    margin-bottom: 2px;
+  }
+  .text {
+    font-size: 14px; line-height: 1.7; color: #1F2328;
+    word-break: break-word;
   }
 
   /* ============================================================
-     A 版 · 扁平 Notion 评论风
+     A 版 · 全扁平 · 完全不分模块
      ============================================================ */
   .a-feed .msg {
     display: flex; gap: 12px;
-    padding: 0 0 18px;
-  }
-  .a-feed .msg + .msg {
-    padding-top: 18px;
+    padding: 16px 0;
     border-top: 1px solid #f1f3f5;
   }
-  .a-feed .msg.reply {
-    margin-left: 40px;
-  }
+  .a-feed .msg:first-child { border-top: 0; padding-top: 0; }
+  .a-feed .msg.reply { margin-left: 40px; }
   .a-feed .avatar {
     width: 28px; height: 28px; flex-shrink: 0;
     border-radius: 50%;
@@ -99,120 +125,121 @@
     font-size: 12px; font-weight: 500;
   }
   .a-feed .body { flex: 1; min-width: 0; }
-  .a-feed .author {
-    font-size: 13px; font-weight: 600; color: #1F2328;
-    margin-bottom: 2px;
-  }
-  .a-feed .text {
-    font-size: 14px; line-height: 1.7; color: #1F2328;
-    word-break: break-word;
-  }
-  .a-feed .mention {
-    color: #2563eb; background: #eff6ff;
-    padding: 1px 5px; border-radius: 4px;
-    font-weight: 500;
-  }
-  .a-feed .link {
-    color: #2563eb; text-decoration: none;
-    border-bottom: 1px solid #bfdbfe;
-  }
-  .a-feed .link:hover { border-bottom-color: #2563eb; }
-  .a-feed .attach {
-    margin-top: 8px;
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 6px 12px;
-    border: 1px solid #e6e8eb; border-radius: 6px;
-    font-size: 12.5px; color: #4b5563;
-    background: #fff;
-  }
-  .a-feed .attach .ico { font-size: 14px; }
-  .a-feed .attach .size { color: #9ca3af; font-size: 11.5px; }
   .a-feed .reply-hint {
-    margin-left: 40px; margin-top: -8px; margin-bottom: 8px;
+    margin-left: 40px;
     font-size: 11.5px; color: #9ca3af;
+    margin-top: -6px;
+    padding-top: 6px;
   }
   .a-feed .reply-hint::before {
     content: '↳ '; color: #d1d5db;
   }
 
   /* ============================================================
-     D 版 · Twitter/X 竖线串联
+     B 版 · 模块化 + 竖线串联
      ============================================================ */
-  .d-feed { position: relative; }
-  .d-feed .msg {
-    position: relative;
-    display: flex; gap: 12px;
-    padding-bottom: 18px;
+  .b-feed .topic {
+    margin-bottom: 36px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid #f1f3f5;
   }
-  .d-feed .msg .avatar {
-    width: 32px; height: 32px; flex-shrink: 0;
+  .b-feed .topic:last-child {
+    border-bottom: 0;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  /* 首条 event：视觉强调 */
+  .b-feed .topic .lead {
+    display: flex; gap: 12px;
+    position: relative;
+    padding-left: 12px;
+    border-left: 3px solid #2563eb;
+    margin-bottom: 18px;
+  }
+  .b-feed .topic .lead .avatar {
+    width: 34px; height: 34px; flex-shrink: 0;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     font-size: 13px; font-weight: 500;
+  }
+  .b-feed .topic .lead .body { flex: 1; min-width: 0; }
+  .b-feed .topic .lead .author {
+    font-size: 13.5px; font-weight: 600;
+  }
+  .b-feed .topic .lead .author::after {
+    content: '· 首条';
+    font-size: 11px; color: #2563eb;
+    margin-left: 6px;
+    font-weight: 500;
+    background: #eff6ff;
+    padding: 1px 6px; border-radius: 4px;
+    letter-spacing: 0.02em;
+  }
+  .b-feed .topic .lead .text {
+    font-size: 14.5px; line-height: 1.7;
+    font-weight: 500;
+    color: #1F2328;
+  }
+
+  /* 模块内部回复区：左侧 2px 竖线串联 */
+  .b-feed .replies {
+    padding-left: 14px; /* 与 lead 的 border-left 对齐 */
+    position: relative;
+  }
+  .b-feed .replies .msg {
+    position: relative;
+    display: flex; gap: 12px;
+    padding-bottom: 14px;
+  }
+  .b-feed .replies .msg .avatar {
+    width: 30px; height: 30px; flex-shrink: 0;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 500;
     position: relative;
     z-index: 2;
+    background: #fff;
   }
-  /* 左侧竖线：从头像底部延伸到下一条头像顶部 */
-  .d-feed .msg:not(:last-child)::before {
+  /* 竖线：从头像下方延伸到下一条头像 */
+  .b-feed .replies .msg:not(:last-child)::before {
     content: '';
     position: absolute;
-    left: 15px;
-    top: 38px;  /* avatar 32 + 6 */
+    left: 14px;
+    top: 36px;
     bottom: 0;
     width: 2px;
     background: #e6e8eb;
     z-index: 1;
   }
-  .d-feed .msg.reply {
-    margin-left: 44px;
-  }
-  /* 延续讨论用更浅、更细的次级竖线 */
-  .d-feed .msg.reply:not(:last-child)::before {
-    background: #eef0f2;
-    width: 1.5px;
-  }
-  /* 延续讨论第一条：从上面那条头像画一根"分叉"过来 */
-  .d-feed .msg.reply::after {
+  /* 第一条之前再画一根线，从首条 event 牵下来 */
+  .b-feed .replies::before {
     content: '';
     position: absolute;
-    left: -29px;       /* 回到上层竖线 */
-    top: 16px;
-    width: 29px; height: 14px;
-    border-left: 2px solid #e6e8eb;
-    border-bottom: 2px solid #e6e8eb;
-    border-bottom-left-radius: 10px;
+    left: 14px;
+    top: -14px;
+    height: 14px;
+    width: 2px;
+    background: #e6e8eb;
   }
-  .d-feed .body { flex: 1; min-width: 0; padding-top: 2px; }
-  .d-feed .author {
-    font-size: 13px; font-weight: 600; color: #1F2328;
-    margin-bottom: 3px;
-  }
-  .d-feed .text {
-    font-size: 14px; line-height: 1.7; color: #1F2328;
-    word-break: break-word;
-  }
-  .d-feed .mention {
-    color: #2563eb; background: #eff6ff;
-    padding: 1px 5px; border-radius: 4px;
-    font-weight: 500;
-  }
-  .d-feed .link {
-    color: #2563eb; text-decoration: none;
-    border-bottom: 1px solid #bfdbfe;
-  }
-  .d-feed .link:hover { border-bottom-color: #2563eb; }
-  .d-feed .attach {
-    margin-top: 8px;
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 6px 12px;
-    border: 1px solid #e6e8eb; border-radius: 6px;
-    font-size: 12.5px; color: #4b5563;
-    background: #fff;
-  }
-  .d-feed .attach .ico { font-size: 14px; }
-  .d-feed .attach .size { color: #9ca3af; font-size: 11.5px; }
+  .b-feed .replies .body { flex: 1; min-width: 0; padding-top: 4px; }
+  .b-feed .replies .author { font-size: 12.5px; }
+  .b-feed .replies .text { font-size: 13.5px; line-height: 1.65; }
 
-  /* ========== 输入框（两版共用，但对比用） ========== */
+  /* 模块内的"延续讨论"：再缩进 + 次级竖线 */
+  .b-feed .replies .msg.reply { margin-left: 38px; }
+  .b-feed .replies .msg.reply::after {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 14px;
+    width: 24px; height: 12px;
+    border-left: 2px solid #eef0f2;
+    border-bottom: 2px solid #eef0f2;
+    border-bottom-left-radius: 8px;
+  }
+
+  /* ========== 输入框 ========== */
   .new-msg {
     margin-top: 28px;
     display: flex; gap: 12px;
@@ -226,7 +253,7 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 12px; font-weight: 500;
   }
-  .col.d .new-msg .avatar { width: 32px; height: 32px; font-size: 13px; }
+  .col.b .new-msg .avatar { width: 30px; height: 30px; }
   .new-msg input {
     flex: 1;
     border: 0; outline: 0;
@@ -238,7 +265,7 @@
   }
   .new-msg input::placeholder { color: #9ca3af; }
 
-  /* ========== 底部观察区（让你快速切换看差异） ========== */
+  /* ========== 底部观察栏 ========== */
   .observe {
     position: fixed; left: 0; right: 0; bottom: 0;
     background: #1F2328; color: #fff;
@@ -256,44 +283,43 @@
   }
   .observe button:hover { background: #374151; }
 
-  /* 仅看单侧模式 */
-  body.only-a .col.d { display: none; }
+  body.only-a .col.b { display: none; }
   body.only-a .compare-wrap { grid-template-columns: 1fr; }
-  body.only-d .col.a { display: none; }
-  body.only-d .compare-wrap { grid-template-columns: 1fr; }
+  body.only-b .col.a { display: none; }
+  body.only-b .compare-wrap { grid-template-columns: 1fr; }
 </style>
 </head>
 <body>
 
 <div class="page-head">
   <h1>
-    v1.2 视觉方向对比 · 讨论区
-    <span class="rule">只对比视觉，功能暂不可点击</span>
+    v1.2 视觉方向对比 v2 · 讨论区
+    <span class="rule">含「首条 event」 + 模块化感受</span>
   </h1>
   <div class="sub">
-    两版内容完全相同（7 条发言，含 @人、延续讨论、链接、附件、图片）。请对比哪种更能让你"把注意力放在讲了什么"上。
+    两栏内容完全相同 · 同一个 Event 下并行讨论着 <strong>2 个话题</strong>（红点已读 / 飞书集成）。请对比哪种更能让你感受到「在这个话题之下」的氛围。
   </div>
 </div>
 
 <div class="compare-wrap">
 
-  <!-- ==================== 左 · A 版 · 扁平 Notion 评论风 ==================== -->
+  <!-- ==================== 左 · A 版 · 全扁平不分模块 ==================== -->
   <div class="col a">
 
     <div class="pitch">
       <span class="tag">方案 A</span>
-      <h3>扁平 · Notion 评论风</h3>
+      <h3>全扁平 · 不分模块</h3>
       <div class="desc">
-        无任何边框/卡片/竖线。发言之间靠 <strong>1px 浅灰分隔线</strong> 和 <strong>段间距</strong> 区分。
-        延续讨论用 <strong>40px 缩进</strong> 表达层级，不画结构线。
+        所有发言一条流，靠 1px 浅灰分隔线 + 段间距区分。
+        延续讨论用 40px 缩进 + "↳ 钟嘉辉 回复 肖迈" 灰字小标提示。
       </div>
       <div class="pros-cons">
-        <div class="pro"><strong>✓ 优点</strong>极致干净，目光无障碍跟随文字流动；像在读一段对话而不是在"看 UI"</div>
-        <div class="con"><strong>✗ 风险</strong>多人密集回复时容易"糊成一团"；延续关系只靠缩进，层级感弱</div>
+        <div class="pro"><strong>✓ 优点</strong>极致干净，注意力 100% 在文字</div>
+        <div class="con"><strong>✗ 风险</strong>多话题并行时容易混淆，没有"在这个话题之下"的感觉</div>
       </div>
     </div>
 
-    <div class="discuss-title">讨论 · 7</div>
+    <div class="discuss-title">讨论 · 9</div>
 
     <div class="a-feed">
 
@@ -301,81 +327,68 @@
         <div class="avatar" style="background:#bbf7d0;color:#065f46;">钟</div>
         <div class="body">
           <div class="author">钟嘉辉</div>
-          <div class="text">
-            想再讨论下红点消失逻辑：现在是用户点击 Topic 即清除未读，但如果他只是一扫而过没真正阅读，红点就丢了。我倾向"停留 &gt; 3s 或滚动到底部"才算已读。<span class="mention">@肖迈</span> 能帮看下吗？
-          </div>
+          <div class="text">想再讨论下红点消失逻辑：现在是用户点击 Topic 即清除未读，但如果他只是一扫而过没真正阅读，红点就丢了。我倾向"停留 &gt; 3s 或滚动到底部"才算已读。<span class="mention">@肖迈</span></div>
         </div>
       </div>
-
       <div class="msg">
         <div class="avatar" style="background:#c7d2fe;color:#3730a3;">王</div>
         <div class="body">
           <div class="author">王昕</div>
-          <div class="text">
-            同感。红点本身意义也要重新定义——是"有未读新内容"还是"有需要你处理的事"，前者靠滚动/停留就能清，后者必须主动行为才能清。参考一下
-            <a class="link" href="#">Slack 的 unread 设计文档</a>。
-          </div>
+          <div class="text">同感。红点本身意义也要重新定义——是"有未读新内容"还是"有需要你处理的事"。参考一下 <a class="link" href="#">Slack 的 unread 设计文档</a>。</div>
         </div>
       </div>
-
       <div class="msg">
         <div class="avatar" style="background:#fecaca;color:#991b1b;">丹</div>
         <div class="body">
           <div class="author">李丹阳</div>
-          <div class="text">
-            技术上可以做：停留 3s + 可见范围 ≥60% 计为已读。用 IntersectionObserver 实现，成本不高。
-          </div>
-          <a class="attach">
-            <span class="ico">🖼️</span>
-            <span>红点已读-方案示意.png</span>
-            <span class="size">240 KB</span>
-          </a>
+          <div class="text">技术上可以做：停留 3s + 可见范围 ≥60% 计为已读。用 IntersectionObserver 实现。</div>
+          <a class="attach"><span class="ico">🖼️</span><span>红点已读-方案示意.png</span><span class="size">240 KB</span></a>
         </div>
       </div>
-
-      <div class="msg">
-        <div class="avatar" style="background:#ddd6fe;color:#5b21b6;">培</div>
-        <div class="body">
-          <div class="author">李培轮</div>
-          <div class="text">
-            后端也可以加一个"最后阅读位点"字段，滚动到底就持久化。配合前端 observer 双保险。
-          </div>
-        </div>
-      </div>
-
       <div class="msg">
         <div class="avatar" style="background:#fde68a;color:#92400e;">肖</div>
         <div class="body">
           <div class="author">肖迈</div>
-          <div class="text">
-            结论确认：前端 observer + 后端位点。<span class="mention">@钟嘉辉</span> 这周排期？
-          </div>
+          <div class="text">结论确认：前端 observer + 后端位点。<span class="mention">@钟嘉辉</span> 这周排期？</div>
         </div>
       </div>
-
       <div class="reply-hint">钟嘉辉 回复 肖迈</div>
       <div class="msg reply">
         <div class="avatar" style="background:#bbf7d0;color:#065f46;">钟</div>
         <div class="body">
           <div class="author">钟嘉辉</div>
-          <div class="text">
-            收到，本周排期，周五前出 PRD。
-          </div>
+          <div class="text">收到，本周排期，周五前出 PRD。</div>
         </div>
       </div>
 
+      <!-- 第二个话题（A 版没有视觉分隔，只能靠内容感知） -->
       <div class="msg">
         <div class="avatar" style="background:#c7d2fe;color:#3730a3;">王</div>
         <div class="body">
           <div class="author">王昕</div>
-          <div class="text">
-            对了，那红点出现时候的动画效果是不是也要改一下？现在太刺眼了。
-          </div>
-          <a class="attach">
-            <span class="ico">📄</span>
-            <span>红点动效-现状与建议.pdf</span>
-            <span class="size">1.2 MB</span>
-          </a>
+          <div class="text">另外说一下飞书集成方案，<span class="mention">@李培轮</span> 你之前调研的 webhook 还是 OpenAPI 哪个更合适？</div>
+        </div>
+      </div>
+      <div class="msg">
+        <div class="avatar" style="background:#ddd6fe;color:#5b21b6;">培</div>
+        <div class="body">
+          <div class="author">李培轮</div>
+          <div class="text">调研下来 OpenAPI 更稳，webhook 经常丢消息。但 OpenAPI 要做 token 刷新这一套，工作量稍大。</div>
+          <a class="attach"><span class="ico">📄</span><span>飞书集成-技术对比.pdf</span><span class="size">560 KB</span></a>
+        </div>
+      </div>
+      <div class="msg">
+        <div class="avatar" style="background:#fde68a;color:#92400e;">肖</div>
+        <div class="body">
+          <div class="author">肖迈</div>
+          <div class="text">同意 OpenAPI。token 刷新封装成 SDK 就能复用。</div>
+        </div>
+      </div>
+      <div class="msg">
+        <div class="avatar" style="background:#c7d2fe;color:#3730a3;">王</div>
+        <div class="body">
+          <div class="author">王昕</div>
+          <div class="text">那这块就这么定，<span class="mention">@李培轮</span> 这周出技术方案？</div>
         </div>
       </div>
 
@@ -387,104 +400,101 @@
     </div>
   </div>
 
-  <!-- ==================== 右 · D 版 · Twitter/X 竖线串联 ==================== -->
-  <div class="col d">
+  <!-- ==================== 右 · B 版 · 模块化 + 竖线串联 ==================== -->
+  <div class="col b">
 
     <div class="pitch">
-      <span class="tag">方案 D</span>
-      <h3>竖线串联 · Twitter/X 风</h3>
+      <span class="tag">方案 B</span>
+      <h3>模块化 · 首条 event + 竖线串联</h3>
       <div class="desc">
-        每条发言左侧一根 <strong>2px 浅灰竖线</strong> 贯穿所有头像，视觉上"一串"而不是"一堆"。
-        延续讨论缩进后用 <strong>L 形分叉线</strong> 连接到父发言，层级一眼可辨。
+        每个"首条 event"开启一个模块（左蓝色短杠 + 加粗 + 「· 首条」徽标）。
+        模块内部用 <strong>2px 浅灰竖线</strong> 串联回复，形成"在这个话题之下"的视觉聚拢。
+        模块之间用 36px 间距 + 1px 横线分隔。
       </div>
       <div class="pros-cons">
-        <div class="pro"><strong>✓ 优点</strong>视觉结构感强，密集讨论时仍能顺线阅读；延续关系用画面就讲明白</div>
-        <div class="con"><strong>✗ 风险</strong>比 A 更"重"，线条本身也是视觉信息；对"讲了什么"的焦点有一点分流</div>
+        <div class="pro"><strong>✓ 优点</strong>多话题并行时层次清晰；首条 event 一眼可辨</div>
+        <div class="con"><strong>✗ 风险</strong>比 A 略重，多了"模块"这一层视觉负担</div>
       </div>
     </div>
 
-    <div class="discuss-title">讨论 · 7</div>
+    <div class="discuss-title">讨论 · 9</div>
 
-    <div class="d-feed">
+    <div class="b-feed">
 
-      <div class="msg">
-        <div class="avatar" style="background:#bbf7d0;color:#065f46;">钟</div>
-        <div class="body">
-          <div class="author">钟嘉辉</div>
-          <div class="text">
-            想再讨论下红点消失逻辑：现在是用户点击 Topic 即清除未读，但如果他只是一扫而过没真正阅读，红点就丢了。我倾向"停留 &gt; 3s 或滚动到底部"才算已读。<span class="mention">@肖迈</span> 能帮看下吗？
+      <!-- 模块 1：红点已读 -->
+      <div class="topic">
+        <div class="lead">
+          <div class="avatar" style="background:#bbf7d0;color:#065f46;">钟</div>
+          <div class="body">
+            <div class="author">钟嘉辉</div>
+            <div class="text">想再讨论下红点消失逻辑：现在是用户点击 Topic 即清除未读，但如果他只是一扫而过没真正阅读，红点就丢了。我倾向"停留 &gt; 3s 或滚动到底部"才算已读。<span class="mention">@肖迈</span></div>
+          </div>
+        </div>
+        <div class="replies">
+          <div class="msg">
+            <div class="avatar" style="background:#c7d2fe;color:#3730a3;">王</div>
+            <div class="body">
+              <div class="author">王昕</div>
+              <div class="text">同感。红点本身意义也要重新定义——是"有未读新内容"还是"有需要你处理的事"。参考 <a class="link" href="#">Slack 的 unread 设计文档</a>。</div>
+            </div>
+          </div>
+          <div class="msg">
+            <div class="avatar" style="background:#fecaca;color:#991b1b;">丹</div>
+            <div class="body">
+              <div class="author">李丹阳</div>
+              <div class="text">技术上可以做：停留 3s + 可见范围 ≥60% 计为已读。用 IntersectionObserver 实现。</div>
+              <a class="attach"><span class="ico">🖼️</span><span>红点已读-方案示意.png</span><span class="size">240 KB</span></a>
+            </div>
+          </div>
+          <div class="msg">
+            <div class="avatar" style="background:#fde68a;color:#92400e;">肖</div>
+            <div class="body">
+              <div class="author">肖迈</div>
+              <div class="text">结论确认：前端 observer + 后端位点。<span class="mention">@钟嘉辉</span> 这周排期？</div>
+            </div>
+          </div>
+          <div class="msg reply">
+            <div class="avatar" style="background:#bbf7d0;color:#065f46;">钟</div>
+            <div class="body">
+              <div class="author">钟嘉辉</div>
+              <div class="text">收到，本周排期，周五前出 PRD。</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="msg">
-        <div class="avatar" style="background:#c7d2fe;color:#3730a3;">王</div>
-        <div class="body">
-          <div class="author">王昕</div>
-          <div class="text">
-            同感。红点本身意义也要重新定义——是"有未读新内容"还是"有需要你处理的事"，前者靠滚动/停留就能清，后者必须主动行为才能清。参考一下
-            <a class="link" href="#">Slack 的 unread 设计文档</a>。
+      <!-- 模块 2：飞书集成 -->
+      <div class="topic">
+        <div class="lead">
+          <div class="avatar" style="background:#c7d2fe;color:#3730a3;">王</div>
+          <div class="body">
+            <div class="author">王昕</div>
+            <div class="text">另外说一下飞书集成方案，<span class="mention">@李培轮</span> 你之前调研的 webhook 还是 OpenAPI 哪个更合适？</div>
           </div>
         </div>
-      </div>
-
-      <div class="msg">
-        <div class="avatar" style="background:#fecaca;color:#991b1b;">丹</div>
-        <div class="body">
-          <div class="author">李丹阳</div>
-          <div class="text">
-            技术上可以做：停留 3s + 可见范围 ≥60% 计为已读。用 IntersectionObserver 实现，成本不高。
+        <div class="replies">
+          <div class="msg">
+            <div class="avatar" style="background:#ddd6fe;color:#5b21b6;">培</div>
+            <div class="body">
+              <div class="author">李培轮</div>
+              <div class="text">调研下来 OpenAPI 更稳，webhook 经常丢消息。但 OpenAPI 要做 token 刷新这一套，工作量稍大。</div>
+              <a class="attach"><span class="ico">📄</span><span>飞书集成-技术对比.pdf</span><span class="size">560 KB</span></a>
+            </div>
           </div>
-          <a class="attach">
-            <span class="ico">🖼️</span>
-            <span>红点已读-方案示意.png</span>
-            <span class="size">240 KB</span>
-          </a>
-        </div>
-      </div>
-
-      <div class="msg">
-        <div class="avatar" style="background:#ddd6fe;color:#5b21b6;">培</div>
-        <div class="body">
-          <div class="author">李培轮</div>
-          <div class="text">
-            后端也可以加一个"最后阅读位点"字段，滚动到底就持久化。配合前端 observer 双保险。
+          <div class="msg">
+            <div class="avatar" style="background:#fde68a;color:#92400e;">肖</div>
+            <div class="body">
+              <div class="author">肖迈</div>
+              <div class="text">同意 OpenAPI。token 刷新封装成 SDK 就能复用。</div>
+            </div>
           </div>
-        </div>
-      </div>
-
-      <div class="msg">
-        <div class="avatar" style="background:#fde68a;color:#92400e;">肖</div>
-        <div class="body">
-          <div class="author">肖迈</div>
-          <div class="text">
-            结论确认：前端 observer + 后端位点。<span class="mention">@钟嘉辉</span> 这周排期？
+          <div class="msg">
+            <div class="avatar" style="background:#c7d2fe;color:#3730a3;">王</div>
+            <div class="body">
+              <div class="author">王昕</div>
+              <div class="text">那这块就这么定，<span class="mention">@李培轮</span> 这周出技术方案？</div>
+            </div>
           </div>
-        </div>
-      </div>
-
-      <div class="msg reply">
-        <div class="avatar" style="background:#bbf7d0;color:#065f46;">钟</div>
-        <div class="body">
-          <div class="author">钟嘉辉</div>
-          <div class="text">
-            收到，本周排期，周五前出 PRD。
-          </div>
-        </div>
-      </div>
-
-      <div class="msg">
-        <div class="avatar" style="background:#c7d2fe;color:#3730a3;">王</div>
-        <div class="body">
-          <div class="author">王昕</div>
-          <div class="text">
-            对了，那红点出现时候的动画效果是不是也要改一下？现在太刺眼了。
-          </div>
-          <a class="attach">
-            <span class="ico">📄</span>
-            <span>红点动效-现状与建议.pdf</span>
-            <span class="size">1.2 MB</span>
-          </a>
         </div>
       </div>
 
@@ -499,11 +509,11 @@
 </div>
 
 <div class="observe">
-  <span class="hint">👀 对比时把屏幕往两侧瞟，看哪边的"内容"更跳出来；哪边让你更快找到"延续讨论"那一对发言。</span>
+  <span class="hint">👀 重点对比："多话题并行" 在哪一边更有「在这个话题之下」的感受？哪一边更不抢内容焦点？</span>
   <span>
     <button onclick="document.body.className=''">双栏对比</button>
-    <button onclick="document.body.className='only-a'">只看 A</button>
-    <button onclick="document.body.className='only-d'">只看 D</button>
+    <button onclick="document.body.className='only-a'">只看 A · 全扁平</button>
+    <button onclick="document.body.className='only-b'">只看 B · 模块化</button>
   </span>
 </div>
 
