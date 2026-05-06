@@ -117,8 +117,8 @@
   .event-meta .ts { margin-left: auto; }
 
   .event h1 {
-    font-size: 22px; font-weight: 600;
-    margin: 0 0 12px; letter-spacing: -0.01em;
+    font-size: 26px; font-weight: 600;
+    margin: 0 0 12px; letter-spacing: -0.015em;
     color: #1F2328;
   }
   .event-author {
@@ -131,12 +131,12 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 13px; font-weight: 500;
   }
-  .event-author .info { font-size: 13px; }
+  .event-author .info { font-size: 14px; }
   .event-author .name { font-weight: 600; color: #1F2328; }
-  .event-author .role { color: #9ca3af; }
+  .event-author .role { color: #9ca3af; font-weight: 400; font-size: 12px; margin-left: 4px; }
 
   .event-body {
-    font-size: 15px; line-height: 1.85;
+    font-size: 15.5px; line-height: 1.85;
     color: #1F2328;
   }
   .event-body p { margin: 0 0 14px; }
@@ -205,12 +205,12 @@
   }
   .lead .body { flex: 1; min-width: 0; padding-top: 4px; }
   .lead .author {
-    font-size: 13.5px; font-weight: 600; color: #1F2328;
-    margin-bottom: 3px;
+    font-size: 14px; font-weight: 600; color: #1F2328;
+    margin-bottom: 4px;
   }
-  .lead .role { color: #9ca3af; font-weight: 400; margin-left: 6px; }
+  .lead .role { color: #9ca3af; font-weight: 400; margin-left: 4px; font-size: 12px; }
   .lead .text {
-    font-size: 14.5px; line-height: 1.75;
+    font-size: 15.5px; line-height: 1.75;
     font-weight: 500; color: #1F2328;
   }
 
@@ -250,13 +250,13 @@
   }
   .reply .body { flex: 1; min-width: 0; padding-top: 3px; }
   .reply .author {
-    font-size: 13px; font-weight: 600; color: #1F2328;
-    margin-bottom: 2px;
+    font-size: 12.5px; font-weight: 600; color: #1F2328;
+    margin-bottom: 3px;
   }
-  .reply .role { color: #9ca3af; font-weight: 400; margin-left: 6px; }
-  .reply .ts { color: #d1d5db; font-weight: 400; font-size: 11.5px; margin-left: 6px; }
+  .reply .role { color: #9ca3af; font-weight: 400; margin-left: 4px; font-size: 11px; }
+  .reply .ts { color: #d1d5db; font-weight: 400; font-size: 11px; margin-left: 6px; }
   .reply .text {
-    font-size: 13.5px; line-height: 1.7; color: #1F2328;
+    font-size: 14px; line-height: 1.7; color: #1F2328;
   }
 
   /* ---- 子回复（缩进 2 层） ---- */
@@ -277,8 +277,8 @@
     margin-left: 0;
   }
   .sub-reply .body { flex: 1; min-width: 0; padding-top: 3px; }
-  .sub-reply .author { font-size: 12.5px; font-weight: 600; }
-  .sub-reply .role { color: #9ca3af; font-weight: 400; margin-left: 6px; }
+  .sub-reply .author { font-size: 11.5px; font-weight: 600; }
+  .sub-reply .role { color: #9ca3af; font-weight: 400; margin-left: 4px; font-size: 10.5px; }
   .sub-reply .text { font-size: 13px; line-height: 1.65; }
 
   /* 子回复 L 形拐角（用 SVG-like 画法，保证像素级连通） */
@@ -297,59 +297,64 @@
   /* 子回复后还有兄弟（同层后续）时，主竖线从子回复 L 上方继续 */
   /* 当前 demo 不复杂，先做单条子回复演示 */
 
-  /* ---- 富内容：链接、@提及、附件 ---- */
+  /* ---- 富内容：链接、@提及、附件（v1.2 全面降权，避免抢内容焦点） ---- */
   .mention {
-    color: #2563eb; background: #eff6ff;
-    padding: 1px 5px; border-radius: 4px;
+    color: #2563eb;
     font-weight: 500;
     cursor: pointer;
   }
-  .mention:hover { background: #dbeafe; }
+  .mention:hover { text-decoration: underline; }
   .link {
     color: #2563eb;
-    border-bottom: 1px solid #bfdbfe;
+    border-bottom: 1px solid #dbeafe;
   }
-  .link:hover { border-bottom-color: #2563eb; text-decoration: none; }
+  .link:hover { border-bottom-color: #93c5fd; text-decoration: none; }
 
   .attach-grid {
     margin-top: 8px;
     display: flex; flex-wrap: wrap; gap: 8px;
+    align-items: flex-start;
   }
+  /* 图片占位：浅灰素色，不抢戏 */
   .attach-img {
-    display: block; max-width: 280px; max-height: 180px;
-    border-radius: 8px; border: 1px solid #e6e8eb;
+    display: block; max-width: 240px; max-height: 140px;
+    border-radius: 6px; border: 1px solid #e6e8eb;
     object-fit: cover;
     cursor: pointer;
   }
   .attach-img.placeholder {
-    width: 280px; height: 160px;
-    background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);
-    display: flex; align-items: center; justify-content: center;
-    color: #92400e; font-size: 12.5px; font-weight: 500;
-    text-align: center;
-  }
-  .attach-file {
-    display: inline-flex; align-items: center; gap: 10px;
-    padding: 8px 12px;
-    border: 1px solid #e6e8eb; border-radius: 8px;
-    font-size: 12.5px; color: #4b5563;
+    width: 240px; height: 130px;
     background: #fafbfc;
+    border: 1px solid #e6e8eb;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: #9ca3af; font-size: 11.5px; font-weight: 400;
+    text-align: center;
+    padding: 0 12px; gap: 4px;
+  }
+  .attach-img.placeholder .ico { font-size: 18px; opacity: 0.6; }
+  /* 文件附件：去卡片化，inline 风格 */
+  .attach-file {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 0;
+    font-size: 12.5px; color: #6b7280;
+    background: transparent;
+    border: 0;
     text-decoration: none;
     max-width: 320px;
   }
-  .attach-file:hover { background: #f5f6f8; text-decoration: none; }
+  .attach-file:hover { color: #2563eb; text-decoration: none; }
   .attach-file .ico {
-    width: 32px; height: 32px; flex-shrink: 0;
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
-    background: #fff; border: 1px solid #f1f3f5;
+    font-size: 13px;
+    color: #9ca3af;
   }
-  .attach-file .meta { display: flex; flex-direction: column; min-width: 0; }
+  .attach-file:hover .ico { color: #2563eb; }
   .attach-file .name {
-    color: #1F2328; font-weight: 500;
+    color: inherit; font-weight: 400;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    border-bottom: 1px dashed #e6e8eb;
   }
+  .attach-file:hover .name { border-bottom-color: #93c5fd; }
   .attach-file .size { color: #9ca3af; font-size: 11px; }
 
   /* ---- 每条悬浮才显示的操作菜单 ---- */
@@ -523,7 +528,7 @@
   <div class="slogan">透明即上下文，上下文即生产力</div>
   <div class="topbar-right">
     <div class="bell" onclick="toast('通知中心 · v1.2')">🔔<span class="dot"></span></div>
-    <div class="me"><div class="avatar">钟</div><span>钟嘉辉</span></div>
+    <div class="me"><div class="avatar">钟</div><span>Brant</span></div>
   </div>
 </div>
 
@@ -573,7 +578,7 @@
       <div class="event-author">
         <div class="avatar">王</div>
         <div class="info">
-          <div class="name">王昕 <span class="role">· SSV 产品</span></div>
+          <div class="name">Wang <span class="role">【王昕】</span></div>
         </div>
       </div>
 
@@ -616,7 +621,7 @@
         <div class="lead">
           <div class="avatar" style="background:#bbf7d0;color:#065f46;">钟</div>
           <div class="body">
-            <div class="author">钟嘉辉<span class="role">· 技术架构</span></div>
+            <div class="author">Brant <span class="role">【钟嘉辉】</span></div>
             <div class="text">
               想再讨论下红点消失逻辑：现在是用户点击 Topic 即清除未读，但如果他只是一扫而过没真正阅读，红点就丢了，后续新动态他反而感知不到。
               我倾向"<strong>停留 &gt; 3s 或滚动到底部</strong>"才算已读。<span class="mention">@肖迈</span>
@@ -631,7 +636,7 @@
           <div class="reply">
             <div class="avatar" style="background:#c7d2fe;color:#3730a3;">王</div>
             <div class="body">
-              <div class="author">王昕<span class="role">· SSV 产品</span></div>
+              <div class="author">Wang <span class="role">【王昕】</span></div>
               <div class="text">
                 同感。红点本身意义也要重新定义——是"有未读新内容"还是"有需要你处理的事"。
                 前者靠滚动/停留就能清，后者必须主动行为才能清。可以参考
@@ -644,12 +649,16 @@
           <div class="reply">
             <div class="avatar" style="background:#fecaca;color:#991b1b;">丹</div>
             <div class="body">
-              <div class="author">李丹阳<span class="role">· 前端</span></div>
+              <div class="author">Danyang <span class="role">【李丹阳】</span></div>
               <div class="text">
                 技术上可以做：停留 3s + 可见范围 ≥60% 计为已读。用 IntersectionObserver 实现，成本不高。
               </div>
               <div class="attach-grid">
-                <div class="attach-img placeholder" onclick="toast('全屏预览：红点已读-方案示意.png')">🖼 红点已读-方案示意.png<br/><span style="font-size:11px;opacity:.7;">点击查看大图</span></div>
+                <div class="attach-img placeholder" onclick="toast('全屏预览：红点已读-方案示意.png')">
+                  <span class="ico">🖼</span>
+                  <span>红点已读-方案示意.png</span>
+                  <span style="font-size:10.5px;opacity:.7;">240 × 130</span>
+                </div>
               </div>
             </div>
             <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 复制链接')">⋯</button></div>
@@ -658,7 +667,7 @@
           <div class="reply">
             <div class="avatar" style="background:#ddd6fe;color:#5b21b6;">培</div>
             <div class="body">
-              <div class="author">李培伦<span class="role">· 后端</span></div>
+              <div class="author">Peilun <span class="role">【李培伦】</span></div>
               <div class="text">
                 后端也可以加一个"最后阅读位点"字段，滚动到底就持久化。配合前端 observer 双保险。
               </div>
@@ -669,7 +678,7 @@
           <div class="reply">
             <div class="avatar" style="background:#fde68a;color:#92400e;">肖</div>
             <div class="body">
-              <div class="author">肖迈<span class="role">· 维护者</span></div>
+              <div class="author">Xiaomai <span class="role">【肖迈】</span></div>
               <div class="text">
                 结论确认：<strong>前端 observer + 后端位点</strong>。<span class="mention">@钟嘉辉</span> 这周排期？
               </div>
@@ -678,15 +687,14 @@
               <div class="sub-reply">
                 <div class="avatar" style="background:#bbf7d0;color:#065f46;">钟</div>
                 <div class="body">
-                  <div class="author">钟嘉辉<span class="role">· 技术架构</span></div>
+                  <div class="author">Brant <span class="role">【钟嘉辉】</span></div>
                   <div class="text">
                     收到，本周排期，周五前出 PRD。
                     <a class="attach-file" style="margin-top:8px;">
-                      <div class="ico">📄</div>
-                      <div class="meta">
-                        <div class="name">红点已读-PRD-v0.1.pdf</div>
-                        <div class="size">1.2 MB · 已签收</div>
-                      </div>
+                      <span class="ico">📄</span>
+                      <span class="name">红点已读-PRD-v0.1.pdf</span>
+                      <span class="size">· 1.2 MB</span>
+                    </a>
                     </a>
                   </div>
                 </div>
@@ -709,7 +717,7 @@
         <div class="lead">
           <div class="avatar" style="background:#c7d2fe;color:#3730a3;">王</div>
           <div class="body">
-            <div class="author">王昕<span class="role">· SSV 产品</span></div>
+            <div class="author">Wang <span class="role">【王昕】</span></div>
             <div class="text">
               另外说一下飞书集成方案。我们之前调研过一轮，<span class="mention">@李培伦</span> 你看 webhook 还是 OpenAPI 哪个更适合？
               我个人倾向哪个更稳就用哪个，长期维护成本敏感。
@@ -724,18 +732,16 @@
           <div class="reply">
             <div class="avatar" style="background:#ddd6fe;color:#5b21b6;">培</div>
             <div class="body">
-              <div class="author">李培伦<span class="role">· 后端</span></div>
+              <div class="author">Peilun <span class="role">【李培伦】</span></div>
               <div class="text">
                 调研下来 OpenAPI 更稳，webhook 经常丢消息（飞书侧没有重试机制）。
                 但 OpenAPI 要做 token 刷新、限流、错误降级一整套，工作量稍大。完整对比在这里：
               </div>
               <div class="attach-grid">
                 <a class="attach-file">
-                  <div class="ico">📄</div>
-                  <div class="meta">
-                    <div class="name">飞书集成-技术方案对比.pdf</div>
-                    <div class="size">560 KB</div>
-                  </div>
+                  <span class="ico">📄</span>
+                  <span class="name">飞书集成-技术方案对比.pdf</span>
+                  <span class="size">· 560 KB</span>
                 </a>
               </div>
             </div>
@@ -745,7 +751,7 @@
           <div class="reply">
             <div class="avatar" style="background:#fde68a;color:#92400e;">肖</div>
             <div class="body">
-              <div class="author">肖迈<span class="role">· 维护者</span></div>
+              <div class="author">Xiaomai <span class="role">【肖迈】</span></div>
               <div class="text">
                 同意 OpenAPI。token 刷新封装成 SDK 后续也能复用到其他第三方集成里。
                 可以看下 <a class="link" href="#">larksuite/oapi-sdk-go</a> 这个开源 SDK。
@@ -757,7 +763,7 @@
           <div class="reply">
             <div class="avatar" style="background:#c7d2fe;color:#3730a3;">王</div>
             <div class="body">
-              <div class="author">王昕<span class="role">· SSV 产品</span></div>
+              <div class="author">Wang <span class="role">【王昕】</span></div>
               <div class="text">
                 那这块就这么定，<span class="mention">@李培伦</span> 这周出技术方案？
               </div>
