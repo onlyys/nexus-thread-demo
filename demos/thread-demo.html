@@ -329,21 +329,8 @@
     display:flex; gap: 12px; align-items: flex-start;
     margin-top: 28px;               /* 与上方 Thread 列表拉开距离，独立成块 */
     transition: border-color .2s, background .2s;
-    position: relative;
-  }
-  .new-thread::before {             /* 顶部小标题 */
-    content: '我也来参加讨论';
-    position: absolute;
-    left: 18px; top: -10px;
-    background: #f5f6f8;
-    padding: 0 8px;
-    font-size: 12px;
-    color: #6b7280;
-    font-weight: 500;
-    letter-spacing: 0.02em;
   }
   .new-thread:focus-within { border-color: #2563eb; background:#fff; }
-  .new-thread:focus-within::before { background:#fff; color:#2563eb; }
   .new-thread .avatar-sm { width: 36px; height: 36px; font-size: 13px; flex-shrink: 0; }
   .new-thread .nt-body { flex: 1; }
   .new-thread textarea { width: 100%; border: 0; outline: none; font-family: inherit; font-size: 13.5px; resize: none; line-height: 1.6; min-height: 24px; background: transparent; padding: 4px 0; }
@@ -979,7 +966,7 @@
         <div class="new-thread" id="newThread">
           <div class="avatar-sm" style="background:#bbf7d0;color:#065f46;">钟</div>
           <div class="nt-body">
-            <textarea id="newThreadInput" placeholder="发起讨论…"
+            <textarea id="newThreadInput" placeholder="我也来参加讨论…"
               oninput="autoGrow(this); toggleSend()"
               onkeydown="handleNewThreadKey(event)"></textarea>
             <div class="nt-foot">
@@ -1276,7 +1263,7 @@
           <div class="new-thread" style="margin-top:0;">
             <div class="avatar-sm" style="background:#bbf7d0;color:#065f46;">钟</div>
             <div class="nt-body">
-              <textarea readonly placeholder="发起讨论…" style="color:#9ca3af;"></textarea>
+              <textarea readonly placeholder="我也来参加讨论…" style="color:#9ca3af;"></textarea>
               <div class="nt-foot">
                 <button class="send-btn" disabled>发起讨论</button>
               </div>
