@@ -403,6 +403,142 @@
   .section-head { font-size: 18px; font-weight: 600; margin: 8px 0 14px; }
   .section-head .sub { font-size: 13px; color: #6b7280; font-weight: 400; margin-left: 10px; }
 
+  /* ============================================================
+     Event 讨论区右侧 AI 总结栏（仅 page-event 内的双列布局）
+     ============================================================ */
+  .event-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    align-items: start;
+  }
+  .event-main { min-width: 0; /* 防止 grid 子项溢出 */ }
+  .event-aside {
+    position: sticky; top: 0;
+    max-height: calc(100vh - 56px - 56px); /* 顶栏 + 一些 padding */
+    overflow-y: auto;
+    align-self: start;
+  }
+
+  /* 窄屏自动隐藏右栏，主区铺满 */
+  @media (max-width: 1180px) {
+    .event-layout { grid-template-columns: 1fr; }
+    .event-aside { display: none; }
+  }
+
+  /* Topic 概览 */
+  .aside-topic {
+    background:#fff; border:1px solid #e6e8eb; border-radius: 12px;
+    padding: 14px 16px; margin-bottom: 12px;
+  }
+  .aside-topic-title {
+    font-size: 14px; font-weight: 600; color:#1f2328;
+    margin-bottom: 4px; line-height: 1.5;
+  }
+  .aside-topic-meta { font-size: 12px; color:#9ca3af; margin-bottom: 10px; }
+  .aside-topic-badges {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .aside-topic-badges span {
+    font-size: 11.5px; color:#4b5563; background:#f5f6f8;
+    padding: 3px 10px; border-radius: 999px;
+  }
+
+  /* AI 总结区 */
+  .aside-section {
+    background:#fff; border:1px solid #e6e8eb; border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .aside-section-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .aside-section-title { font-size: 13px; font-weight: 600; color:#1f2328; }
+  .aside-regen {
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    color: #fff; border: 0; padding: 5px 10px; border-radius: 999px;
+    font-size: 11.5px; font-weight: 500; cursor: pointer;
+    display: flex; align-items: center; gap: 4px;
+    transition: all .15s;
+  }
+  .aside-regen:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(124,58,237,.25); }
+  .aside-regen-ico { display: inline-block; transition: transform .4s; font-size: 12px; }
+  .aside-regen.spinning .aside-regen-ico { animation: aside-spin .8s linear infinite; }
+  @keyframes aside-spin { to { transform: rotate(360deg); } }
+
+  /* 版本切换 */
+  .aside-ver-tabs {
+    display: flex; gap: 4px; margin-bottom: 10px;
+    background:#f5f6f8; padding: 3px; border-radius: 6px;
+  }
+  .aside-ver-tab {
+    flex: 1; text-align: center;
+    font-size: 11.5px; color: #6b7280;
+    padding: 4px 6px; border-radius: 4px;
+    cursor: pointer; transition: all .15s;
+  }
+  .aside-ver-tab:hover { color: #1f2328; }
+  .aside-ver-tab.active { background:#fff; color:#1f2328; font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+
+  /* AI 总结卡片 */
+  .aside-ai-cards { display: flex; flex-direction: column; gap: 10px; }
+  .aside-ai-card {
+    background: #fafbfc; border: 1px solid #f1f3f5; border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .aside-ai-card.v11 {
+    background: linear-gradient(135deg, #fafbff 0%, #fdfaff 100%);
+    border-color: #e0e7ff;
+  }
+  .aside-ai-date {
+    font-size: 11px; color: #9ca3af;
+    background:#fff; padding: 1px 8px; border-radius: 999px;
+    display: inline-block; margin-bottom: 6px;
+    border: 1px solid #f1f3f5;
+  }
+  .aside-ai-title {
+    font-size: 12.5px; font-weight: 600; color:#1f2328;
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  }
+  .aside-ai-tag-resolved { background:#ecfdf5; color:#059669; font-size:10.5px; padding: 1px 6px; border-radius: 999px; font-weight: 500; }
+  .aside-ai-tag-active   { background:#fff7ed; color:#c2410c; font-size:10.5px; padding: 1px 6px; border-radius: 999px; font-weight: 500; }
+  .aside-ai-tag-hot      { background:#fef2f2; color:#b91c1c; font-size:10.5px; padding: 1px 6px; border-radius: 999px; font-weight: 500; }
+  .aside-ai-body {
+    font-size: 12px; color: #374151; line-height: 1.6;
+  }
+  .aside-ai-card.v11 .aside-ai-body strong { color: #1f2328; }
+  .aside-ai-stat {
+    display: block; margin-top: 6px;
+    font-size: 11px; color: #6b7280;
+    padding-top: 6px; border-top: 1px dashed #e6e8eb;
+  }
+  .aside-ai-card.v11 .aside-ai-stat { color: #2563eb; }
+
+  /* loading 态 */
+  .aside-ai-loading {
+    text-align: center; padding: 32px 16px;
+    background:#fafbfc; border-radius: 8px;
+  }
+  .aside-ai-spinner {
+    width: 24px; height: 24px;
+    border: 2.5px solid #e6e8eb; border-top-color: #2563eb;
+    border-radius: 50%; animation: aside-spin 0.8s linear infinite;
+    margin: 0 auto 10px;
+  }
+  .aside-ai-loading-text {
+    font-size: 12px; color: #6b7280;
+  }
+
+  /* 差异说明 */
+  .aside-tip {
+    margin-top: 12px;
+    background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 11.5px; color: #1e40af; line-height: 1.55;
+  }
+  .aside-tip strong { color: #1e3a8a; }
+
   /* My 待办卡片（T4） */
   .mytodo-card {
     background:#fff; border:1px solid #e6e8eb; border-radius: 10px;
@@ -485,6 +621,7 @@
         <span class="v11-chip" onclick="spotlightFeature('resolved')">② 标记已解决</span>
         <span class="v11-chip" onclick="spotlightFeature('mytodo')">③ My · 待办跟踪</span>
         <span class="v11-chip" onclick="spotlightFeature('hotkey')">④ Enter 即发布</span>
+        <span class="v11-chip" onclick="spotlightFeature('aisum')">⑤ AI 总结升级</span>
         <span class="v11-chip alt" onclick="simulateBackflow()">⏩ 模拟回流通知</span>
       </div>
       <button class="v11-close" onclick="document.getElementById('v11Banner').style.display='none'">×</button>
@@ -535,6 +672,8 @@
 
     <!-- ===== 页面 2：Event 讨论区 ===== -->
     <section class="page" id="page-event">
+      <div class="event-layout">
+        <div class="event-main">
       <div class="breadcrumb">
         <a onclick="goScene('topicList')">ALL</a>
         › <a onclick="goScene('topicList')">SSV Nexus 产品进展和一些思考</a>
@@ -844,6 +983,109 @@
           </div>
         </div>
       </div>
+        </div><!-- /.event-main -->
+
+        <!-- ============================================================
+             右侧 AI 总结栏（仅 Event 讨论区显示）
+             ============================================================ -->
+        <aside class="event-aside" id="eventAside">
+          <!-- Topic 概览（同 Nexus 产品线右侧栏顶部） -->
+          <div class="aside-topic">
+            <div class="aside-topic-title">📄 Nexus 产品进展和一些思考</div>
+            <div class="aside-topic-meta">suriwang(王昕) · 2026-04-21</div>
+            <div class="aside-topic-badges">
+              <span>📂 3 事件</span>
+              <span>💬 4 讨论</span>
+              <span>📌 2 待办</span>
+            </div>
+          </div>
+
+          <!-- AI 总结区域 -->
+          <div class="aside-section">
+            <div class="aside-section-head">
+              <span class="aside-section-title">🤖 Topic 概览 · AI 总结</span>
+              <button class="aside-regen" onclick="regenSummary()" title="按 Thread 抽结论 · v1.1 升级">
+                <span class="aside-regen-ico">↻</span>
+                <span class="aside-regen-label">v1.1 重生成</span>
+              </button>
+            </div>
+
+            <!-- 版本切换条 -->
+            <div class="aside-ver-tabs" id="aiVerTabs">
+              <span class="aside-ver-tab active" data-ver="v10" onclick="switchAiVer('v10', this)">v1.0 流水账</span>
+              <span class="aside-ver-tab" data-ver="v11" onclick="switchAiVer('v11', this)">v1.1 Thread 结论 ✨</span>
+            </div>
+
+            <!-- v1.0 风格（默认显示） -->
+            <div class="aside-ai-cards" id="aiCardsV10">
+              <div class="aside-ai-card">
+                <div class="aside-ai-date">2026-04-21</div>
+                <div class="aside-ai-title">#1 体验邀请</div>
+                <div class="aside-ai-body">
+                  Nexus AI 正式上线，核心功能包括上传文档自动生成摘要/待办，以及聚合各团队进展洞察。该版本旨在通过 AI 提升信息透明度与协作效率，目前处于首版反馈收集阶段。<span class="aside-ai-stat">本期：2 条评论</span>
+                </div>
+              </div>
+              <div class="aside-ai-card">
+                <div class="aside-ai-date">2026-04-27</div>
+                <div class="aside-ai-title">#2 近期发布与修复</div>
+                <div class="aside-ai-body">
+                  SSV Nexus 已完成图文/附件支持、AI 重新分析及全权限加固。五一前将上线归档、企微 Bot 通知、按人/组织搜索等核心功能。<span class="aside-ai-stat">本期：3 条评论</span>
+                </div>
+              </div>
+              <div class="aside-ai-card">
+                <div class="aside-ai-date">2026-04-29</div>
+                <div class="aside-ai-title">#3 一些新的思考</div>
+                <div class="aside-ai-body">
+                  Nexus 近期明确了移动端适配、AI 能力演进及讨论区改造三大迭代方向。移动端将分两期推进，AI 功能拟从单点总结向交叉分析演进。<span class="aside-ai-stat">本期：4 条评论</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- v1.1 风格（隐藏） -->
+            <div class="aside-ai-cards" id="aiCardsV11" style="display:none;">
+              <div class="aside-ai-card v11">
+                <div class="aside-ai-date">2026-04-21</div>
+                <div class="aside-ai-title">#1 体验邀请 <span class="aside-ai-tag-resolved">✓ 共识</span></div>
+                <div class="aside-ai-body">
+                  Nexus AI v1 上线邀请反馈。<strong>团队认同方向，但请求强化"AI 摘要的可控性"</strong>。<br>
+                  <span class="aside-ai-stat">📌 已转 1 待办：补充 AI 摘要可关闭/重新生成入口</span>
+                </div>
+              </div>
+              <div class="aside-ai-card v11">
+                <div class="aside-ai-date">2026-04-27</div>
+                <div class="aside-ai-title">#2 近期发布与修复 <span class="aside-ai-tag-active">⏳ 进行中</span></div>
+                <div class="aside-ai-body">
+                  企微 Bot 通知与归档已落地；<strong>"按人/组织搜索"在 Q&A 阶段</strong>，王昕提出搜索权重需要按部门相关性排序。
+                  <span class="aside-ai-stat">💬 3 条讨论 · 1 等待回复</span>
+                </div>
+              </div>
+              <div class="aside-ai-card v11">
+                <div class="aside-ai-date">2026-04-29</div>
+                <div class="aside-ai-title">#3 一些新的思考 <span class="aside-ai-tag-hot">🔥 激增</span></div>
+                <div class="aside-ai-body">
+                  4 条讨论同时推进：<br>
+                  ① <strong>红点已读机制</strong> · ✅ 共识"前端 observer + 后端阅读位点"，已转待办<br>
+                  ② <strong>移动端 H5 兜底</strong> · ⏳ 等待回复，李培轮承诺 1 天出方案<br>
+                  ③ <strong>AI 简报热词</strong> · 💬 暂无回复<br>
+                  ④ <strong>DuckDB 评估</strong> · 🧊 冷态（5 天）
+                  <span class="aside-ai-stat">💬 4 讨论 · 📌 1 待办 · ✅ 1 共识</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- loading 状态 -->
+            <div class="aside-ai-loading" id="aiLoading" style="display:none;">
+              <div class="aside-ai-spinner"></div>
+              <div class="aside-ai-loading-text">AI 正在按 Thread 重新提炼结论...</div>
+            </div>
+
+            <!-- 差异说明 -->
+            <div class="aside-tip" id="aiDiffTip" style="display:none;">
+              💡 <strong>v1.1 升级</strong>：从"按时间流水"→"按议题抽结论"，每个 Thread 独立成段，标注 ✅ 共识 / ⏳ 进行中 / 🔥 激增 / 🧊 冷态。
+            </div>
+          </div>
+        </aside>
+      </div><!-- /.event-layout -->
     </section>
 
     <!-- ===== 页面 3：新旧模式对比 ===== -->
@@ -1326,6 +1568,7 @@ function spotlightFeature(key) {
     resolved: { scene: 'event',  selector: '.thread[data-tid="t2"] .t-menu',             tip: '点 ⋯ 菜单 → 「✓ 标记已解决」' },
     mytodo:   { scene: 'mytodo', selector: '#page-mytodo .role-tab',                     tip: '切"我的待办" / "我发出的"双视角' },
     hotkey:   { scene: 'event',  selector: '.thread[data-tid="t1"] .thread-reply-box textarea, .thread[data-tid="t1"] .thread-reply-box .rbox', tip: 'Enter 直接发送，⌘ Enter 才换行' },
+    aisum:    { scene: 'event',  selector: '.aside-regen', tip: '点「v1.1 重生成」看 AI 按 Thread 抽结论' },
   };
   const it = map[key];
   if (!it) return;
@@ -1356,6 +1599,45 @@ function spotlightFeature(key) {
    模拟「指派人回流」三连通知
    场景：肖迈作为指派人，依次收到 +1 完成 / +2 逾期 / +4 拒绝 三种通知
    ========================================================== */
+/* ==========================================================
+   Event 右侧栏 · AI 总结：版本切换 + 重新生成
+   ========================================================== */
+function switchAiVer(ver, btn) {
+  document.querySelectorAll('.aside-ver-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.ver === ver);
+  });
+  document.getElementById('aiCardsV10').style.display = ver === 'v10' ? '' : 'none';
+  document.getElementById('aiCardsV11').style.display = ver === 'v11' ? '' : 'none';
+  document.getElementById('aiDiffTip').style.display = ver === 'v11' ? '' : 'none';
+}
+
+function regenSummary() {
+  const btn = document.querySelector('.aside-regen');
+  const v10 = document.getElementById('aiCardsV10');
+  const v11 = document.getElementById('aiCardsV11');
+  const loading = document.getElementById('aiLoading');
+  const tip = document.getElementById('aiDiffTip');
+
+  // 阶段 1：进入 loading（隐藏卡片，显示 spinner）
+  btn.classList.add('spinning');
+  v10.style.display = 'none';
+  v11.style.display = 'none';
+  tip.style.display = 'none';
+  loading.style.display = '';
+
+  // 阶段 2：1.5s 后展示 v1.1 + 切版本 tab
+  setTimeout(() => {
+    btn.classList.remove('spinning');
+    loading.style.display = 'none';
+    v11.style.display = '';
+    tip.style.display = '';
+    document.querySelectorAll('.aside-ver-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.ver === 'v11');
+    });
+    toast('🤖 AI 已按 Thread 重新提炼结论 · v1.1 模式');
+  }, 1500);
+}
+
 function simulateBackflow() {
   goScene('event');
   setTimeout(() => {
