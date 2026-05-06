@@ -321,14 +321,33 @@
   .thread-reply-box .send-btn-sm { background:#1f2328; color:#fff; font-weight: 500; font-size: 12.5px; }
   .thread-reply-box .send-btn-sm:hover { background:#000; }
 
-  .new-thread { background:#fff; border: 1.5px dashed #d1d5db; border-radius: 12px; padding: 14px 18px; display:flex; gap: 12px; align-items: flex-start; margin-top: 14px; transition: border-color .2s, background .2s; }
-  .new-thread:focus-within { border-color: #2563eb; background:#fff; border-style: solid; }
+  .new-thread {
+    background:#f5f6f8;             /* 浅灰底，与上方 Thread 白底卡片形成清晰边界 */
+    border: 1px solid #e6e8eb;
+    border-radius: 12px;
+    padding: 16px 18px 14px;
+    display:flex; gap: 12px; align-items: flex-start;
+    margin-top: 28px;               /* 与上方 Thread 列表拉开距离，独立成块 */
+    transition: border-color .2s, background .2s;
+    position: relative;
+  }
+  .new-thread::before {             /* 顶部小标题 */
+    content: '我也来参加讨论';
+    position: absolute;
+    left: 18px; top: -10px;
+    background: #f5f6f8;
+    padding: 0 8px;
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .new-thread:focus-within { border-color: #2563eb; background:#fff; }
+  .new-thread:focus-within::before { background:#fff; color:#2563eb; }
   .new-thread .avatar-sm { width: 36px; height: 36px; font-size: 13px; flex-shrink: 0; }
   .new-thread .nt-body { flex: 1; }
   .new-thread textarea { width: 100%; border: 0; outline: none; font-family: inherit; font-size: 13.5px; resize: none; line-height: 1.6; min-height: 24px; background: transparent; padding: 4px 0; }
   .new-thread .nt-foot { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
-  .new-thread .nt-hint { font-size: 12px; color: #9ca3af; }
-  .new-thread .nt-hint kbd { background:#f5f6f8; border:1px solid #e6e8eb; border-radius: 4px; padding: 0 5px; font-size: 11px; font-family: monospace; }
   .new-thread .send-btn { margin-left: auto; background: #1f2328; color: #fff; border: 0; padding: 7px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight:500; }
   .new-thread .send-btn:hover { background:#000; }
   .new-thread .send-btn:disabled { background:#d1d5db; cursor: not-allowed; }
@@ -964,9 +983,6 @@
               oninput="autoGrow(this); toggleSend()"
               onkeydown="handleNewThreadKey(event)"></textarea>
             <div class="nt-foot">
-              <div class="nt-hint">
-                提示：输入 <kbd>@</kbd> 提及 · <kbd>Enter</kbd> 发送 · <kbd>⌘ Enter</kbd> 换行
-              </div>
               <button class="send-btn" id="newThreadSend" disabled onclick="sendNewThread()">发起讨论</button>
             </div>
           </div>
@@ -1260,9 +1276,8 @@
           <div class="new-thread" style="margin-top:0;">
             <div class="avatar-sm" style="background:#bbf7d0;color:#065f46;">钟</div>
             <div class="nt-body">
-              <textarea readonly placeholder="发起讨论... 输入 @ 可提及同事，Enter 发送，⌘ Enter 换行" style="color:#9ca3af;"></textarea>
+              <textarea readonly placeholder="发起讨论…" style="color:#9ca3af;"></textarea>
               <div class="nt-foot">
-                <div class="nt-hint">提示：输入 <kbd>@</kbd> 提及 · <kbd>Enter</kbd> 发送 · <kbd>⌘ Enter</kbd> 换行</div>
                 <button class="send-btn" disabled>发起讨论</button>
               </div>
             </div>
