@@ -1,0 +1,2204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SSV Nexus · 讨论模块升级（Thread）交互演示</title>
+<style>
+  /* 基底：继承自 ssv-nexus-prototype/mention-visibility-demo.html */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    background: #f5f6f8; color: #1f2328; font-size: 14px; line-height: 1.6; overflow: hidden;
+  }
+  .topbar { height: 56px; background: #fff; border-bottom: 1px solid #e6e8eb; display: flex; align-items: center; padding: 0 20px; position: relative; z-index: 50; }
+  .logo { width: 32px; height: 32px; border-radius: 8px; background: #1f2328; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 10px; }
+  .brand { font-weight: 600; font-size: 15px; margin-right: 16px; }
+  .slogan { color: #6b7280; font-size: 12px; border-left: 1px solid #e6e8eb; padding-left: 12px; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+  .bell { position: relative; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #f5f6f8; cursor: pointer; font-size: 18px; }
+  .bell:hover { background:#eef2ff; }
+  .bell .dot { position: absolute; top: 8px; right: 8px; width: 10px; height: 10px; border-radius: 50%; background: #ef4444; border: 2px solid #f5f6f8; display:none; }
+  .bell.has-unread .dot { display:block; }
+  .me { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .me .avatar { width: 30px; height: 30px; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; background:#bbf7d0; color:#065f46; }
+
+  .layout { display: grid; grid-template-columns: 220px 1fr; height: calc(100vh - 56px); }
+  .sidebar { background: #fff; border-right: 1px solid #e6e8eb; padding: 18px 12px; overflow-y:auto; }
+  .sidebar h4 { font-size: 11px; color: #9ca3af; letter-spacing: 1px; padding: 8px 10px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; color: #4b5563; cursor: pointer; font-size: 13px; margin-bottom: 2px; }
+  .nav-item:hover { background: #f5f6f8; }
+  .nav-item.active { background: #1f2328; color: #fff; }
+  .main { overflow-y: auto; padding: 28px 36px 80px; position: relative; }
+  .page { display: none; }
+  .page.active { display: block; animation: fade .25s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px);} to {opacity:1; transform:none;} }
+
+  .guide { background:#1f2328; color:#fff; border-radius:10px; padding:12px 16px; font-size:13px; margin-bottom: 18px; display:flex; align-items:center; gap:12px; }
+  .guide .step { background:#fff; color:#1f2328; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; }
+  .guide .tip { color:#d1d5db; font-size:12px; margin-left:auto; }
+  .guide strong { color: #fff; }
+  .guide code { background: rgba(255,255,255,.12); padding: 1px 6px; border-radius: 4px; color: #fff; font-size: 11.5px; }
+
+  .scene-tabs { display: flex; gap: 6px; margin-bottom: 18px; border-bottom: 1px solid #e6e8eb; }
+  .scene-tab { padding: 8px 14px; font-size: 13px; color: #6b7280; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .scene-tab:hover { color: #1f2328; }
+  .scene-tab.active { color: #1f2328; border-bottom-color: #1f2328; font-weight: 500; }
+
+  /* v1.1 新功能导览浮条 */
+  .v11-banner {
+    background: linear-gradient(90deg, #f0f7ff 0%, #fdf4ff 100%);
+    border: 1px solid #c7d2fe;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 14px;
+    flex-wrap: wrap;
+    position: relative;
+  }
+  .v11-banner .v11-title {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; color: #1f2328;
+  }
+  .v11-banner .v11-chips { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+  .v11-chip {
+    background: #fff; border: 1px solid #c7d2fe;
+    color: #2563eb; font-size: 12.5px; font-weight: 500;
+    padding: 5px 12px; border-radius: 999px;
+    cursor: pointer; transition: all .15s;
+    user-select: none;
+  }
+  .v11-chip:hover { background: #2563eb; color: #fff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,.2); }
+  .v11-chip.alt { background: #fef3c7; border-color: #fde68a; color: #92400e; }
+  .v11-chip.alt:hover { background: #f59e0b; color: #fff; box-shadow: 0 4px 12px rgba(245,158,11,.3); }
+  .v11-close {
+    width: 24px; height: 24px; border-radius: 4px;
+    background: transparent; color: #9ca3af; font-size: 18px; line-height: 1;
+    cursor: pointer; border: 0;
+  }
+  .v11-close:hover { background: rgba(0,0,0,.05); color: #1f2328; }
+
+  /* spotlight 高亮动画 */
+  .spotlight {
+    animation: spotlightPulse 1.6s ease-in-out 2;
+    position: relative; z-index: 5;
+  }
+  @keyframes spotlightPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0.35), 0 0 24px rgba(245, 158, 11, 0.5); }
+  }
+
+  .topic-list { background:#fff; border:1px solid #e6e8eb; border-radius:12px; overflow:hidden; }
+  .topic-row { padding: 16px 20px; border-bottom: 1px solid #f1f3f5; display:flex; align-items:flex-start; gap:14px; cursor:pointer; transition: background .15s; }
+  .topic-row:last-child { border-bottom:0; }
+  .topic-row:hover { background:#f9fafb; }
+  .topic-row.highlight { background:#fffbeb; outline:2px solid #fde68a; outline-offset:-2px; }
+  .topic-emoji { font-size:22px; }
+  .topic-meta { flex:1; }
+  .topic-title { font-size:14.5px; font-weight:600; margin-bottom:4px; }
+  .topic-sub { font-size:12px; color:#6b7280; }
+  .topic-badges { display:flex; gap:6px; margin-top:8px; flex-wrap: wrap; }
+  .topic-badges span { background:#f5f6f8; color:#4b5563; font-size:11.5px; padding:2px 8px; border-radius:999px; }
+  .topic-badges span.hot { background:#fef2f2; color:#b91c1c; }
+  .topic-arrow { color:#9ca3af; align-self:center; }
+
+  .breadcrumb { font-size:12.5px; color:#6b7280; margin-bottom:14px; }
+  .breadcrumb a { color:#6b7280; cursor:pointer; }
+  .breadcrumb a:hover { color:#1f2328; }
+  .event-card { background: #fff; border: 1px solid #e6e8eb; border-radius: 12px; padding: 22px 24px; margin-bottom: 16px; }
+  .event-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+  .event-meta { font-size: 12px; color: #6b7280; margin-bottom: 14px; }
+  .event-body { font-size: 13.5px; color: #374151; line-height: 1.8; }
+  .event-body ol { padding-left: 20px; margin: 10px 0; }
+  .event-body ol li { margin: 6px 0; }
+  .reactions { display: flex; gap: 8px; margin: 16px 0 6px; }
+  .reaction { background: #f5f6f8; border-radius: 999px; padding: 5px 12px; font-size: 12.5px; cursor: pointer; user-select: none; }
+  .reaction:hover { background: #eef2ff; }
+  .reaction.active { background:#eff6ff; color:#2563eb; }
+
+  .discuss-title { font-size: 14px; font-weight: 600; color: #1f2328; margin: 26px 0 14px; display:flex; align-items:center; gap:8px; }
+  .discuss-title .count { color:#9ca3af; font-weight:400; font-size: 13px; }
+
+
+  .thread { background:#fff; border: 1px solid #e6e8eb; border-radius: 12px; margin-bottom: 12px; overflow: hidden; transition: box-shadow .2s, border-color .2s; }
+  .thread:hover { border-color: #d1d5db; box-shadow: 0 2px 8px rgba(0,0,0,.04); }
+  /* 旧 .expanded 兼容别名（JS 里还可能用到） */
+  .thread.expanded { border-color: #c7d2fe; box-shadow: 0 2px 12px rgba(99,102,241,.08); }
+  .thread.expanded .reply.hidden-history { display: flex; }
+  .thread-head { padding: 14px 18px; display: flex; align-items: flex-start; gap: 12px; cursor: pointer; }
+  .thread-head .avatar-sm { width: 36px; height: 36px; font-size: 13px; }
+  .thread-head .tbody { flex: 1; min-width: 0; }
+  .thread-head .t-line1 { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; font-size: 13.5px; }
+  .thread-head .t-author { font-weight: 600; color: #1f2328; }
+  .thread-head .t-dept { color: #9ca3af; font-size: 12px; font-weight: 400; }
+  .thread-head .t-time { color: #9ca3af; font-size: 12px; margin-left: auto; }
+  .thread-head .t-menu {
+    width: 24px; height: 24px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    color: #9ca3af; font-size: 15px; line-height: 1;
+    margin-left: 4px; cursor: pointer;
+    opacity: 0; transition: opacity .15s, background .15s;
+  }
+  .thread:hover .t-menu, .thread.full-expanded .t-menu, .thread.resolved .t-menu { opacity: 1; }
+  .thread-head .t-menu:hover { background: #f5f6f8; color: #1f2328; }
+  .thread-head .t-preview { font-size: 13.5px; color: #374151; line-height: 1.65; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .thread.expanded .thread-head .t-preview { -webkit-line-clamp: unset; display: block; }
+  .thread-foot { display: flex; align-items: center; gap: 14px; padding: 0 18px 12px; font-size: 12px; color: #6b7280; flex-wrap: wrap; }
+  .thread-foot .chip { display:inline-flex; align-items:center; gap:4px; padding: 2px 8px; border-radius: 999px; background: #f5f6f8; }
+  .thread-foot .chip.reply-count { background: #eff6ff; color: #2563eb; font-weight: 500; }
+  .thread-foot .chip.todo-done { background:#ecfdf5; color:#059669; }
+  .thread-foot .chip.waiting { background:#fff7ed; color:#c2410c; }
+  .thread-foot .reply-btn { margin-left: auto; color: #2563eb; cursor: pointer; font-weight: 500; }
+  .thread-foot .reply-btn:hover { text-decoration: underline; }
+
+  /* ============================================================
+     Thread 默认态（混合态 C · v1.1）
+     - 活跃 Thread：首条 + 最新 1 条可见，中间历史折叠
+     - 冷 Thread（cold，>3 天无回复）：整体收起，只见首条
+     - 已解决（resolved）：默认整体折叠，头部带 ✓ 已解决标
+     - 用户主动 .full-expanded：展示所有历史回复
+     ============================================================ */
+  /* 默认：回复区可见（不再整体 display:none） */
+  .thread-replies {
+    display: block;
+    padding: 0 18px 6px 56px; /* 左缩进 56px：与主帖 avatar(36) + gap(12) + 微调对齐，形成层级 */
+    border-top: 1px dashed #e6e8eb;
+    margin-top: 4px;
+    padding-top: 10px;
+    position: relative;
+  }
+  /* 左侧引导竖线：从折叠条延到底部最后一条回复，暗示"挂在主帖下" */
+  .thread-replies::before {
+    content: '';
+    position: absolute;
+    left: 35px;        /* 对齐主帖 avatar 中线 */
+    top: 12px;
+    bottom: 8px;
+    width: 2px;
+    background: #eef0f2;
+    border-radius: 1px;
+  }
+  /* cold 或 resolved：整体收起 */
+  .thread.cold .thread-replies,
+  .thread.resolved .thread-replies { display: none; }
+  .thread.cold.full-expanded .thread-replies,
+  .thread.resolved.full-expanded .thread-replies { display: block; animation: fade .2s ease; }
+
+  /* 中间历史回复：默认隐藏，full-expanded 时展示 */
+  .reply.hidden-history { display: none; }
+  .thread.full-expanded .reply.hidden-history { display: flex; animation: fade .18s ease; }
+
+  /* 折叠器（"· 查看 N 条历史回复 ·"） */
+  .history-collapser {
+    text-align: center;
+    padding: 6px 0 4px;
+    font-size: 11.5px;
+    color: #9ca3af;
+    cursor: pointer;
+    user-select: none;
+    letter-spacing: 0.02em;
+    margin-left: -38px; /* 抵消 thread-replies 的左缩进，保持视觉居中 */
+    position: relative;
+    z-index: 1;
+    background: #fff;   /* 盖住引导线，避免与折叠条文字打架 */
+  }
+  .history-collapser::before, .history-collapser::after {
+    content: '';
+    display: inline-block;
+    width: 28px;
+    border-top: 1px dashed #ebedf0;
+    vertical-align: middle;
+    margin: 0 10px;
+  }
+  .history-collapser:hover { color: #2563eb; }
+  .history-collapser .arrow { margin: 0 4px; transition: transform .2s; display: inline-block; }
+  .thread.full-expanded .history-collapser .arrow { transform: rotate(180deg); }
+  .thread.full-expanded .history-collapser .label-collapsed { display: none; }
+  .history-collapser .label-expanded { display: none; }
+  .thread.full-expanded .history-collapser .label-expanded { display: inline; }
+
+  /* 冷态 / 已解决 · 卡片头部标 */
+  .thread.cold .thread-head { opacity: 0.92; }
+  .thread.cold .thread-head::after {
+    content: '🧊 冷';
+    font-size: 11px; color: #9ca3af;
+    background:#f5f6f8; padding: 2px 8px; border-radius: 999px;
+    margin-left: 8px; align-self: flex-start; margin-top: 3px;
+    white-space: nowrap;
+  }
+  .thread.resolved { opacity: 0.88; }
+  .thread.resolved .thread-head::after {
+    content: '✓ 已解决';
+    font-size: 11px; color: #059669; font-weight: 500;
+    background:#ecfdf5; padding: 2px 8px; border-radius: 999px;
+    margin-left: 8px; align-self: flex-start; margin-top: 3px;
+    white-space: nowrap;
+  }
+  .thread.resolved:hover { opacity: 1; }
+
+  /* resolved 态 · 头部小字"撤销解决"（hover 显示） */
+  .thread.resolved .undo-resolve {
+    display: none;
+    font-size: 11.5px; color: #6b7280; cursor: pointer;
+    margin-left: 8px; text-decoration: underline dotted;
+  }
+  .thread.resolved:hover .undo-resolve { display: inline; }
+  .thread.resolved .undo-resolve:hover { color: #dc2626; }
+  .thread:not(.resolved) .undo-resolve { display: none !important; }
+
+  /* 全展开态强调（替代旧 .expanded 的蓝框） */
+  .thread.full-expanded {
+    border-color: #c7d2fe;
+    box-shadow: 0 2px 12px rgba(99,102,241,.08);
+  }
+
+  /* 回复输入框：默认可见（无论 Thread 是否展开） */
+  .thread-reply-box { display: block; padding: 8px 18px 14px; background:#fafbfc; border-top: 1px solid #f1f3f5; }
+  .thread.cold .thread-reply-box,
+  .thread.resolved .thread-reply-box { display: none; }
+  .thread.cold.full-expanded .thread-reply-box,
+  .thread.resolved.full-expanded .thread-reply-box { display: block; }
+  .reply { display: flex; gap: 10px; padding: 10px 0; position: relative; transition: background .2s; border-radius: 6px; }
+  .reply.focused { background:#fffbeb; outline:2px solid #fde68a; padding: 10px; }
+  .reply + .reply { border-top: 1px solid #f1f3f5; }
+  .reply .avatar-sm { width: 30px; height: 30px; font-size: 12px; flex-shrink: 0; }
+  .reply-body { flex: 1; min-width: 0; position: relative; }
+  .reply-author { font-size: 13px; font-weight: 600; }
+  .reply-author .dept { color: #9ca3af; font-weight: 400; font-size: 12px; margin-left: 6px; }
+  .reply-author .time { color: #9ca3af; font-weight: 400; font-size: 11.5px; margin-left: 6px; }
+  .reply-text { font-size: 13.5px; color:#374151; margin-top: 2px; line-height: 1.65; }
+  .reply-text .mention-tag { color: #2563eb; background: #eff6ff; padding: 0 4px; border-radius: 4px; font-weight: 500; }
+  .reply-actions { opacity: 0; transition: opacity .15s; display: flex; gap: 6px; align-items: center; position: absolute; top: 6px; right: 0; background:#fff; border:1px solid #e6e8eb; border-radius: 6px; padding: 2px; }
+  .reply:hover .reply-actions { opacity: 1; }
+  .reply-actions button { background: none; border: 0; cursor: pointer; padding: 4px 8px; font-size: 12.5px; color: #6b7280; border-radius: 4px; }
+  .reply-actions button:hover { background:#f5f6f8; color:#1f2328; }
+  /* 系统消息（元事件 · 非对话内容）：居中 / 克制 / 分层
+     - 基础：11px + 浅灰 #9ca3af + 细虚线
+     - 转化（转为待办）：仅图标点蓝，文字保持浅灰；视觉更轻
+     - 完成（待办完成）：图标点绿，文字略重
+     - resolved（已解决）：图标点蓝灰
+  */
+  .sys-msg {
+    text-align: center;
+    font-size: 11px;
+    color: #9ca3af;
+    padding: 8px 0;
+    letter-spacing: 0.02em;
+    margin-left: -38px; /* 抵消 thread-replies 的左缩进，保持视觉居中 */
+    position: relative;
+    z-index: 1;
+    background: #fff;
+  }
+  .sys-msg::before, .sys-msg::after {
+    content: '';
+    display: inline-block;
+    width: 28px;
+    border-top: 1px dashed #ebedf0;
+    vertical-align: middle;
+    margin: 0 10px;
+  }
+  .sys-msg .ico { display: inline-block; margin-right: 4px; vertical-align: middle; }
+  .sys-msg.todo-created .ico { color: #2563eb; }
+  .sys-msg.todo-done { color: #6b7280; font-weight: 500; }
+  .sys-msg.todo-done .ico { color: #059669; }
+  .sys-msg.resolved .ico { color: #2563eb; }
+  .sys-msg .link { color: #6b7280; text-decoration: underline dotted; cursor: pointer; }
+  .sys-msg .link:hover { color: #1f2328; }
+
+  .thread-reply-box .rbox { background:#fff; border:1px solid #e6e8eb; border-radius: 8px; padding: 8px 10px; display:flex; align-items:flex-start; gap:8px; }
+  .thread-reply-box textarea {
+    flex: 1; border: 0; outline: none; font-size: 13px; background: transparent;
+    font-family: inherit; resize: none; line-height: 1.55;
+    min-height: 20px; max-height: 120px; padding: 2px 0;
+    overflow-y: auto;
+  }
+  .thread-reply-box input { flex: 1; border: 0; outline: none; font-size: 13px; background: transparent; }
+  .thread-reply-box .rbox .at-btn { align-self: flex-start; margin-top: 1px; }
+  .thread-reply-box .rbox .send-btn-sm { align-self: flex-start; margin-top: 1px; }
+  .thread-reply-box .at-btn, .thread-reply-box .send-btn-sm { background: none; border: 0; cursor: pointer; font-size: 13px; color: #6b7280; padding: 4px 10px; border-radius: 6px; }
+  .thread-reply-box .at-btn:hover { background:#f5f6f8; color:#1f2328; }
+  .thread-reply-box .send-btn-sm { background:#1f2328; color:#fff; font-weight: 500; font-size: 12.5px; }
+  .thread-reply-box .send-btn-sm:hover { background:#000; }
+
+  .new-thread {
+    background:#f5f6f8;             /* 浅灰底，与上方 Thread 白底卡片形成清晰边界 */
+    border: 1px solid #e6e8eb;
+    border-radius: 12px;
+    padding: 16px 18px 14px;
+    display:flex; gap: 12px; align-items: flex-start;
+    margin-top: 28px;               /* 与上方 Thread 列表拉开距离，独立成块 */
+    transition: border-color .2s, background .2s;
+  }
+  .new-thread:focus-within { border-color: #2563eb; background:#fff; }
+  .new-thread .avatar-sm { width: 36px; height: 36px; font-size: 13px; flex-shrink: 0; }
+  .new-thread .nt-body { flex: 1; }
+  .new-thread textarea { width: 100%; border: 0; outline: none; font-family: inherit; font-size: 13.5px; resize: none; line-height: 1.6; min-height: 24px; background: transparent; padding: 4px 0; }
+  .new-thread .nt-foot { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+  .new-thread .send-btn { margin-left: auto; background: #1f2328; color: #fff; border: 0; padding: 7px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight:500; }
+  .new-thread .send-btn:hover { background:#000; }
+  .new-thread .send-btn:disabled { background:#d1d5db; cursor: not-allowed; }
+
+  .avatar-sm { width: 32px; height: 32px; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; flex-shrink:0; }
+
+  .ctx-menu { position: fixed; background: #fff; border: 1px solid #e6e8eb; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.1); z-index: 100; min-width: 160px; padding: 4px 0; display: none; }
+  .ctx-menu.show { display: block; animation: fade .12s; }
+  .ctx-menu .mi { padding: 8px 14px; font-size: 13px; color: #374151; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .ctx-menu .mi:hover { background:#f5f6f8; }
+  .ctx-menu .mi.danger { color: #dc2626; }
+  .ctx-menu .sep { height: 1px; background:#f1f3f5; margin: 4px 0; }
+
+  .modal-mask { position: fixed; inset: 0; background: rgba(31,35,40,.3); z-index: 300; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+  .modal-mask.show { display: flex; animation: fade .2s; }
+  .modal { background:#fff; border-radius: 14px; width: 440px; max-width: 90vw; box-shadow: 0 20px 60px rgba(0,0,0,.2); overflow: hidden; }
+  .modal-head { padding: 18px 22px 12px; }
+  .modal-head h3 { font-size: 16px; font-weight: 600; }
+  .modal-head .sub { color: #6b7280; font-size: 12.5px; margin-top: 4px; }
+  .modal-body { padding: 6px 22px 18px; }
+  .modal-body .quoted { background:#f9fafb; border-left: 3px solid #d1d5db; padding: 8px 12px; font-size: 12.5px; color: #4b5563; border-radius: 4px; margin-bottom: 14px; }
+  .modal-body label { display: block; font-size: 12px; color: #6b7280; margin: 10px 0 4px; letter-spacing: .5px; }
+  .modal-body input, .modal-body select { width: 100%; border: 1px solid #e6e8eb; border-radius: 8px; padding: 8px 12px; font-size: 13.5px; font-family: inherit; background:#fff; outline: none; }
+  .modal-body input:focus, .modal-body select:focus { border-color: #2563eb; }
+  .modal-foot { padding: 12px 22px 18px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #f1f3f5; }
+  .modal-foot .btn-ghost { background:#fff; color:#4b5563; border:1px solid #d1d5db; padding: 7px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+  .modal-foot .btn-ghost:hover { background:#f5f6f8; }
+  .modal-foot .btn-primary { background:#1f2328; color:#fff; border:0; padding: 7px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 500; }
+  .modal-foot .btn-primary:hover { background:#000; }
+
+  .todo-block { background:#fff; border: 1px solid #e6e8eb; border-radius: 12px; padding: 16px 20px; margin-top: 20px; }
+  .todo-block h4 { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .todo-block h4 .tag-count { background:#f5f6f8; color:#4b5563; font-size: 11.5px; padding: 2px 8px; border-radius: 999px; font-weight: 500; }
+  .todo-item { display: flex; gap: 10px; padding: 10px 0; align-items: flex-start; border-top: 1px solid #f1f3f5; }
+  .todo-item:first-of-type { border-top: 0; }
+  .todo-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; margin-top: 3px; accent-color: #1f2328; }
+  .todo-item .ti-body { flex: 1; font-size: 13.5px; }
+  .todo-item .ti-meta { font-size: 12px; color: #6b7280; margin-top: 4px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .todo-item .ti-meta .src-tag { background:#eff6ff; color:#2563eb; font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 500; }
+  .todo-item .ti-meta .src-tag a { color: #2563eb; text-decoration: underline; cursor: pointer; }
+  .todo-item.done .ti-body { color: #9ca3af; text-decoration: line-through; }
+  .todo-item.done .src-tag { opacity: .6; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .compare .col { background: #fff; border: 1px solid #e6e8eb; border-radius: 12px; padding: 16px 18px; }
+  .compare .col.old { background:#fafafa; }
+  .compare .col.new { border-color: #c7d2fe; }
+  .col-head { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #f1f3f5; }
+  .col-head .badge-old { background:#f3f4f6; color:#6b7280; font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 500; }
+  .col-head .badge-new { background:#eff6ff; color:#2563eb; font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 500; }
+  .old-comment { display: flex; gap: 10px; padding: 8px 0; border-top: 1px solid #f1f3f5; }
+  .old-comment:first-of-type { border-top: 0; }
+  .old-comment .avatar-sm { width: 26px; height: 26px; font-size: 11px; }
+  .old-comment .ob { flex: 1; font-size: 12.5px; line-height: 1.6; }
+  .old-comment .oa { font-weight: 600; font-size: 12.5px; }
+  .old-comment .oa .d { color: #9ca3af; font-weight: 400; font-size: 11.5px; margin-left: 4px; }
+  .old-comment .txt { color: #374151; margin-top: 1px; }
+  .old-comment .tm { color: #9ca3af; font-size: 11px; margin-top: 2px; }
+  .mini-thread { border: 1px solid #e6e8eb; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; background:#fff; }
+  .mini-thread .mh { font-size: 12.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+  .mini-thread .mh .d { color: #9ca3af; font-weight: 400; font-size: 11.5px; }
+  .mini-thread .mt { font-size: 12.5px; color: #374151; margin: 4px 0 6px; line-height: 1.55; }
+  .mini-thread .mf { font-size: 11.5px; color: #6b7280; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .mini-thread .mf .chip { background:#eff6ff; color:#2563eb; padding: 1px 6px; border-radius: 999px; font-weight: 500; }
+  .mini-thread .mf .chip.done { background:#ecfdf5; color:#059669; }
+
+  .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); background: #1f2328; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 13px; z-index: 999; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .toast.show { opacity: 1; }
+
+  .notif-pop { position: fixed; top: 72px; right: 20px; width: 360px; background:#fff; border:1px solid #e6e8eb; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,.15); padding: 14px 16px; z-index: 200; transform: translateX(420px); opacity: 0; transition: transform .35s cubic-bezier(.2,.9,.3,1.2), opacity .25s; }
+  .notif-pop.show { transform: translateX(0); opacity: 1; }
+  .notif-pop .np-head { display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:12.5px; color:#6b7280; }
+  .notif-pop .np-head strong { color:#1f2328; }
+  .notif-pop .np-head .close { margin-left:auto; cursor:pointer; color:#9ca3af; font-size: 18px; line-height: 1; }
+  .notif-pop .np-body { font-size: 13.5px; color:#374151; line-height: 1.65; }
+  .notif-pop .np-body .preview { color:#6b7280; font-size:12.5px; background:#f9fafb; border-left:3px solid #d1d5db; padding:6px 10px; margin-top:8px; border-radius:4px; }
+  .notif-pop .np-cta { margin-top: 10px; display:flex; gap:6px; }
+  .notif-pop button { font-size: 12.5px; padding: 6px 12px; border-radius: 6px; cursor: pointer; border:0; font-weight: 500; }
+  .btn-primary-pop { background:#1f2328; color:#fff; }
+  .btn-primary-pop:hover { background:#000; }
+
+  .flow-step { background:#fff; border:1px solid #e6e8eb; border-radius: 12px; padding: 16px 18px; margin-bottom: 10px; display: flex; gap: 14px; align-items: flex-start; position: relative; }
+  .flow-step::before { content: ''; position: absolute; left: 34px; top: 100%; width: 2px; height: 12px; background: #d1d5db; }
+  .flow-step:last-of-type::before { display: none; }
+  .flow-num { flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; background:#1f2328; color:#fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+  .flow-num.done { background:#059669; }
+  .flow-body { flex: 1; }
+  .flow-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .flow-desc { font-size: 12.5px; color: #6b7280; line-height: 1.6; }
+  .flow-desc code { background:#f5f6f8; padding: 1px 6px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 11.5px; }
+
+  .section-head { font-size: 18px; font-weight: 600; margin: 8px 0 14px; }
+  .section-head .sub { font-size: 13px; color: #6b7280; font-weight: 400; margin-left: 10px; }
+
+  /* ============================================================
+     Event 讨论区右侧 AI 总结栏（仅 page-event 内的双列布局）
+     ============================================================ */
+  .event-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    align-items: start;
+  }
+  .event-main { min-width: 0; /* 防止 grid 子项溢出 */ }
+  .event-aside {
+    position: sticky; top: 0;
+    max-height: calc(100vh - 56px - 56px); /* 顶栏 + 一些 padding */
+    overflow-y: auto;
+    align-self: start;
+  }
+
+  /* 窄屏自动隐藏右栏，主区铺满 */
+  @media (max-width: 1180px) {
+    .event-layout { grid-template-columns: 1fr; }
+    .event-aside { display: none; }
+  }
+
+  /* Topic 概览 */
+  .aside-topic {
+    background:#fff; border:1px solid #e6e8eb; border-radius: 12px;
+    padding: 14px 16px; margin-bottom: 12px;
+  }
+  .aside-topic-title {
+    font-size: 14px; font-weight: 600; color:#1f2328;
+    margin-bottom: 4px; line-height: 1.5;
+  }
+  .aside-topic-meta { font-size: 12px; color:#9ca3af; margin-bottom: 10px; }
+  .aside-topic-badges {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .aside-topic-badges span {
+    font-size: 11.5px; color:#4b5563; background:#f5f6f8;
+    padding: 3px 10px; border-radius: 999px;
+  }
+
+  /* AI 总结区 */
+  .aside-section {
+    background:#fff; border:1px solid #e6e8eb; border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .aside-section-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .aside-section-title { font-size: 13px; font-weight: 600; color:#1f2328; }
+  .aside-regen {
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    color: #fff; border: 0; padding: 5px 10px; border-radius: 999px;
+    font-size: 11.5px; font-weight: 500; cursor: pointer;
+    display: flex; align-items: center; gap: 4px;
+    transition: all .15s;
+  }
+  .aside-regen:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(124,58,237,.25); }
+  .aside-regen-ico { display: inline-block; transition: transform .4s; font-size: 12px; }
+  .aside-regen.spinning .aside-regen-ico { animation: aside-spin .8s linear infinite; }
+  @keyframes aside-spin { to { transform: rotate(360deg); } }
+
+  /* 版本切换 */
+  .aside-ver-tabs {
+    display: flex; gap: 4px; margin-bottom: 10px;
+    background:#f5f6f8; padding: 3px; border-radius: 6px;
+  }
+  .aside-ver-tab {
+    flex: 1; text-align: center;
+    font-size: 11.5px; color: #6b7280;
+    padding: 4px 6px; border-radius: 4px;
+    cursor: pointer; transition: all .15s;
+  }
+  .aside-ver-tab:hover { color: #1f2328; }
+  .aside-ver-tab.active { background:#fff; color:#1f2328; font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+
+  /* AI 总结卡片 */
+  .aside-ai-cards { display: flex; flex-direction: column; gap: 10px; }
+  .aside-ai-card {
+    background: #fafbfc; border: 1px solid #f1f3f5; border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .aside-ai-card.v11 {
+    background: linear-gradient(135deg, #fafbff 0%, #fdfaff 100%);
+    border-color: #e0e7ff;
+  }
+  .aside-ai-date {
+    font-size: 11px; color: #9ca3af;
+    background:#fff; padding: 1px 8px; border-radius: 999px;
+    display: inline-block; margin-bottom: 6px;
+    border: 1px solid #f1f3f5;
+  }
+  .aside-ai-title {
+    font-size: 12.5px; font-weight: 600; color:#1f2328;
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  }
+  .aside-ai-tag-resolved { background:#ecfdf5; color:#059669; font-size:10.5px; padding: 1px 6px; border-radius: 999px; font-weight: 500; }
+  .aside-ai-tag-active   { background:#fff7ed; color:#c2410c; font-size:10.5px; padding: 1px 6px; border-radius: 999px; font-weight: 500; }
+  .aside-ai-tag-hot      { background:#fef2f2; color:#b91c1c; font-size:10.5px; padding: 1px 6px; border-radius: 999px; font-weight: 500; }
+  .aside-ai-body {
+    font-size: 12px; color: #374151; line-height: 1.6;
+  }
+  .aside-ai-card.v11 .aside-ai-body strong { color: #1f2328; }
+  .aside-ai-stat {
+    display: block; margin-top: 6px;
+    font-size: 11px; color: #6b7280;
+    padding-top: 6px; border-top: 1px dashed #e6e8eb;
+  }
+  .aside-ai-card.v11 .aside-ai-stat { color: #2563eb; }
+
+  /* loading 态 */
+  .aside-ai-loading {
+    text-align: center; padding: 32px 16px;
+    background:#fafbfc; border-radius: 8px;
+  }
+  .aside-ai-spinner {
+    width: 24px; height: 24px;
+    border: 2.5px solid #e6e8eb; border-top-color: #2563eb;
+    border-radius: 50%; animation: aside-spin 0.8s linear infinite;
+    margin: 0 auto 10px;
+  }
+  .aside-ai-loading-text {
+    font-size: 12px; color: #6b7280;
+  }
+
+  /* 差异说明 */
+  .aside-tip {
+    margin-top: 12px;
+    background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 11.5px; color: #1e40af; line-height: 1.55;
+  }
+  .aside-tip strong { color: #1e3a8a; }
+
+  /* My 待办卡片（T4） */
+  .mytodo-card {
+    background:#fff; border:1px solid #e6e8eb; border-radius: 10px;
+    padding: 12px 16px; margin-bottom: 8px;
+    display: flex; gap: 12px; align-items: flex-start;
+    transition: box-shadow .15s, border-color .15s;
+  }
+  .mytodo-card:hover { border-color: #d1d5db; box-shadow: 0 2px 8px rgba(0,0,0,.04); }
+  .mytodo-card.done { background:#fafbfc; }
+  .mytodo-card.done .mt-title { color:#9ca3af; text-decoration: line-through; }
+  .mytodo-card input[type="checkbox"] { width:16px; height:16px; margin-top:3px; accent-color:#1f2328; cursor:pointer; }
+  .mytodo-card .mt-left { flex-shrink: 0; }
+  .mytodo-card .mt-main { flex: 1; min-width: 0; }
+  .mytodo-card .mt-title { font-size: 13.5px; font-weight: 500; color:#1f2328; line-height: 1.5; }
+  .mytodo-card .mt-meta {
+    font-size: 12px; color: #6b7280; margin-top: 6px;
+    display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+  }
+  .mytodo-card .src-chip {
+    background:#eff6ff; color:#2563eb; padding: 2px 8px; border-radius: 999px;
+    font-size: 11.5px; font-weight: 500; text-decoration: none; cursor: pointer;
+  }
+  .mytodo-card .src-chip:hover { background:#dbeafe; }
+  .mytodo-card .due { font-size: 12px; }
+  .mytodo-card .due.due-soon { color: #c2410c; font-weight: 500; }
+  .mytodo-card .due.due-overdue { color: #dc2626; font-weight: 600; }
+
+  /* role / status tab active 状态 */
+  .role-tab, .status-tab { transition: background .15s, color .15s; }
+  .role-tab:hover { background:#f5f6f8; }
+  .status-tab:hover { background:#f5f6f8; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">N</div>
+  <div class="brand">SSV Nexus</div>
+  <div class="slogan">透明即上下文，上下文即生产力</div>
+  <div class="topbar-right">
+    <div class="bell" id="bell" onclick="toast('通知中心见 notification-demo.html')">🔔<span class="dot"></span></div>
+    <div class="me"><div class="avatar">钟</div><span>钟嘉辉</span></div>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h4>TOPICS</h4>
+    <div class="nav-item active" onclick="goScene('topicList')">● ALL</div>
+    <div class="nav-item" onclick="toast('MY 页面未覆盖')">◎ MY</div>
+    <h4 style="margin-top:14px;">TOOLS</h4>
+    <div class="nav-item" onclick="toast('Skills 见参考原型')">⚡ Skills</div>
+    <div class="nav-item" onclick="toast('插件未覆盖')">🧩 插件</div>
+    <h4 style="margin-top:14px;">ADMIN</h4>
+    <div class="nav-item" onclick="toast('定位未覆盖')">💡 定位</div>
+    <div class="nav-item" onclick="toast('宪章未覆盖')">📜 宪章</div>
+    <div class="nav-item" onclick="toast('设置未覆盖')">⚙️ 设置</div>
+  </aside>
+
+  <main class="main">
+
+    <div class="scene-tabs">
+      <div class="scene-tab active" data-scene="topicList" onclick="goScene('topicList')">话题列表</div>
+      <div class="scene-tab" data-scene="event" onclick="goScene('event')">Event 讨论区</div>
+      <div class="scene-tab" data-scene="compare" onclick="goScene('compare')">新旧模式对比</div>
+      <div class="scene-tab" data-scene="empty" onclick="goScene('empty')">空态文案替换</div>
+      <div class="scene-tab" data-scene="mytodo" onclick="goScene('mytodo')">My · 待办跟踪</div>
+      <div class="scene-tab" data-scene="flow" onclick="goScene('flow')">全链路流程</div>
+    </div>
+
+    <!-- v1.1 新功能导览（评审用 · 可关闭） -->
+    <div class="v11-banner" id="v11Banner">
+      <div class="v11-title">
+        <span style="font-size:13px;">🆕</span>
+        <strong>v1.1 新功能</strong>
+        <span style="color:#9ca3af; font-size:12px;">点 chip 立即定位到展示位置</span>
+      </div>
+      <div class="v11-chips">
+        <span class="v11-chip" onclick="spotlightFeature('hybrid')">① Thread 混合态 C</span>
+        <span class="v11-chip" onclick="spotlightFeature('resolved')">② 标记已解决</span>
+        <span class="v11-chip" onclick="spotlightFeature('mytodo')">③ My · 待办跟踪</span>
+        <span class="v11-chip" onclick="spotlightFeature('hotkey')">④ Enter 即发布</span>
+        <span class="v11-chip" onclick="spotlightFeature('aisum')">⑤ AI 总结升级</span>
+        <span class="v11-chip alt" onclick="simulateBackflow()">⏩ 模拟回流通知</span>
+      </div>
+      <button class="v11-close" onclick="document.getElementById('v11Banner').style.display='none'">×</button>
+    </div>
+
+    <!-- ===== 页面 1：Topic 列表 ===== -->
+    <section class="page active" id="page-topicList">
+      <div class="guide">
+        <span class="step">1 / 4</span>
+        <span>你是 <strong>钟嘉辉</strong>（技术架构）。点下方 <strong>SSV Nexus 产品进展</strong> 体验 Thread 讨论。</span>
+        <span class="tip">评论 → 讨论</span>
+      </div>
+      <div class="topic-list">
+        <div class="topic-row highlight" onclick="goScene('event')">
+          <div class="topic-emoji">📄</div>
+          <div class="topic-meta">
+            <div class="topic-title">SSV Nexus 产品进展和一些思考</div>
+            <div class="topic-sub">suriwang(王昕) · SSV 产品 · 最近更新 刚刚</div>
+            <div class="topic-badges">
+              <span>3 事件</span>
+              <span>4 条讨论</span>
+              <span class="hot">🔥 1 讨论激增</span>
+              <span>2 条待办</span>
+            </div>
+          </div>
+          <div class="topic-arrow">→</div>
+        </div>
+        <div class="topic-row" onclick="toast('该 Topic Demo 未覆盖')">
+          <div class="topic-emoji">📊</div>
+          <div class="topic-meta">
+            <div class="topic-title">Q2 产品路线图</div>
+            <div class="topic-sub">李四 · 战略中心 · 2 天前</div>
+            <div class="topic-badges"><span>3 事件</span><span>5 条讨论</span></div>
+          </div>
+          <div class="topic-arrow">→</div>
+        </div>
+        <div class="topic-row" onclick="toast('该 Topic Demo 未覆盖')">
+          <div class="topic-emoji">🌱</div>
+          <div class="topic-meta">
+            <div class="topic-title">乡村振兴 · 试点复盘</div>
+            <div class="topic-sub">张三 · 为村发展实验室 · 4 天前</div>
+            <div class="topic-badges"><span>2 事件</span><span>8 条讨论</span></div>
+          </div>
+          <div class="topic-arrow">→</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 页面 2：Event 讨论区 ===== -->
+    <section class="page" id="page-event">
+      <div class="event-layout">
+        <div class="event-main">
+      <div class="breadcrumb">
+        <a onclick="goScene('topicList')">ALL</a>
+        › <a onclick="goScene('topicList')">SSV Nexus 产品进展和一些思考</a>
+        › #3 一些新的思考
+      </div>
+
+      <div class="guide">
+        <span class="step">2 / 4</span>
+        <span>试试 <strong>展开 Thread</strong>、<strong>发起新讨论</strong>、点消息的 <strong>···</strong> 菜单把它 <strong>📌 转为待办</strong>。</span>
+        <span class="tip" onclick="goScene('compare')" style="cursor:pointer;text-decoration:underline;">对比旧模式 →</span>
+      </div>
+
+      <div class="event-card">
+        <h3>#3 一些新的思考，即将到来的新体验</h3>
+        <div class="event-meta">suriwang(王昕) · 2026-04-29 17:27 · 可见范围：SSV 全体员工</div>
+        <div class="event-body">
+          收到很多同事的体验反馈，如下是近期的思考，我们会这么做下去：
+          <ol>
+            <li><strong>通知、触达、移动化</strong>：nexus 偏严肃场景，以 PC 为主，但移动端同样重要，企微 Bot + 移动端适配会分两期推进。</li>
+            <li><strong>AI 从单 topic 到交叉分析到纵深使用</strong>：单 topic 总结 → 交叉分析 → 放开 chat 输入框。</li>
+            <li><strong>评论具备局限性，讨论能放大可能性</strong>：评论回复区会做一次升级改造，营造讨论氛围。</li>
+          </ol>
+        </div>
+
+        <div class="reactions">
+          <div class="reaction active">👍 赞 2</div>
+          <div class="reaction">👎 踩</div>
+          <div class="reaction">🤔 疑惑</div>
+        </div>
+
+        <div class="discuss-title">
+          💬 讨论 <span class="count" id="discussCount">4</span>
+        </div>
+
+        <div id="threadList">
+
+          <!-- Thread 1（已转为待办） -->
+          <div class="thread" data-tid="t1">
+            <div class="thread-head" onclick="toggleThread('t1')">
+              <div class="avatar-sm" style="background:#bbf7d0;color:#065f46;">钟</div>
+              <div class="tbody">
+                <div class="t-line1">
+                  <span class="t-author">钟嘉辉</span>
+                  <span class="t-dept">· 技术架构</span>
+                  <span class="t-time">2 小时前</span>
+                  <span class="undo-resolve" onclick="event.stopPropagation();undoResolve('t1')">撤销已解决</span>
+                  <div class="t-menu" onclick="event.stopPropagation();openThreadMenu(event, this, 't1')">⋯</div>
+                </div>
+                <div class="t-preview">想再讨论下红点消失逻辑：现在是用户点击 Topic 即清除未读，但如果他只是一扫而过没真正阅读，红点就丢了，后续新增动态他反而感知不到。我倾向"停留 &gt; 3s 或滚动到底部"才算已读。</div>
+              </div>
+            </div>
+            <div class="thread-foot">
+              <span class="chip reply-count">💬 4 条回复</span>
+              <span class="chip todo-done" id="t1-todo-chip">✅ 已转为待办</span>
+              <span>最新：肖迈 · 30 分钟前</span>
+            </div>
+            <div class="thread-replies" id="replies-t1">
+              <div class="history-collapser" onclick="toggleFullExpand('t1')">
+                <span class="arrow">▾</span>
+                <span class="label-collapsed">查看 3 条历史回复</span>
+                <span class="label-expanded">收起历史回复</span>
+              </div>
+              <div class="reply hidden-history" data-mid="t1-r1">
+                <div class="avatar-sm" style="background:#c7d2fe;color:#3730a3;">王</div>
+                <div class="reply-body">
+                  <div class="reply-author">王昕<span class="dept">· SSV 产品</span><span class="time">1 小时前</span></div>
+                  <div class="reply-text">同感。红点本身意义也要重新定义——是"有未读新内容"还是"有需要你处理的事"，前者靠滚动/停留就能清，后者必须主动行为才能清。</div>
+                  <div class="reply-actions">
+                    <button onclick="toast('已点赞 👍')">👍</button>
+                    <button onclick="openMenuAt(event, this, 't1-r1')">···</button>
+                  </div>
+                </div>
+              </div>
+              <div class="reply hidden-history" data-mid="t1-r2">
+                <div class="avatar-sm" style="background:#fecaca;color:#991b1b;">丹</div>
+                <div class="reply-body">
+                  <div class="reply-author">李丹阳<span class="dept">· 前端</span><span class="time">1 小时前</span></div>
+                  <div class="reply-text">技术上可以做：停留 3s + 可见范围 ≥60% 计为已读。用 IntersectionObserver 实现，成本不高。</div>
+                  <div class="reply-actions">
+                    <button onclick="toast('已点赞 👍')">👍</button>
+                    <button onclick="openMenuAt(event, this, 't1-r2')">···</button>
+                  </div>
+                </div>
+              </div>
+              <div class="reply hidden-history" data-mid="t1-r3">
+                <div class="avatar-sm" style="background:#ddd6fe;color:#5b21b6;">培</div>
+                <div class="reply-body">
+                  <div class="reply-author">李培轮<span class="dept">· 后端</span><span class="time">50 分钟前</span></div>
+                  <div class="reply-text">后端也可以加一个"最后阅读位点"字段，滚动到底就持久化。配合前端 observer 双保险。</div>
+                  <div class="reply-actions">
+                    <button onclick="toast('已点赞 👍')">👍</button>
+                    <button onclick="openMenuAt(event, this, 't1-r3')">···</button>
+                  </div>
+                </div>
+              </div>
+              <div class="reply" data-mid="t1-r4">
+                <div class="avatar-sm" style="background:#fde68a;color:#92400e;">肖</div>
+                <div class="reply-body">
+                  <div class="reply-author">肖迈<span class="dept">· 维护者</span><span class="time">30 分钟前</span></div>
+                  <div class="reply-text">结论确认：前端 observer + 后端位点。<span class="mention-tag">@钟嘉辉</span> 这个作为一项子任务跟进下？</div>
+                  <div class="reply-actions">
+                    <button onclick="toast('已点赞 👍')">👍</button>
+                    <button onclick="openMenuAt(event, this, 't1-r4')">···</button>
+                  </div>
+                </div>
+              </div>
+              <div class="sys-msg todo-created" id="t1-sys">
+                <span class="ico">📌</span>肖迈 将本条讨论转为待办 · 指派 钟嘉辉 · 30 分钟前
+              </div>
+            </div>
+            <div class="thread-reply-box">
+              <div class="rbox">
+                <button class="at-btn" onclick="toast('@ 菜单：见 mention-visibility-demo')">@</button>
+                <textarea rows="1" placeholder="根据王昕的思考，我也来参与讨论…"
+                  oninput="autoGrow(this)"
+                  onkeydown="handleThreadReplyKey(event)"></textarea>
+                <button class="send-btn-sm" onclick="sendReplyFrom(this)">发送</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Thread 2（等待回复中） -->
+          <div class="thread" data-tid="t2">
+            <div class="thread-head" onclick="toggleThread('t2')">
+              <div class="avatar-sm" style="background:#c7d2fe;color:#3730a3;">王</div>
+              <div class="tbody">
+                <div class="t-line1">
+                  <span class="t-author">王昕</span>
+                  <span class="t-dept">· SSV 产品</span>
+                  <span class="t-time">5 小时前</span>
+                  <span class="undo-resolve" onclick="event.stopPropagation();undoResolve('t2')">撤销已解决</span>
+                  <div class="t-menu" onclick="event.stopPropagation();openThreadMenu(event, this, 't2')">⋯</div>
+                </div>
+                <div class="t-preview">移动端 Bot 通知卡片的"查看原文"跳转现在是深链打开 PC 站，移动端体验割裂。一期先兜底 H5 只读版，还是直接等移动端原生页面？</div>
+              </div>
+            </div>
+            <div class="thread-foot">
+              <span class="chip reply-count">💬 2 条回复</span>
+              <span class="chip waiting">⏳ 等待回复中</span>
+              <span>最新：李培轮 · 3 小时前</span>
+            </div>
+            <div class="thread-replies" id="replies-t2">
+              <div class="history-collapser" onclick="toggleFullExpand('t2')">
+                <span class="arrow">▾</span>
+                <span class="label-collapsed">查看 1 条历史回复</span>
+                <span class="label-expanded">收起历史回复</span>
+              </div>
+              <div class="reply hidden-history" data-mid="t2-r1">
+                <div class="avatar-sm" style="background:#fde68a;color:#92400e;">肖</div>
+                <div class="reply-body">
+                  <div class="reply-author">肖迈<span class="dept">· 维护者</span><span class="time">4 小时前</span></div>
+                  <div class="reply-text">一期先兜底 H5 只读版吧，否则 Bot 推送落地体验残。</div>
+                  <div class="reply-actions">
+                    <button onclick="toast('已点赞 👍')">👍</button>
+                    <button onclick="openMenuAt(event, this, 't2-r1')">···</button>
+                  </div>
+                </div>
+              </div>
+              <div class="reply" data-mid="t2-r2">
+                <div class="avatar-sm" style="background:#ddd6fe;color:#5b21b6;">培</div>
+                <div class="reply-body">
+                  <div class="reply-author">李培轮<span class="dept">· 后端</span><span class="time">3 小时前</span></div>
+                  <div class="reply-text">H5 只读版接口已经具备，接一层 rewrite 就行。预计 1 天出方案。</div>
+                  <div class="reply-actions">
+                    <button onclick="toast('已点赞 👍')">👍</button>
+                    <button onclick="openMenuAt(event, this, 't2-r2')">···</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="thread-reply-box">
+              <div class="rbox">
+                <button class="at-btn" onclick="toast('@ 菜单')">@</button>
+                <textarea rows="1" placeholder="加入这场讨论…"
+                  oninput="autoGrow(this)"
+                  onkeydown="handleThreadReplyKey(event)"></textarea>
+                <button class="send-btn-sm" onclick="sendReplyFrom(this)">发送</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Thread 3（无回复） -->
+          <div class="thread" data-tid="t3">
+            <div class="thread-head" onclick="toggleThread('t3')">
+              <div class="avatar-sm" style="background:#fed7aa;color:#9a3412;">李</div>
+              <div class="tbody">
+                <div class="t-line1">
+                  <span class="t-author">李四</span>
+                  <span class="t-dept">· 战略中心</span>
+                  <span class="t-time">10 分钟前</span>
+                  <span class="undo-resolve" onclick="event.stopPropagation();undoResolve('t3')">撤销已解决</span>
+                  <div class="t-menu" onclick="event.stopPropagation();openThreadMenu(event, this, 't3')">⋯</div>
+                </div>
+                <div class="t-preview">AI 简报能不能把"讨论激增"作为首屏热词之一？每天早上点开 ALL 只想知道昨天哪几个 Topic 被激烈讨论，不想逐个点进去看。</div>
+              </div>
+            </div>
+            <div class="thread-foot">
+              <span class="chip">💬 暂无回复</span>
+              <span class="reply-btn" onclick="document.querySelector('.thread[data-tid=&quot;t3&quot;] .thread-reply-box textarea').focus()">首个回复 →</span>
+            </div>
+            <div class="thread-replies" id="replies-t3">
+              <div style="color:#9ca3af; font-size: 12.5px; padding: 10px 0 4px; text-align: center;">
+                还没有人回复，来抢首个回复吧
+              </div>
+            </div>
+            <div class="thread-reply-box">
+              <div class="rbox">
+                <button class="at-btn" onclick="toast('@ 菜单')">@</button>
+                <textarea rows="1" placeholder="加入这场讨论…"
+                  oninput="autoGrow(this)"
+                  onkeydown="handleThreadReplyKey(event)"></textarea>
+                <button class="send-btn-sm" onclick="sendReplyFrom(this)">发送</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Thread 4（冷态，>3 天无回复，默认整体折叠） -->
+          <div class="thread cold" data-tid="t4">
+            <div class="thread-head" onclick="toggleFullExpand('t4')">
+              <div class="avatar-sm" style="background:#ddd6fe;color:#5b21b6;">培</div>
+              <div class="tbody">
+                <div class="t-line1">
+                  <span class="t-author">李培轮</span>
+                  <span class="t-dept">· 后端</span>
+                  <span class="t-time">5 天前</span>
+                  <span class="undo-resolve" onclick="event.stopPropagation();undoResolve('t4')">撤销已解决</span>
+                  <div class="t-menu" onclick="event.stopPropagation();openThreadMenu(event, this, 't4')">⋯</div>
+                </div>
+                <div class="t-preview">AI 交叉分析的后端数据模型初稿：考虑用 DuckDB 做即席查询，Topic 级别列存。大家怎么看？</div>
+              </div>
+            </div>
+            <div class="thread-foot">
+              <span class="chip">💬 1 条回复</span>
+              <span style="color:#9ca3af;">最新：王昕 · 4 天前</span>
+            </div>
+            <div class="thread-replies" id="replies-t4">
+              <div class="reply" data-mid="t4-r1">
+                <div class="avatar-sm" style="background:#c7d2fe;color:#3730a3;">王</div>
+                <div class="reply-body">
+                  <div class="reply-author">王昕<span class="dept">· SSV 产品</span><span class="time">4 天前</span></div>
+                  <div class="reply-text">方向 OK，先看 POC 效果。</div>
+                  <div class="reply-actions">
+                    <button onclick="toast('已点赞 👍')">👍</button>
+                    <button onclick="openMenuAt(event, this, 't4-r1')">···</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="thread-reply-box">
+              <div class="rbox">
+                <button class="at-btn" onclick="toast('@ 菜单')">@</button>
+                <textarea rows="1" placeholder="加入这场讨论…"
+                  oninput="autoGrow(this)"
+                  onkeydown="handleThreadReplyKey(event)"></textarea>
+                <button class="send-btn-sm" onclick="sendReplyFrom(this)">发送</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 发起新讨论 -->
+        <div class="new-thread" id="newThread">
+          <div class="avatar-sm" style="background:#bbf7d0;color:#065f46;">钟</div>
+          <div class="nt-body">
+            <textarea id="newThreadInput" placeholder="我也来参加讨论…"
+              oninput="autoGrow(this); toggleSend()"
+              onkeydown="handleNewThreadKey(event)"></textarea>
+            <div class="nt-foot">
+              <button class="send-btn" id="newThreadSend" disabled onclick="sendNewThread()">发起讨论</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Event 待办列表（与 Thread 双向链接） · v1.1 暂时隐藏，DOM 保留以兼容 simulateBackflow 注入逻辑 -->
+      <div class="todo-block" hidden>
+        <h4>📋 Event 待办 <span class="tag-count" id="todoCount">2</span></h4>
+        <div id="todoList">
+          <div class="todo-item" data-todo="td-1" data-mid="t1-r4">
+            <input type="checkbox" onchange="toggleTodo(this,'td-1','t1-r4')" />
+            <div class="ti-body">
+              红点已读机制：前端 observer + 后端阅读位点
+              <div class="ti-meta">
+                <span class="src-tag">来自讨论 · <a onclick="jumpToMessage('t1-r4')">查看原讨论 →</a></span>
+                <span>指派：钟嘉辉</span>
+                <span>截止：下周三</span>
+              </div>
+            </div>
+          </div>
+          <div class="todo-item" data-todo="td-2">
+            <input type="checkbox" />
+            <div class="ti-body">
+              Event #3 发布后收集二次反馈
+              <div class="ti-meta">
+                <span>指派：王昕</span>
+                <span>截止：本周五</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+        </div><!-- /.event-main -->
+
+        <!-- ============================================================
+             右侧 AI 总结栏（仅 Event 讨论区显示）
+             ============================================================ -->
+        <aside class="event-aside" id="eventAside">
+          <!-- Topic 概览（同 Nexus 产品线右侧栏顶部） -->
+          <div class="aside-topic">
+            <div class="aside-topic-title">📄 Nexus 产品进展和一些思考</div>
+            <div class="aside-topic-meta">suriwang(王昕) · 2026-04-21</div>
+            <div class="aside-topic-badges">
+              <span>📂 3 事件</span>
+              <span>💬 4 讨论</span>
+              <span>📌 2 待办</span>
+            </div>
+          </div>
+
+          <!-- AI 总结区域 -->
+          <div class="aside-section">
+            <div class="aside-section-head">
+              <span class="aside-section-title">🤖 Topic 概览 · AI 总结</span>
+              <button class="aside-regen" onclick="regenSummary()" title="按 Thread 抽结论 · v1.1 升级">
+                <span class="aside-regen-ico">↻</span>
+                <span class="aside-regen-label">v1.1 重生成</span>
+              </button>
+            </div>
+
+            <!-- 版本切换条 -->
+            <div class="aside-ver-tabs" id="aiVerTabs">
+              <span class="aside-ver-tab active" data-ver="v10" onclick="switchAiVer('v10', this)">v1.0 流水账</span>
+              <span class="aside-ver-tab" data-ver="v11" onclick="switchAiVer('v11', this)">v1.1 Thread 结论 ✨</span>
+            </div>
+
+            <!-- v1.0 风格（默认显示） -->
+            <div class="aside-ai-cards" id="aiCardsV10">
+              <div class="aside-ai-card">
+                <div class="aside-ai-date">2026-04-21</div>
+                <div class="aside-ai-title">#1 体验邀请</div>
+                <div class="aside-ai-body">
+                  Nexus AI 正式上线，核心功能包括上传文档自动生成摘要/待办，以及聚合各团队进展洞察。该版本旨在通过 AI 提升信息透明度与协作效率，目前处于首版反馈收集阶段。<span class="aside-ai-stat">本期：2 条评论</span>
+                </div>
+              </div>
+              <div class="aside-ai-card">
+                <div class="aside-ai-date">2026-04-27</div>
+                <div class="aside-ai-title">#2 近期发布与修复</div>
+                <div class="aside-ai-body">
+                  SSV Nexus 已完成图文/附件支持、AI 重新分析及全权限加固。五一前将上线归档、企微 Bot 通知、按人/组织搜索等核心功能。<span class="aside-ai-stat">本期：3 条评论</span>
+                </div>
+              </div>
+              <div class="aside-ai-card">
+                <div class="aside-ai-date">2026-04-29</div>
+                <div class="aside-ai-title">#3 一些新的思考</div>
+                <div class="aside-ai-body">
+                  Nexus 近期明确了移动端适配、AI 能力演进及讨论区改造三大迭代方向。移动端将分两期推进，AI 功能拟从单点总结向交叉分析演进。<span class="aside-ai-stat">本期：4 条评论</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- v1.1 风格（隐藏） -->
+            <div class="aside-ai-cards" id="aiCardsV11" style="display:none;">
+              <div class="aside-ai-card v11">
+                <div class="aside-ai-date">2026-04-21</div>
+                <div class="aside-ai-title">#1 体验邀请 <span class="aside-ai-tag-resolved">✓ 共识</span></div>
+                <div class="aside-ai-body">
+                  Nexus AI v1 上线邀请反馈。<strong>团队认同方向，但请求强化"AI 摘要的可控性"</strong>。<br>
+                  <span class="aside-ai-stat">📌 已转 1 待办：补充 AI 摘要可关闭/重新生成入口</span>
+                </div>
+              </div>
+              <div class="aside-ai-card v11">
+                <div class="aside-ai-date">2026-04-27</div>
+                <div class="aside-ai-title">#2 近期发布与修复 <span class="aside-ai-tag-active">⏳ 进行中</span></div>
+                <div class="aside-ai-body">
+                  企微 Bot 通知与归档已落地；<strong>"按人/组织搜索"在 Q&A 阶段</strong>，王昕提出搜索权重需要按部门相关性排序。
+                  <span class="aside-ai-stat">💬 3 条讨论 · 1 等待回复</span>
+                </div>
+              </div>
+              <div class="aside-ai-card v11">
+                <div class="aside-ai-date">2026-04-29</div>
+                <div class="aside-ai-title">#3 一些新的思考 <span class="aside-ai-tag-hot">🔥 激增</span></div>
+                <div class="aside-ai-body">
+                  4 条讨论同时推进：<br>
+                  ① <strong>红点已读机制</strong> · ✅ 共识"前端 observer + 后端阅读位点"，已转待办<br>
+                  ② <strong>移动端 H5 兜底</strong> · ⏳ 等待回复，李培轮承诺 1 天出方案<br>
+                  ③ <strong>AI 简报热词</strong> · 💬 暂无回复<br>
+                  ④ <strong>DuckDB 评估</strong> · 🧊 冷态（5 天）
+                  <span class="aside-ai-stat">💬 4 讨论 · 📌 1 待办 · ✅ 1 共识</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- loading 状态 -->
+            <div class="aside-ai-loading" id="aiLoading" style="display:none;">
+              <div class="aside-ai-spinner"></div>
+              <div class="aside-ai-loading-text">AI 正在按 Thread 重新提炼结论...</div>
+            </div>
+
+            <!-- 差异说明 -->
+            <div class="aside-tip" id="aiDiffTip" style="display:none;">
+              💡 <strong>v1.1 升级</strong>：从"按时间流水"→"按议题抽结论"，每个 Thread 独立成段，标注 ✅ 共识 / ⏳ 进行中 / 🔥 激增 / 🧊 冷态。
+            </div>
+          </div>
+        </aside>
+      </div><!-- /.event-layout -->
+    </section>
+
+    <!-- ===== 页面 3：新旧模式对比 ===== -->
+    <section class="page" id="page-compare">
+      <div class="guide">
+        <span class="step">3 / 4</span>
+        <span>左：旧评论扁平混排（不同议题互相干扰）。右：Thread 每议题独立成线 + 可转待办。</span>
+      </div>
+      <div class="section-head">新旧模式对比 <span class="sub">同样的 3 组讨论内容：左边混杂，右边清晰</span></div>
+
+      <div class="compare">
+        <div class="col old">
+          <div class="col-head">💬 评论区 <span class="badge-old">旧</span></div>
+          <div class="old-comment">
+            <div class="avatar-sm" style="background:#bbf7d0;color:#065f46;">钟</div>
+            <div class="ob">
+              <div class="oa">钟嘉辉<span class="d">· 技术架构</span></div>
+              <div class="txt">想讨论下红点消失逻辑：点了就清感觉不太对，应该按停留时间。</div>
+              <div class="tm">2 小时前</div>
+            </div>
+          </div>
+          <div class="old-comment">
+            <div class="avatar-sm" style="background:#c7d2fe;color:#3730a3;">王</div>
+            <div class="ob">
+              <div class="oa">王昕<span class="d">· SSV 产品</span></div>
+              <div class="txt">移动端跳转的事情我也想聊——现在 Bot 通知卡片跳 PC 体验割裂。</div>
+              <div class="tm">5 小时前</div>
+            </div>
+          </div>
+          <div class="old-comment">
+            <div class="avatar-sm" style="background:#c7d2fe;color:#3730a3;">王</div>
+            <div class="ob">
+              <div class="oa">王昕<span class="d">· SSV 产品</span></div>
+              <div class="txt">@钟嘉辉 你那个红点问题我同意，需要重新定义红点含义。</div>
+              <div class="tm">1 小时前</div>
+            </div>
+          </div>
+          <div class="old-comment">
+            <div class="avatar-sm" style="background:#fde68a;color:#92400e;">肖</div>
+            <div class="ob">
+              <div class="oa">肖迈<span class="d">· 维护者</span></div>
+              <div class="txt">移动端一期先兜底 H5。</div>
+              <div class="tm">4 小时前</div>
+            </div>
+          </div>
+          <div class="old-comment">
+            <div class="avatar-sm" style="background:#fecaca;color:#991b1b;">丹</div>
+            <div class="ob">
+              <div class="oa">李丹阳<span class="d">· 前端</span></div>
+              <div class="txt">红点这个技术上好做，IntersectionObserver 就行。</div>
+              <div class="tm">1 小时前</div>
+            </div>
+          </div>
+          <div class="old-comment">
+            <div class="avatar-sm" style="background:#fed7aa;color:#9a3412;">李</div>
+            <div class="ob">
+              <div class="oa">李四<span class="d">· 战略中心</span></div>
+              <div class="txt">AI 简报能不能把"讨论激增"作为首屏热词。</div>
+              <div class="tm">10 分钟前</div>
+            </div>
+          </div>
+          <div class="old-comment">
+            <div class="avatar-sm" style="background:#ddd6fe;color:#5b21b6;">培</div>
+            <div class="ob">
+              <div class="oa">李培轮<span class="d">· 后端</span></div>
+              <div class="txt">回钟嘉辉的红点：后端可以加"最后阅读位点"字段。</div>
+              <div class="tm">50 分钟前</div>
+            </div>
+          </div>
+          <div class="old-comment">
+            <div class="avatar-sm" style="background:#ddd6fe;color:#5b21b6;">培</div>
+            <div class="ob">
+              <div class="oa">李培轮<span class="d">· 后端</span></div>
+              <div class="txt">回王昕的移动端：H5 只读版接口已经具备，1 天出方案。</div>
+              <div class="tm">3 小时前</div>
+            </div>
+          </div>
+          <div style="margin-top: 14px; padding: 10px; background:#fef3c7; border-radius: 8px; font-size: 12.5px; color: #92400e;">
+            ⚠️ 问题：3 个议题（红点/移动端/AI 简报）发言交叉混排，需要靠 @人名 猜测在回应谁，也没法把"结论"变成待办。
+          </div>
+        </div>
+
+        <div class="col new">
+          <div class="col-head">💬 讨论区 <span class="badge-new">新 · Thread</span></div>
+          <div class="mini-thread">
+            <div class="mh">钟嘉辉<span class="d">· 技术架构 · 2 小时前</span></div>
+            <div class="mt">想讨论下红点消失逻辑：点了就清感觉不太对，应该按停留时间。</div>
+            <div class="mf">
+              <span class="chip">💬 4 条</span>
+              <span class="chip done">✅ 已转为待办</span>
+            </div>
+          </div>
+          <div class="mini-thread">
+            <div class="mh">王昕<span class="d">· SSV 产品 · 5 小时前</span></div>
+            <div class="mt">移动端跳转现在是深链打开 PC 站，体验割裂。一期兜底 H5 还是等原生？</div>
+            <div class="mf">
+              <span class="chip">💬 2 条</span>
+              <span class="chip" style="background:#fff7ed;color:#c2410c;">⏳ 等待回复</span>
+            </div>
+          </div>
+          <div class="mini-thread">
+            <div class="mh">李四<span class="d">· 战略中心 · 10 分钟前</span></div>
+            <div class="mt">AI 简报能不能把"讨论激增"作为首屏热词？</div>
+            <div class="mf">
+              <span class="chip" style="background:#f5f6f8; color:#6b7280;">💬 暂无回复</span>
+            </div>
+          </div>
+          <div style="margin-top: 14px; padding: 10px; background:#ecfdf5; border-radius: 8px; font-size: 12.5px; color: #059669;">
+            ✅ 收益：每议题一条 Thread，参与者、结论、待办一目了然；新人进来也能顺脉络读。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 页面 3.5：空态文案替换 ===== -->
+    <section class="page" id="page-empty">
+      <div class="guide">
+        <span class="step">+1</span>
+        <span>基于业务方截图：旧评论空态 vs 新讨论空态。<strong>文案 + 占位</strong>对应 v1.0 §3.2 的 9 处改动之 3。</span>
+      </div>
+      <div class="section-head">空态对比 <span class="sub">当一个 Event 还没有任何发言时，用户看到什么</span></div>
+
+      <div class="compare">
+        <!-- 旧：评论空态（完全还原业务方截图） -->
+        <div class="col old">
+          <div class="col-head">
+            <span style="display:inline-flex;align-items:center;gap:6px;">💬 评论 <span class="count" style="color:#9ca3af;font-weight:400;font-size:12.5px;background:#f5f6f8;padding:1px 8px;border-radius:999px;">0</span></span>
+            <span class="badge-old" style="margin-left:auto;">旧 · 现网</span>
+          </div>
+
+          <div style="border:1px solid #e6e8eb; border-radius:10px; padding:14px 16px; background:#fff;">
+            <textarea readonly placeholder="写下你的评论" style="width:100%; min-height:70px; border:0; outline:none; font-family:inherit; font-size:13.5px; resize:none; color:#9ca3af; background:transparent;"></textarea>
+            <div style="display:flex; align-items:center; margin-top:8px;">
+              <button style="font-size:16px; color:#9ca3af; background:transparent; border:0; cursor:default;">📎</button>
+              <button style="margin-left:auto; background:#c7d2fe; color:#fff; border:0; padding:6px 16px; border-radius:8px; font-size:13px; cursor:default;">发送</button>
+            </div>
+          </div>
+
+          <div style="margin-top:14px; text-align:center; padding:28px 0; color:#9ca3af; font-size:13px; border-top:1px solid #f1f3f5;">
+            暂无评论，来发表第一条吧
+          </div>
+
+          <div style="margin-top:14px; padding: 10px 12px; background:#fef3c7; border-radius: 8px; font-size: 12.5px; color: #92400e;">
+            ⚠️ 问题：文案"留言板"感强，<strong>行为预期=随口一说</strong>；且空态不暗示「讨论」的价值——用户不知道在这里该做什么。
+          </div>
+        </div>
+
+        <!-- 新：讨论空态 -->
+        <div class="col new">
+          <div class="col-head">
+            <span style="display:inline-flex;align-items:center;gap:6px;">💬 讨论 <span class="count" style="color:#9ca3af;font-weight:400;font-size:12.5px;background:#f5f6f8;padding:1px 8px;border-radius:999px;">0</span></span>
+            <span class="badge-new" style="margin-left:auto;">新 · v1.0</span>
+          </div>
+
+          <div class="new-thread" style="margin-top:0;">
+            <div class="avatar-sm" style="background:#bbf7d0;color:#065f46;">钟</div>
+            <div class="nt-body">
+              <textarea readonly placeholder="我也来参加讨论…" style="color:#9ca3af;"></textarea>
+              <div class="nt-foot">
+                <button class="send-btn" disabled>发起讨论</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:18px; display:flex; flex-direction:column; align-items:center; padding:24px 16px; color:#6b7280; font-size:13px; gap:8px; background:#fff; border:1px dashed #e6e8eb; border-radius:10px;">
+            <div style="font-size:28px;">💡</div>
+            <div style="font-weight:500; color:#1f2328;">还没有人发起讨论</div>
+            <div style="font-size:12.5px; color:#9ca3af;">来开启第一条 · 有结论时可以一键 📌 转为待办</div>
+          </div>
+
+          <div style="margin-top:14px; padding: 10px 12px; background:#ecfdf5; border-radius: 8px; font-size: 12.5px; color: #059669;">
+            ✅ 收益：文案「发起讨论」+ 提示「输入 @ / Enter 发送 / ⌘ Enter 换行」+ 空态图示「转待办」——<strong>行为预期=围绕议题深入</strong>，降低 0→1 参与门槛。
+          </div>
+        </div>
+      </div>
+
+      <!-- 9 处文案改动速览（从需求文档 §3.2 提取） -->
+      <div style="margin-top: 22px; background:#fff; border:1px solid #e6e8eb; border-radius: 12px; padding: 16px 20px;">
+        <div style="font-size: 14px; font-weight: 600; margin-bottom: 10px;">📝 全量文案改动（v1.0 · §3.2）</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px 20px; font-size: 12.5px;">
+          <div style="color:#9ca3af;">位置</div><div style="color:#9ca3af;">旧</div><div style="color:#9ca3af;">新</div>
+          <div>Event 底部入口</div><div style="color:#6b7280;text-decoration:line-through;">评论 3</div><div style="color:#1f2328;font-weight:500;">讨论 3</div>
+          <div>输入框占位</div><div style="color:#6b7280;text-decoration:line-through;">写下你的评论</div><div style="color:#1f2328;font-weight:500;">发起讨论...</div>
+          <div>评论区标题</div><div style="color:#6b7280;text-decoration:line-through;">评论区</div><div style="color:#1f2328;font-weight:500;">讨论区</div>
+          <div>空态文案</div><div style="color:#6b7280;text-decoration:line-through;">暂无评论，来发表第一条吧</div><div style="color:#1f2328;font-weight:500;">还没有人发起讨论，来开启第一条</div>
+          <div>站内通知（新发言）</div><div style="color:#6b7280;text-decoration:line-through;">xx 评论了你的 Event</div><div style="color:#1f2328;font-weight:500;">xx 在讨论中发言</div>
+          <div>站内通知（新回复）</div><div style="color:#6b7280;text-decoration:line-through;">xx 回复了你的评论</div><div style="color:#1f2328;font-weight:500;">xx 回复了你的讨论</div>
+          <div>企微 Bot 汇总</div><div style="color:#6b7280;text-decoration:line-through;">有 3 条新评论</div><div style="color:#1f2328;font-weight:500;">有 3 条新讨论</div>
+          <div>AI 总结用词</div><div style="color:#6b7280;text-decoration:line-through;">新评论</div><div style="color:#1f2328;font-weight:500;">新讨论</div>
+          <div>My 页面板块</div><div style="color:#6b7280;text-decoration:line-through;">我评论过的 Topics</div><div style="color:#1f2328;font-weight:500;">我参与讨论的 Topics</div>
+          <div>输入框键位提示</div><div style="color:#6b7280;text-decoration:line-through;">（无提示）</div><div style="color:#1f2328;font-weight:500;">Enter 发送 · ⌘ Enter 换行</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 页面 3.8：My · 待办跟踪（跨 Topic 聚合） ===== -->
+    <section class="page" id="page-mytodo">
+      <div class="guide">
+        <span class="step">+2</span>
+        <span>从这里跟踪你的所有"讨论转出的待办"。<strong>嘉辉视角</strong>看"指派给我的"，<strong>肖迈视角</strong>看"我发出的"。跨 Topic 聚合，不用挨个 Event 找。</span>
+        <span class="tip">v1.1 新增</span>
+      </div>
+
+      <div class="section-head">My · 待办跟踪 <span class="sub">对应需求 §4.4.4 · 跨 Topic 聚合 · 指派人与被指派人双视角</span></div>
+
+      <!-- 视角切换 + 状态筛选 -->
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px; background:#fff; border:1px solid #e6e8eb; border-radius: 12px; padding: 10px 14px;">
+        <div style="font-size:13px; color:#9ca3af;">视角</div>
+        <div class="role-tab" data-role="assigned" onclick="switchMyTodoRole('assigned', this)"
+             style="padding:6px 14px; border-radius:6px; font-size:13px; cursor:pointer; background:#1f2328; color:#fff; font-weight:500;">
+          我的待办（被指派）
+        </div>
+        <div class="role-tab" data-role="sent" onclick="switchMyTodoRole('sent', this)"
+             style="padding:6px 14px; border-radius:6px; font-size:13px; cursor:pointer; color:#6b7280;">
+          我发出的（指派他人）
+        </div>
+        <div style="margin-left:auto; display:flex; gap:6px; font-size:12px;">
+          <span class="status-tab active" data-status="all"  onclick="filterMyTodo('all', this)"  style="padding:4px 10px; border-radius:999px; cursor:pointer; background:#f5f6f8; color:#1f2328; font-weight:500;">全部 <span style="color:#9ca3af;">5</span></span>
+          <span class="status-tab" data-status="todo"  onclick="filterMyTodo('todo', this)"  style="padding:4px 10px; border-radius:999px; cursor:pointer; color:#6b7280;">待处理 <span style="color:#9ca3af;">3</span></span>
+          <span class="status-tab" data-status="done"  onclick="filterMyTodo('done', this)"  style="padding:4px 10px; border-radius:999px; cursor:pointer; color:#6b7280;">已完成 <span style="color:#9ca3af;">1</span></span>
+          <span class="status-tab" data-status="overdue" onclick="filterMyTodo('overdue', this)" style="padding:4px 10px; border-radius:999px; cursor:pointer; color:#dc2626;">逾期 <span style="color:#dc2626;">1</span></span>
+        </div>
+      </div>
+
+      <!-- 视角 A：我的待办（被指派） -->
+      <div id="mytodo-assigned" class="mytodo-view">
+        <div style="font-size:12.5px; color:#6b7280; margin:6px 0 10px;">下面是<strong style="color:#1f2328;">钟嘉辉</strong>作为"被指派人"跨所有 Topic 的待办列表：</div>
+
+        <div class="mytodo-card" data-status="todo">
+          <div class="mt-left">
+            <input type="checkbox" />
+          </div>
+          <div class="mt-main">
+            <div class="mt-title">红点已读机制：前端 observer + 后端阅读位点</div>
+            <div class="mt-meta">
+              <a class="src-chip" onclick="goScene('event')">💬 SSV Nexus 产品进展 · #3 · 肖迈的讨论</a>
+              <span>指派自：<strong>肖迈</strong></span>
+              <span class="due due-soon">📅 下周三（3 天后）</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mytodo-card" data-status="overdue">
+          <div class="mt-left">
+            <input type="checkbox" />
+          </div>
+          <div class="mt-main">
+            <div class="mt-title">撰写移动端适配 H5 兜底方案文档</div>
+            <div class="mt-meta">
+              <a class="src-chip" onclick="toast('跳转至源讨论（Demo）')">💬 SSV Nexus 产品进展 · #3 · 王昕的讨论</a>
+              <span>指派自：<strong>王昕</strong></span>
+              <span class="due due-overdue">⚠️ 昨天逾期 1 天</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mytodo-card" data-status="todo">
+          <div class="mt-left">
+            <input type="checkbox" />
+          </div>
+          <div class="mt-main">
+            <div class="mt-title">Q2 路线图 · 技术可行性评估（附表格）</div>
+            <div class="mt-meta">
+              <a class="src-chip" onclick="toast('跳转至源 Event（Demo）')">📄 Q2 产品路线图 · #2 · 李四的 Event</a>
+              <span>指派自：<strong>李四</strong></span>
+              <span>📅 下周五</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mytodo-card done" data-status="done">
+          <div class="mt-left">
+            <input type="checkbox" checked />
+          </div>
+          <div class="mt-main">
+            <div class="mt-title">Event #1 发布后的一次内部同步</div>
+            <div class="mt-meta">
+              <a class="src-chip" onclick="toast('跳转（Demo）')">💬 SSV Nexus · #1 · 肖迈的讨论</a>
+              <span>指派自：<strong>肖迈</strong></span>
+              <span style="color:#059669;">✓ 已完成 · 2 天前</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI 提示条 -->
+        <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:10px 14px; margin-top:16px; font-size:12.5px; color:#1e40af;">
+          💡 <strong>AI 参谋</strong>：你有 <strong>1 条逾期待办</strong>、<strong>1 条 3 日内到期</strong>，建议优先处理。
+          <span style="margin-left:auto; float:right; color:#2563eb; cursor:pointer; text-decoration:underline;">让 AI 起草「延期说明」 →</span>
+        </div>
+      </div>
+
+      <!-- 视角 B：我发出的（指派他人） -->
+      <div id="mytodo-sent" class="mytodo-view" style="display:none;">
+        <div style="font-size:12.5px; color:#6b7280; margin:6px 0 10px;">下面是<strong style="color:#1f2328;">肖迈</strong>作为"指派人"跨所有 Topic 发出的待办列表：</div>
+
+        <div class="mytodo-card" data-status="todo">
+          <div class="mt-left" style="align-self:center;">
+            <div class="avatar-sm" style="background:#bbf7d0;color:#065f46; width:28px; height:28px; font-size:11px;">钟</div>
+          </div>
+          <div class="mt-main">
+            <div class="mt-title">红点已读机制：前端 observer + 后端阅读位点</div>
+            <div class="mt-meta">
+              <a class="src-chip" onclick="goScene('event')">💬 SSV Nexus 产品进展 · #3</a>
+              <span>指派给：<strong>钟嘉辉</strong></span>
+              <span class="due due-soon">📅 下周三</span>
+              <span style="color:#c2410c;">⏳ 处理中</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mytodo-card done" data-status="done">
+          <div class="mt-left" style="align-self:center;">
+            <div class="avatar-sm" style="background:#c7d2fe;color:#3730a3; width:28px; height:28px; font-size:11px;">王</div>
+          </div>
+          <div class="mt-main">
+            <div class="mt-title">Event #1 发布后的一次内部同步</div>
+            <div class="mt-meta">
+              <a class="src-chip" onclick="toast('跳转（Demo）')">💬 SSV Nexus · #1</a>
+              <span>指派给：<strong>王昕</strong></span>
+              <span style="color:#059669;">✓ 已完成 · 2 天前</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mytodo-card" data-status="todo">
+          <div class="mt-left" style="align-self:center;">
+            <div class="avatar-sm" style="background:#fecaca;color:#991b1b; width:28px; height:28px; font-size:11px;">丹</div>
+          </div>
+          <div class="mt-main">
+            <div class="mt-title">通知中心空态视觉设计</div>
+            <div class="mt-meta">
+              <a class="src-chip" onclick="toast('跳转（Demo）')">💬 通知体验优化 · #2</a>
+              <span>指派给：<strong>李丹阳</strong></span>
+              <span>📅 本周五</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 指派人洞察 -->
+        <div style="background:#fef3c7; border:1px solid #fde68a; border-radius:10px; padding:10px 14px; margin-top:16px; font-size:12.5px; color:#92400e;">
+          📊 <strong>指派回流</strong>：本周指派 3 条，完成 1 条；钟嘉辉的"红点任务"已处理 3 天。
+          <span style="margin-left:auto; float:right; color:#c2410c; cursor:pointer; text-decoration:underline;">让 AI 代发催办私信 →</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 页面 4：全链路流程 ===== -->
+    <section class="page" id="page-flow">
+      <div class="guide">
+        <span class="step">4 / 4</span>
+        <span>Thread 从发起到闭环的 6 步全流程。每步对应需求文档 §5。</span>
+      </div>
+      <div class="section-head">全链路流程 <span class="sub">以"红点消失逻辑讨论"为例</span></div>
+
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-body">
+          <div class="flow-title">发起讨论</div>
+          <div class="flow-desc">钟嘉辉在 Event 讨论区输入问题 → 点击 <code>发起讨论</code> → 讨论区顶部新增 Thread 卡片（收起态）。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-body">
+          <div class="flow-title">触发通知（新 Thread 发起）</div>
+          <div class="flow-desc">系统向 Topic 订阅者/维护人推送 <code>站内 Topic 动态 Tab</code> + <code>企微 Bot 聚合推送</code>。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-body">
+          <div class="flow-title">多人参与（Thread 内线性回复）</div>
+          <div class="flow-desc">王昕、李丹阳、李培轮点击通知进入 → 展开 Thread → 在 Thread 内回复。每次新回复自动通知 Thread 所有参与者。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-body">
+          <div class="flow-title">产出结论 + @ 指派（高优通知）</div>
+          <div class="flow-desc">肖迈总结讨论 → <code>@钟嘉辉</code> → 被 @ 者收到 <code>站内 @我 Tab</code> + <code>企微 Bot（高优）</code> 双通道通知。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">5</div>
+        <div class="flow-body">
+          <div class="flow-title">📌 讨论转为待办（关键差异点）</div>
+          <div class="flow-desc">肖迈点击消息 <code>···</code> 菜单 → <code>转为待办</code> → 指派钟嘉辉。Thread 卡片出现 <code>✅ 已转为待办</code>；Event 待办列表新增一条并链回原 Thread。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num done">✓</div>
+        <div class="flow-body">
+          <div class="flow-title">待办完成 → 状态同步回 Thread</div>
+          <div class="flow-desc">钟嘉辉勾选完成 → Thread 底部系统消息 <code>钟嘉辉 已完成关联待办</code> → 所有参与者收到通知。<strong>闭环。</strong></div>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px; padding: 14px 18px; background:#fff; border:1px dashed #c7d2fe; border-radius: 10px; font-size: 13px; color: #4b5563;">
+        💡 配套交付物：<a style="color:#2563eb;" href="notification-demo.html">通知中心 Demo</a> · <a style="color:#2563eb;" href="reach-demo.html">通知触达配置 Demo</a> · <a style="color:#2563eb;" href="docs/requirement-v1.0.md">需求文档 v1.0</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ··· 上下文菜单（消息级） -->
+<div class="ctx-menu" id="ctxMenu">
+  <div class="mi" onclick="onMenuAction('todo')">📌 <span>转为待办</span></div>
+  <div class="mi" onclick="onMenuAction('copy')">🔗 <span>复制链接</span></div>
+  <div class="sep"></div>
+  <div class="mi" onclick="onMenuAction('edit')">✏️ <span>编辑</span></div>
+  <div class="mi danger" onclick="onMenuAction('delete')">🗑️ <span>删除</span></div>
+</div>
+
+<!-- ··· Thread 级菜单 -->
+<div class="ctx-menu" id="threadMenu">
+  <div class="mi" onclick="onThreadMenu('resolve')">✓ <span>标记已解决</span></div>
+  <div class="mi" onclick="onThreadMenu('pin')">📍 <span>置顶到讨论区</span></div>
+  <div class="mi" onclick="onThreadMenu('subscribe')">🔔 <span>订阅 / 取消订阅</span></div>
+  <div class="mi" onclick="onThreadMenu('copy')">🔗 <span>复制讨论链接</span></div>
+  <div class="sep"></div>
+  <div class="mi danger" onclick="onThreadMenu('delete')">🗑️ <span>删除讨论</span></div>
+</div>
+
+<!-- 转待办弹窗 -->
+<div class="modal-mask" id="todoModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>📌 将此讨论转为待办</h3>
+      <div class="sub">待办将挂在当前 Event 下，并与原讨论消息双向链接。</div>
+    </div>
+    <div class="modal-body">
+      <div class="quoted" id="todoQuoted">— 原消息 —</div>
+      <label>待办内容</label>
+      <input type="text" id="todoTitle" placeholder="请输入待办标题" />
+      <label>指派给</label>
+      <select id="todoAssignee">
+        <option value="钟嘉辉">钟嘉辉（技术架构）</option>
+        <option value="王昕">王昕（SSV 产品）</option>
+        <option value="李丹阳">李丹阳（前端）</option>
+        <option value="李培轮">李培轮（后端）</option>
+        <option value="肖迈">肖迈（维护者）</option>
+      </select>
+      <label>截止</label>
+      <input type="text" id="todoDue" placeholder="例如：下周三" value="下周三" />
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" onclick="closeTodoModal()">取消</button>
+      <button class="btn-primary" onclick="confirmTodo()">转为待办</button>
+    </div>
+  </div>
+</div>
+
+<!-- 右上角弹出式通知 -->
+<div class="notif-pop" id="notifPop"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==========================================================
+   场景切换
+   ========================================================== */
+function goScene(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('page-' + name);
+  if (target) target.classList.add('active');
+  document.querySelectorAll('.scene-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.scene === name);
+  });
+  document.querySelector('.main').scrollTop = 0;
+  closeCtxMenu();
+}
+
+/* ==========================================================
+   v1.1 新功能导览：点 chip 跳到对应位置 + 高亮 spotlight
+   ========================================================== */
+function spotlightFeature(key) {
+  const map = {
+    hybrid:   { scene: 'event',  selector: '.thread[data-tid="t1"] .history-collapser', tip: '点这里展开 / 收起历史回复（混合态 C）' },
+    resolved: { scene: 'event',  selector: '.thread[data-tid="t2"] .t-menu',             tip: '点 ⋯ 菜单 → 「✓ 标记已解决」' },
+    mytodo:   { scene: 'mytodo', selector: '#page-mytodo .role-tab',                     tip: '切"我的待办" / "我发出的"双视角' },
+    hotkey:   { scene: 'event',  selector: '.thread[data-tid="t1"] .thread-reply-box textarea, .thread[data-tid="t1"] .thread-reply-box .rbox', tip: 'Enter 直接发送，⌘ Enter 才换行' },
+    aisum:    { scene: 'event',  selector: '.aside-regen', tip: '点「v1.1 重生成」看 AI 按 Thread 抽结论' },
+  };
+  const it = map[key];
+  if (!it) return;
+  goScene(it.scene);
+
+  // 等 page 渲染好再做 spotlight
+  setTimeout(() => {
+    let target = document.querySelector(it.selector);
+    if (!target) { toast('元素未找到，已切到对应 Tab'); return; }
+
+    // 如果在 Event 页，先确保 t1/t2 卡片为展开态，让目标可见
+    const thread = target.closest('.thread');
+    if (thread) thread.classList.add('full-expanded');
+
+    // 滚到目标
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    // 加 spotlight 动画
+    target.classList.add('spotlight');
+    setTimeout(() => target.classList.remove('spotlight'), 3500);
+
+    // 浮提示气泡
+    toast('💡 ' + it.tip);
+  }, 280);
+}
+
+/* ==========================================================
+   模拟「指派人回流」三连通知
+   场景：肖迈作为指派人，依次收到 +1 完成 / +2 逾期 / +4 拒绝 三种通知
+   ========================================================== */
+/* ==========================================================
+   Event 右侧栏 · AI 总结：版本切换 + 重新生成
+   ========================================================== */
+function switchAiVer(ver, btn) {
+  document.querySelectorAll('.aside-ver-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.ver === ver);
+  });
+  document.getElementById('aiCardsV10').style.display = ver === 'v10' ? '' : 'none';
+  document.getElementById('aiCardsV11').style.display = ver === 'v11' ? '' : 'none';
+  document.getElementById('aiDiffTip').style.display = ver === 'v11' ? '' : 'none';
+}
+
+function regenSummary() {
+  const btn = document.querySelector('.aside-regen');
+  const v10 = document.getElementById('aiCardsV10');
+  const v11 = document.getElementById('aiCardsV11');
+  const loading = document.getElementById('aiLoading');
+  const tip = document.getElementById('aiDiffTip');
+
+  // 阶段 1：进入 loading（隐藏卡片，显示 spinner）
+  btn.classList.add('spinning');
+  v10.style.display = 'none';
+  v11.style.display = 'none';
+  tip.style.display = 'none';
+  loading.style.display = '';
+
+  // 阶段 2：1.5s 后展示 v1.1 + 切版本 tab
+  setTimeout(() => {
+    btn.classList.remove('spinning');
+    loading.style.display = 'none';
+    v11.style.display = '';
+    tip.style.display = '';
+    document.querySelectorAll('.aside-ver-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.ver === 'v11');
+    });
+    toast('🤖 AI 已按 Thread 重新提炼结论 · v1.1 模式');
+  }, 1500);
+}
+
+function simulateBackflow() {
+  goScene('event');
+  setTimeout(() => {
+    // 第一波：+1 待办完成（最常见、最积极）
+    showNotifPop({
+      title: '✓ 待办完成',
+      body: '<strong>钟嘉辉</strong> 已完成你指派的待办「红点已读机制：前端 observer + 后端阅读位点」<div class="preview">关联讨论：SSV Nexus 产品进展 · #3</div>'
+    });
+    document.getElementById('bell').classList.add('has-unread');
+
+    // 第二波：+2 逾期（指派人 + 被指派人双发）
+    setTimeout(() => {
+      hideNotifPop();
+      setTimeout(() => {
+        showNotifPop({
+          title: '⚠️ 待办逾期',
+          body: '你指派给 <strong>李丹阳</strong> 的待办「H5 兜底文档」已逾期 <strong>1 天</strong><div class="preview">建议在企微 Bot 里直接催办，或撤回重派</div>'
+        });
+      }, 200);
+    }, 2400);
+
+    // 第三波：+4 被拒绝/反弹
+    setTimeout(() => {
+      hideNotifPop();
+      setTimeout(() => {
+        showNotifPop({
+          title: '🔄 待办被反弹',
+          body: '<strong>李培轮</strong> 没有接受你指派的待办「DuckDB 评估」，附反馈：<div class="preview">"这周已经在跟另一个，建议下周来；或者改派 @丹阳"</div>'
+        });
+      }, 200);
+    }, 4800);
+
+    // 提示用户去 My·待办跟踪 看完整列表
+    setTimeout(() => {
+      hideNotifPop();
+      toast('💡 完整列表见「My · 待办跟踪」→「我发出的」视角');
+    }, 7200);
+  }, 280);
+}
+
+/* ==========================================================
+   Thread 展开 / 收起
+   ========================================================== */
+function toggleThread(tid) {
+  const el = document.querySelector('.thread[data-tid="' + tid + '"]');
+  if (!el) return;
+  el.classList.toggle('expanded');
+}
+function expandThread(tid) {
+  const el = document.querySelector('.thread[data-tid="' + tid + '"]');
+  if (!el) return;
+  el.classList.add('expanded');
+  el.classList.add('full-expanded');
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* 混合态 C · 全展开/收起切换
+   - 展开：显示所有 hidden-history 回复
+   - 收起：回到首条 + 最新 1 条 */
+function toggleFullExpand(tid) {
+  const el = document.querySelector('.thread[data-tid="' + tid + '"]');
+  if (!el) return;
+  const fully = el.classList.toggle('full-expanded');
+  el.classList.toggle('expanded', fully); // 同步维护 expanded 状态
+  if (fully) {
+    // 滚到折叠条位置，保证视线连续
+    const anchor = el.querySelector('.history-collapser') || el.querySelector('.thread-head');
+    if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+/* ==========================================================
+   发起新 Thread
+   ========================================================== */
+function autoGrow(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+}
+function toggleSend() {
+  const ta = document.getElementById('newThreadInput');
+  document.getElementById('newThreadSend').disabled = !ta.value.trim();
+}
+/* ==========================================================
+   键位规范（v1.1 · 2026-05-05 新增）
+   Enter        → 发送
+   Shift+Enter  → 换行（保留兼容习惯）
+   Cmd/Ctrl+Enter → 换行（新）
+   IME 组字中（isComposing / keyCode 229）Enter 不触发发送
+   ========================================================== */
+function handleSubmitKey(e, onSubmit) {
+  if (e.key !== 'Enter') return;
+  // IME 候选框中：不抢回车
+  if (e.isComposing || e.keyCode === 229) return;
+  const isNewline = e.shiftKey || e.metaKey || e.ctrlKey;
+  if (isNewline) {
+    // Cmd/Ctrl+Enter 在 input 里不会换行；手动补一个 '\n' 到光标处
+    if (e.target.tagName === 'INPUT') {
+      // input 不支持多行；仅允许 Shift 走原生（多行 textarea 才会发生）
+      // 对 Cmd/Ctrl+Enter 在 input 里，升级为 toast 提示"该输入框不支持换行"
+      if (e.metaKey || e.ctrlKey) {
+        e.preventDefault();
+        toast('回复使用单行输入；如需换行请点击展开为多行');
+      }
+      return;
+    }
+    // textarea：Shift/Cmd/Ctrl+Enter 都允许原生换行
+    if (e.metaKey || e.ctrlKey) {
+      // 原生不会换行（input/textarea 对 Cmd+Enter 不插 \n），手动插一下
+      e.preventDefault();
+      insertAtCursor(e.target, '\n');
+    }
+    return;
+  }
+  // 纯 Enter → 发送
+  e.preventDefault();
+  if (typeof onSubmit === 'function') onSubmit(e.target);
+}
+
+function insertAtCursor(el, text) {
+  const start = el.selectionStart || 0;
+  const end = el.selectionEnd || 0;
+  el.value = el.value.slice(0, start) + text + el.value.slice(end);
+  el.selectionStart = el.selectionEnd = start + text.length;
+  // 触发一次 input 事件以便 autoGrow 等逻辑工作
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+/* 兼容旧调用（发起新 Thread 的 textarea） */
+function handleNewThreadKey(e) {
+  handleSubmitKey(e, function() { sendNewThread(); });
+}
+
+/* Thread 内回复框专用（多行 textarea） */
+function handleThreadReplyKey(e) {
+  handleSubmitKey(e, function(el) {
+    submitReply(el);
+  });
+}
+
+/* 点发送按钮：从 btn 往上找到同 rbox 内的 textarea 并提交 */
+function sendReplyFrom(btn) {
+  const box = btn.closest('.rbox');
+  const ta = box && box.querySelector('textarea');
+  if (ta) submitReply(ta);
+}
+
+function submitReply(el) {
+  const val = (el.value || '').trim();
+  if (!val) { toast('内容为空'); return; }
+  toast('已发送（Demo）· Enter=发送 · ⌘↵=换行');
+  el.value = '';
+  if (el.tagName === 'TEXTAREA') {
+    el.style.height = 'auto';
+  }
+}
+let newThreadIdx = 0;
+function sendNewThread() {
+  const ta = document.getElementById('newThreadInput');
+  const text = ta.value.trim();
+  if (!text) return;
+  newThreadIdx += 1;
+  const tid = 'new' + newThreadIdx;
+  const html = [
+    '<div class="thread expanded" data-tid="' + tid + '">',
+    '  <div class="thread-head" onclick="toggleThread(\'' + tid + '\')">',
+    '    <div class="avatar-sm" style="background:#bbf7d0;color:#065f46;">钟</div>',
+    '    <div class="tbody">',
+    '      <div class="t-line1">',
+    '        <span class="t-author">钟嘉辉</span>',
+    '        <span class="t-dept">· 技术架构</span>',
+    '        <span class="t-time">刚刚</span>',
+    '      </div>',
+    '      <div class="t-preview">' + escapeHtml(text) + '</div>',
+    '    </div>',
+    '  </div>',
+    '  <div class="thread-foot">',
+    '    <span class="chip">💬 暂无回复</span>',
+    '    <span class="chip" style="background:#eff6ff;color:#2563eb;">✨ 新讨论</span>',
+    '    <span class="reply-btn">首个回复</span>',
+    '  </div>',
+    '  <div class="thread-replies">',
+    '    <div style="color:#9ca3af; font-size: 13px; padding: 16px 0; text-align: center;">',
+    '      讨论已发起 · 系统已向 Topic 订阅者推送通知（站内 + 企微 Bot）',
+    '    </div>',
+    '  </div>',
+    '  <div class="thread-reply-box">',
+    '    <div class="rbox">',
+    '      <button class="at-btn" onclick="toast(\'@ 菜单\')">@</button>',
+    '      <textarea rows="1" placeholder="加入这场讨论…" oninput="autoGrow(this)" onkeydown="handleThreadReplyKey(event)"></textarea>',
+    '      <button class="send-btn-sm" onclick="sendReplyFrom(this)">发送</button>',
+    '    </div>',
+    '  </div>',
+    '</div>'
+  ].join('');
+  document.getElementById('threadList').insertAdjacentHTML('beforeend', html);
+
+  const cnt = document.getElementById('discussCount');
+  cnt.textContent = parseInt(cnt.textContent) + 1;
+
+  ta.value = '';
+  ta.style.height = 'auto';
+  toggleSend();
+
+  toast('讨论已发起 · 已通知 Topic 订阅者');
+
+  setTimeout(function() {
+    showNotifPop({
+      title: '新讨论推送',
+      body: '你参与的 Topic <strong>SSV Nexus 产品进展</strong> · Event#3 有新讨论：<div class="preview">' + escapeHtml(text) + '</div>',
+    });
+  }, 600);
+}
+
+/* ==========================================================
+   ··· 上下文菜单
+   ========================================================== */
+let ctxCurrentMid = null;
+function openMenuAt(ev, btn, mid) {
+  ev.stopPropagation();
+  ctxCurrentMid = mid;
+  const menu = document.getElementById('ctxMenu');
+  const rect = btn.getBoundingClientRect();
+  menu.style.top = (rect.bottom + 4) + 'px';
+  menu.style.left = Math.max(8, rect.right - 170) + 'px';
+  menu.classList.add('show');
+}
+function closeCtxMenu() {
+  document.getElementById('ctxMenu').classList.remove('show');
+  const tm = document.getElementById('threadMenu');
+  if (tm) tm.classList.remove('show');
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.ctx-menu') && !e.target.closest('.reply-actions') && !e.target.closest('.t-menu')) {
+    closeCtxMenu();
+  }
+});
+
+function onMenuAction(type) {
+  closeCtxMenu();
+  if (type === 'todo') {
+    openTodoModal(ctxCurrentMid);
+  } else if (type === 'copy') {
+    toast('已复制讨论链接');
+  } else if (type === 'edit') {
+    toast('编辑模式（Demo 未覆盖）');
+  } else if (type === 'delete') {
+    toast('删除该消息（Demo 未覆盖）');
+  }
+}
+
+/* ==========================================================
+   Thread 级菜单（标记已解决 / 置顶 / 订阅 / 删除 Thread）
+   ========================================================== */
+let currentThreadTid = null;
+function openThreadMenu(ev, btn, tid) {
+  ev.stopPropagation();
+  currentThreadTid = tid;
+  closeCtxMenu();
+  const menu = document.getElementById('threadMenu');
+  const rect = btn.getBoundingClientRect();
+  menu.style.top = (rect.bottom + 4) + 'px';
+  menu.style.left = Math.max(8, rect.right - 200) + 'px';
+  // 已解决 Thread 在菜单里隐藏"标记已解决"项（改在 hover 撤销）
+  const thread = document.querySelector('.thread[data-tid="' + tid + '"]');
+  const resolveItem = menu.querySelector('.mi:first-child');
+  if (thread && thread.classList.contains('resolved')) {
+    resolveItem.style.display = 'none';
+  } else {
+    resolveItem.style.display = '';
+  }
+  menu.classList.add('show');
+}
+function onThreadMenu(type) {
+  const tid = currentThreadTid;
+  closeCtxMenu();
+  if (!tid) return;
+  if (type === 'resolve') {
+    resolveThread(tid);
+  } else if (type === 'pin') {
+    toast('已置顶到讨论区顶部（Demo）');
+  } else if (type === 'subscribe') {
+    toast('订阅状态已切换（Demo）');
+  } else if (type === 'copy') {
+    toast('已复制讨论链接');
+  } else if (type === 'delete') {
+    if (confirm('删除整条讨论？该讨论下所有回复将一并进入回收站。')) {
+      const el = document.querySelector('.thread[data-tid="' + tid + '"]');
+      if (el) el.remove();
+      const cnt = document.getElementById('discussCount');
+      if (cnt) cnt.textContent = Math.max(0, parseInt(cnt.textContent) - 1);
+      toast('讨论已删除');
+    }
+  }
+}
+
+function resolveThread(tid) {
+  const el = document.querySelector('.thread[data-tid="' + tid + '"]');
+  if (!el) return;
+  el.classList.add('resolved');
+  el.classList.remove('full-expanded');
+  // 在讨论区底部插系统消息
+  const replies = el.querySelector('.thread-replies');
+  if (replies) {
+    const sys = document.createElement('div');
+    sys.className = 'sys-msg resolved';
+    sys.dataset.resolveMark = '1';
+    sys.innerHTML = '<span class="ico">✓</span>讨论已标记为已解决 · 刚刚';
+    replies.appendChild(sys);
+  }
+  // thread-foot 加 resolved chip（如未加）
+  const foot = el.querySelector('.thread-foot');
+  if (foot && !foot.querySelector('.chip.resolved-chip')) {
+    const chip = document.createElement('span');
+    chip.className = 'chip resolved-chip';
+    chip.style.cssText = 'background:#ecfdf5;color:#059669;font-weight:500;';
+    chip.innerHTML = '✓ 已解决';
+    const replyBtn = foot.querySelector('.reply-btn');
+    if (replyBtn) foot.insertBefore(chip, replyBtn); else foot.appendChild(chip);
+  }
+  toast('已标记为已解决 · Thread 已归档');
+}
+
+function undoResolve(tid) {
+  const el = document.querySelector('.thread[data-tid="' + tid + '"]');
+  if (!el) return;
+  el.classList.remove('resolved');
+  // 撤销时，移除上次加的系统消息（最后一条 resolveMark）
+  const marks = el.querySelectorAll('[data-resolve-mark="1"]');
+  if (marks.length) marks[marks.length - 1].remove();
+  // 移除 chip
+  const chip = el.querySelector('.chip.resolved-chip');
+  if (chip) chip.remove();
+  toast('已撤销 · 讨论重新激活');
+}
+
+/* ==========================================================
+   转待办弹窗
+   ========================================================== */
+function openTodoModal(mid) {
+  const reply = document.querySelector('.reply[data-mid="' + mid + '"]');
+  const text = reply ? reply.querySelector('.reply-text').innerText : '';
+  document.getElementById('todoQuoted').textContent = text.length > 120 ? text.slice(0, 120) + '…' : text;
+  document.getElementById('todoTitle').value = suggestTodoTitle(text);
+
+  // 默认指派：取文本中 @ 的第一个，否则 Thread 发起者
+  const atMatch = text.match(/@([\u4e00-\u9fa5A-Za-z0-9_]+)/);
+  const sel = document.getElementById('todoAssignee');
+  if (atMatch) {
+    const name = atMatch[1];
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === name) { sel.selectedIndex = i; break; }
+    }
+  }
+  document.getElementById('todoModal').classList.add('show');
+  document.getElementById('todoModal').dataset.mid = mid;
+}
+function closeTodoModal() {
+  document.getElementById('todoModal').classList.remove('show');
+}
+function suggestTodoTitle(text) {
+  const cleaned = text.replace(/@[\u4e00-\u9fa5A-Za-z0-9_]+\s*/g, '').trim();
+  return cleaned.length > 30 ? cleaned.slice(0, 30) + '…' : cleaned;
+}
+
+let todoIdx = 2;
+function confirmTodo() {
+  const mid = document.getElementById('todoModal').dataset.mid;
+  const title = document.getElementById('todoTitle').value.trim();
+  const assignee = document.getElementById('todoAssignee').value;
+  const due = document.getElementById('todoDue').value.trim();
+  if (!title) { toast('请填写待办标题'); return; }
+
+  todoIdx += 1;
+  const tdId = 'td-' + todoIdx;
+
+  // 1) Event 待办列表新增一条
+  const tdHtml = [
+    '<div class="todo-item" data-todo="' + tdId + '" data-mid="' + mid + '">',
+    '  <input type="checkbox" onchange="toggleTodo(this,\'' + tdId + '\',\'' + mid + '\')" />',
+    '  <div class="ti-body">',
+    '    ' + escapeHtml(title),
+    '    <div class="ti-meta">',
+    '      <span class="src-tag">来自讨论 · <a onclick="jumpToMessage(\'' + mid + '\')">查看原讨论 →</a></span>',
+    '      <span>指派：' + escapeHtml(assignee) + '</span>',
+    '      <span>截止：' + escapeHtml(due || '未设置') + '</span>',
+    '    </div>',
+    '  </div>',
+    '</div>'
+  ].join('');
+  document.getElementById('todoList').insertAdjacentHTML('beforeend', tdHtml);
+  const todoCnt = document.getElementById('todoCount');
+  todoCnt.textContent = parseInt(todoCnt.textContent) + 1;
+
+  // 2) Thread 卡片：回复下方插入系统消息 + 卡片 foot 加"已转为待办"chip
+  const reply = document.querySelector('.reply[data-mid="' + mid + '"]');
+  if (reply) {
+    const thread = reply.closest('.thread');
+    const repliesBox = reply.closest('.thread-replies');
+    // 避免重复添加系统消息
+    const already = repliesBox.querySelector('.sys-msg.todo-created[data-for-mid="' + mid + '"]');
+    if (!already) {
+      const sys = document.createElement('div');
+      sys.className = 'sys-msg todo-created';
+      sys.setAttribute('data-for-mid', mid);
+      sys.innerHTML = '<span class="ico">📌</span>你将该讨论转为待办 · 指派 ' + escapeHtml(assignee) + ' · 刚刚';
+      repliesBox.appendChild(sys);
+    }
+    // thread-foot 追加 chip
+    const foot = thread.querySelector('.thread-foot');
+    if (foot && !foot.querySelector('.chip.todo-done')) {
+      const chip = document.createElement('span');
+      chip.className = 'chip todo-done';
+      chip.textContent = '✅ 已转为待办';
+      // 插到 reply-btn 之前
+      const replyBtn = foot.querySelector('.reply-btn');
+      if (replyBtn) foot.insertBefore(chip, replyBtn);
+      else foot.appendChild(chip);
+    }
+    thread.classList.add('expanded');
+  }
+
+  closeTodoModal();
+  toast('已转为待办 · 指派给 ' + assignee);
+}
+
+/* ==========================================================
+   待办勾选完成 → Thread 系统消息同步
+   ========================================================== */
+function toggleTodo(chk, tdId, mid) {
+  const item = chk.closest('.todo-item');
+  if (chk.checked) {
+    item.classList.add('done');
+    if (mid) {
+      const reply = document.querySelector('.reply[data-mid="' + mid + '"]');
+      if (reply) {
+        const repliesBox = reply.closest('.thread-replies');
+        const thread = reply.closest('.thread');
+        // 追加完成系统消息
+        const flag = '[data-todo-done="' + tdId + '"]';
+        if (!repliesBox.querySelector(flag)) {
+          const sys = document.createElement('div');
+          sys.className = 'sys-msg todo-done';
+          sys.setAttribute('data-todo-done', tdId);
+          const assignee = item.querySelector('.ti-meta span:nth-of-type(2)')
+            ? item.querySelector('.ti-meta span:nth-of-type(2)').textContent.replace('指派：','').trim()
+            : '用户';
+          sys.innerHTML = '<span class="ico">✓</span>' + escapeHtml(assignee) + ' 已完成关联待办 · 刚刚';
+          repliesBox.appendChild(sys);
+        }
+        thread.classList.add('expanded');
+        setTimeout(() => {
+          thread.scrollIntoView({ behavior:'smooth', block:'center' });
+        }, 150);
+      }
+    }
+    toast('待办已完成 · Thread 参与者已收到同步通知');
+  } else {
+    item.classList.remove('done');
+  }
+}
+
+/* ==========================================================
+   从待办跳到原讨论消息
+   ========================================================== */
+function jumpToMessage(mid) {
+  const reply = document.querySelector('.reply[data-mid="' + mid + '"]');
+  if (!reply) { toast('原讨论消息未找到'); return; }
+  const thread = reply.closest('.thread');
+  thread.classList.add('expanded');
+  goScene('event');
+  setTimeout(() => {
+    reply.classList.add('focused');
+    reply.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => reply.classList.remove('focused'), 2400);
+  }, 180);
+}
+
+/* ==========================================================
+   右上角弹出式通知
+   ========================================================== */
+function showNotifPop(opt) {
+  const pop = document.getElementById('notifPop');
+  pop.innerHTML = [
+    '<div class="np-head">💬 <strong>' + (opt.title || '新通知') + '</strong>',
+    '  <span class="close" onclick="hideNotifPop()">×</span>',
+    '</div>',
+    '<div class="np-body">' + (opt.body || '') + '</div>',
+    '<div class="np-cta">',
+    '  <button class="btn-primary-pop" onclick="hideNotifPop()">知道了</button>',
+    '</div>'
+  ].join('');
+  pop.classList.add('show');
+  document.getElementById('bell').classList.add('has-unread');
+  setTimeout(hideNotifPop, 5000);
+}
+function hideNotifPop() {
+  document.getElementById('notifPop').classList.remove('show');
+}
+
+/* ==========================================================
+   工具
+   ========================================================== */
+/* ==========================================================
+   My 待办 · 视角/状态切换（T4）
+   ========================================================== */
+function switchMyTodoRole(role, btn) {
+  document.querySelectorAll('.role-tab').forEach(t => {
+    const active = t.dataset.role === role;
+    t.style.background = active ? '#1f2328' : '';
+    t.style.color = active ? '#fff' : '#6b7280';
+    t.style.fontWeight = active ? '500' : '';
+  });
+  document.getElementById('mytodo-assigned').style.display = role === 'assigned' ? '' : 'none';
+  document.getElementById('mytodo-sent').style.display = role === 'sent' ? '' : 'none';
+  // 重置状态筛选到"全部"
+  filterMyTodo('all', document.querySelector('.status-tab[data-status="all"]'));
+}
+
+function filterMyTodo(status, btn) {
+  document.querySelectorAll('.status-tab').forEach(t => {
+    const active = t.dataset.status === status;
+    t.style.background = active ? '#f5f6f8' : '';
+    t.style.color = active ? '#1f2328' : (t.dataset.status === 'overdue' ? '#dc2626' : '#6b7280');
+    t.style.fontWeight = active ? '500' : '';
+  });
+  const activeView = document.querySelector('.mytodo-view:not([style*="display:none"]):not([style*="display: none"])')
+    || document.getElementById('mytodo-assigned');
+  activeView.querySelectorAll('.mytodo-card').forEach(c => {
+    c.style.display = (status === 'all' || c.dataset.status === status) ? '' : 'none';
+  });
+}
+
+let toastTimer = null;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+</script>
+</body>
+</html>
