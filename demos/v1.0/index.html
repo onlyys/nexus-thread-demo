@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SSV Nexus · v1.0 · 评论改名「讨论」</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #f5f6f8; color: #1F2328;
+      font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 14px; line-height: 1.6; }
+    .wrap { max-width: 840px; margin: 0 auto; padding: 48px 32px; }
+    .badge { display: inline-block; background:#eef2ff; color:#4f46e5; padding: 3px 10px;
+      border-radius: 999px; font-size: 12px; font-weight: 500; letter-spacing: 0.02em; margin-bottom: 14px; }
+    h1 { font-size: 28px; font-weight: 600; margin: 0 0 8px; letter-spacing: -0.01em; }
+    .lead { color:#6b7280; font-size: 15px; margin: 0 0 32px; }
+    .section { background:#fff; border: 1px solid #e6e8eb; border-radius: 12px; padding: 24px 28px; margin-bottom: 20px; }
+    .section h2 { font-size: 16px; font-weight: 600; margin: 0 0 12px; display:flex; align-items: center; gap: 8px; }
+    .section h2 .dot { width:6px; height:6px; border-radius:50%; background:#2563eb; }
+    .section p { margin: 8px 0; color:#374151; }
+    .muted { color:#6b7280; }
+    table { width:100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #f1f3f5; vertical-align: top; }
+    th { background:#fafbfc; color:#6b7280; font-weight: 500; font-size: 12px; letter-spacing: 0.02em; }
+    td.old { color:#9ca3af; text-decoration: line-through; }
+    td.new { color:#1F2328; font-weight: 500; }
+    .callout { background:#f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 14px 18px;
+      font-size: 13px; color:#065f46; margin-top: 16px; }
+    .callout strong { color: #047857; }
+    a { color:#2563eb; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .version-nav { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 24px; }
+    .version-nav a { padding: 8px 14px; border: 1px solid #e6e8eb; border-radius: 8px;
+      background:#fff; color:#1F2328; font-size: 13px; }
+    .version-nav a:hover { border-color:#2563eb; color:#2563eb; text-decoration: none; }
+    .version-nav .cur { background:#2563eb; color:#fff; border-color:#2563eb; pointer-events: none; }
+    .why { background:#fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 14px 18px;
+      font-size: 13px; color: #92400e; }
+    .why strong { color: #78350f; }
+    .meta { display: flex; gap: 24px; color:#6b7280; font-size: 12.5px; margin-top: 6px; }
+    .meta span strong { color:#1F2328; font-weight: 500; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="badge">已发布 · 归档版本</span>
+  <h1>SSV Nexus · v1.0</h1>
+  <p class="lead">评论改名「讨论」 · 9 处文案统一调整</p>
+  <div class="meta">
+    <span>版本号：<strong>v1.0.0</strong></span>
+    <span>上线：<strong>2026-04 月</strong></span>
+    <span>负责：<strong>钟嘉辉</strong>（技术架构） / 王昕（SSV 产品）</span>
+  </div>
+
+  <div class="version-nav">
+    <a class="cur">v1.0 · 评论改名</a>
+    <a href="../demos/v1.1/thread-demo.html">v1.1 · Thread 化</a>
+    <a href="../demos/thread-demo.html">最新（开发中）→</a>
+  </div>
+
+  <div class="section">
+    <h2><span class="dot"></span>这是什么？</h2>
+    <p>v1.0 是 SSV Nexus 内部协作平台针对「Event 评论区」启动的第一轮产品语义升级。</p>
+    <p>本版本的核心动作：<strong>把「评论」这一不太匹配内部协作场景的词，统一替换为「讨论」</strong>——覆盖入口按钮、占位符、空态、标题、站内通知、邮件通知等 9 处用户可见点。</p>
+  </div>
+
+  <div class="section why">
+    <strong>为什么没有可点击的原型 demo？</strong><br />
+    v1.0 是纯<strong>文案 / 语义层</strong>改造，UI 结构、交互路径完全沿用 Nexus 原有评论区样式（线上已发布）。
+    因此 v1.0 没有独立制作的交互原型——如果需要直观对比，请移步
+    <a href="../demos/v1.1/thread-demo.html#scene=compare">v1.1 demo 的「新旧对比」场景</a>，
+    左列是 v1.0（已发布）的讨论区，右列是 v1.1 的 Thread 化版本。
+  </div>
+
+  <div class="section">
+    <h2><span class="dot"></span>9 处改动全量清单</h2>
+    <table>
+      <thead>
+        <tr><th style="width:28%;">位置</th><th style="width:36%;">旧（评论）</th><th>新（讨论）</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Event 底部入口 Tab</td>          <td class="old">评论 3</td>                      <td class="new">讨论 3</td></tr>
+        <tr><td>输入框占位符</td>                <td class="old">写下你的评论…</td>              <td class="new">发起讨论…</td></tr>
+        <tr><td>评论区标题</td>                  <td class="old">评论区</td>                    <td class="new">讨论区</td></tr>
+        <tr><td>空态文案</td>                    <td class="old">暂无评论，来发表第一条吧</td>  <td class="new">还没有人发起讨论，来开启第一条</td></tr>
+        <tr><td>站内通知（新发言）</td>          <td class="old">xx 评论了你的 Event</td>        <td class="new">xx 在讨论中发言</td></tr>
+        <tr><td>站内通知（新回复）</td>          <td class="old">xx 回复了你的评论</td>          <td class="new">xx 回复了你的讨论</td></tr>
+        <tr><td>邮件通知主题</td>                <td class="old">[Nexus] 新评论</td>             <td class="new">[Nexus] 新讨论</td></tr>
+        <tr><td>搜索筛选器</td>                  <td class="old">仅看评论</td>                   <td class="new">仅看讨论</td></tr>
+        <tr><td>@ 提及上下文提示</td>            <td class="old">在评论中提及了你</td>           <td class="new">在讨论中提及了你</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2><span class="dot"></span>为什么做这件事？</h2>
+    <p>「评论」一词在用户心智中更接近「轻量反馈」（如 B 站评论、朋友圈评论）——发出即收工，不期待深入往返。</p>
+    <p>但 SSV Nexus 是<strong>内部协作平台</strong>，Event 下的互动场景期望是：产品、研发、设计多角色围绕一个议题逐步形成决策。这种场景下「讨论」更匹配用户预期——
+    一条发言之后<strong>期待有回应</strong>、<strong>期待形成结论</strong>、<strong>期待沉淀行动</strong>。</p>
+    <div class="callout">
+      ✅ v1.0 是<strong>语义校准</strong>：先把"词"对齐，为 v1.1 的 Thread 化、标记已解决等"结构升级"打好心智基础。
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><span class="dot"></span>交付物</h2>
+    <p>
+      📄 <a href="../docs/v1.0/requirement.md">需求文档 · requirement-v1.0.md</a><br />
+      💬 v1.1 新旧对比场景（见上方黄色说明）<br />
+      🔗 线上访问：Nexus 内部 Event 详情页（已全量发布）
+    </p>
+  </div>
+
+  <div class="section">
+    <h2><span class="dot"></span>后续演进</h2>
+    <p>v1.0 是<strong>文案层</strong>，v1.1 在此之上做了<strong>结构层</strong>改造：</p>
+    <p class="muted">
+      v1.1 · Thread 化讨论区 → 混合态 C（首条+最新默认可见） → 消息级操作（📌 转为待办 / ✓ 标记已解决）
+      → My 待办跟踪 → Event 右栏 AI 总结（v1.0 流水账 vs v1.1 按 Thread 抽结论）
+      → 「我也来参加讨论」独立发起卡片。
+    </p>
+    <p><a href="../demos/v1.1/thread-demo.html">→ 查看 v1.1 完整 demo</a></p>
+  </div>
+
+</div>
+</body>
+</html>
