@@ -46,6 +46,49 @@
   .scene-tab:hover { color: #1f2328; }
   .scene-tab.active { color: #1f2328; border-bottom-color: #1f2328; font-weight: 500; }
 
+  /* v1.1 新功能导览浮条 */
+  .v11-banner {
+    background: linear-gradient(90deg, #f0f7ff 0%, #fdf4ff 100%);
+    border: 1px solid #c7d2fe;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 14px;
+    flex-wrap: wrap;
+    position: relative;
+  }
+  .v11-banner .v11-title {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; color: #1f2328;
+  }
+  .v11-banner .v11-chips { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+  .v11-chip {
+    background: #fff; border: 1px solid #c7d2fe;
+    color: #2563eb; font-size: 12.5px; font-weight: 500;
+    padding: 5px 12px; border-radius: 999px;
+    cursor: pointer; transition: all .15s;
+    user-select: none;
+  }
+  .v11-chip:hover { background: #2563eb; color: #fff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,.2); }
+  .v11-chip.alt { background: #fef3c7; border-color: #fde68a; color: #92400e; }
+  .v11-chip.alt:hover { background: #f59e0b; color: #fff; box-shadow: 0 4px 12px rgba(245,158,11,.3); }
+  .v11-close {
+    width: 24px; height: 24px; border-radius: 4px;
+    background: transparent; color: #9ca3af; font-size: 18px; line-height: 1;
+    cursor: pointer; border: 0;
+  }
+  .v11-close:hover { background: rgba(0,0,0,.05); color: #1f2328; }
+
+  /* spotlight 高亮动画 */
+  .spotlight {
+    animation: spotlightPulse 1.6s ease-in-out 2;
+    position: relative; z-index: 5;
+  }
+  @keyframes spotlightPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0.35), 0 0 24px rgba(245, 158, 11, 0.5); }
+  }
+
   .topic-list { background:#fff; border:1px solid #e6e8eb; border-radius:12px; overflow:hidden; }
   .topic-row { padding: 16px 20px; border-bottom: 1px solid #f1f3f5; display:flex; align-items:flex-start; gap:14px; cursor:pointer; transition: background .15s; }
   .topic-row:last-child { border-bottom:0; }
@@ -428,6 +471,23 @@
       <div class="scene-tab" data-scene="empty" onclick="goScene('empty')">空态文案替换</div>
       <div class="scene-tab" data-scene="mytodo" onclick="goScene('mytodo')">My · 待办跟踪</div>
       <div class="scene-tab" data-scene="flow" onclick="goScene('flow')">全链路流程</div>
+    </div>
+
+    <!-- v1.1 新功能导览（评审用 · 可关闭） -->
+    <div class="v11-banner" id="v11Banner">
+      <div class="v11-title">
+        <span style="font-size:13px;">🆕</span>
+        <strong>v1.1 新功能</strong>
+        <span style="color:#9ca3af; font-size:12px;">点 chip 立即定位到展示位置</span>
+      </div>
+      <div class="v11-chips">
+        <span class="v11-chip" onclick="spotlightFeature('hybrid')">① Thread 混合态 C</span>
+        <span class="v11-chip" onclick="spotlightFeature('resolved')">② 标记已解决</span>
+        <span class="v11-chip" onclick="spotlightFeature('mytodo')">③ My · 待办跟踪</span>
+        <span class="v11-chip" onclick="spotlightFeature('hotkey')">④ Enter 即发布</span>
+        <span class="v11-chip alt" onclick="simulateBackflow()">⏩ 模拟回流通知</span>
+      </div>
+      <button class="v11-close" onclick="document.getElementById('v11Banner').style.display='none'">×</button>
     </div>
 
     <!-- ===== 页面 1：Topic 列表 ===== -->
@@ -1255,6 +1315,85 @@ function goScene(name) {
   });
   document.querySelector('.main').scrollTop = 0;
   closeCtxMenu();
+}
+
+/* ==========================================================
+   v1.1 新功能导览：点 chip 跳到对应位置 + 高亮 spotlight
+   ========================================================== */
+function spotlightFeature(key) {
+  const map = {
+    hybrid:   { scene: 'event',  selector: '.thread[data-tid="t1"] .history-collapser', tip: '点这里展开 / 收起历史回复（混合态 C）' },
+    resolved: { scene: 'event',  selector: '.thread[data-tid="t2"] .t-menu',             tip: '点 ⋯ 菜单 → 「✓ 标记已解决」' },
+    mytodo:   { scene: 'mytodo', selector: '#page-mytodo .role-tab',                     tip: '切"我的待办" / "我发出的"双视角' },
+    hotkey:   { scene: 'event',  selector: '.thread[data-tid="t1"] .thread-reply-box textarea, .thread[data-tid="t1"] .thread-reply-box .rbox', tip: 'Enter 直接发送，⌘ Enter 才换行' },
+  };
+  const it = map[key];
+  if (!it) return;
+  goScene(it.scene);
+
+  // 等 page 渲染好再做 spotlight
+  setTimeout(() => {
+    let target = document.querySelector(it.selector);
+    if (!target) { toast('元素未找到，已切到对应 Tab'); return; }
+
+    // 如果在 Event 页，先确保 t1/t2 卡片为展开态，让目标可见
+    const thread = target.closest('.thread');
+    if (thread) thread.classList.add('full-expanded');
+
+    // 滚到目标
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    // 加 spotlight 动画
+    target.classList.add('spotlight');
+    setTimeout(() => target.classList.remove('spotlight'), 3500);
+
+    // 浮提示气泡
+    toast('💡 ' + it.tip);
+  }, 280);
+}
+
+/* ==========================================================
+   模拟「指派人回流」三连通知
+   场景：肖迈作为指派人，依次收到 +1 完成 / +2 逾期 / +4 拒绝 三种通知
+   ========================================================== */
+function simulateBackflow() {
+  goScene('event');
+  setTimeout(() => {
+    // 第一波：+1 待办完成（最常见、最积极）
+    showNotifPop({
+      title: '✓ 待办完成',
+      body: '<strong>钟嘉辉</strong> 已完成你指派的待办「红点已读机制：前端 observer + 后端阅读位点」<div class="preview">关联讨论：SSV Nexus 产品进展 · #3</div>'
+    });
+    document.getElementById('bell').classList.add('has-unread');
+
+    // 第二波：+2 逾期（指派人 + 被指派人双发）
+    setTimeout(() => {
+      hideNotifPop();
+      setTimeout(() => {
+        showNotifPop({
+          title: '⚠️ 待办逾期',
+          body: '你指派给 <strong>李丹阳</strong> 的待办「H5 兜底文档」已逾期 <strong>1 天</strong><div class="preview">建议在企微 Bot 里直接催办，或撤回重派</div>'
+        });
+      }, 200);
+    }, 2400);
+
+    // 第三波：+4 被拒绝/反弹
+    setTimeout(() => {
+      hideNotifPop();
+      setTimeout(() => {
+        showNotifPop({
+          title: '🔄 待办被反弹',
+          body: '<strong>李培轮</strong> 没有接受你指派的待办「DuckDB 评估」，附反馈：<div class="preview">"这周已经在跟另一个，建议下周来；或者改派 @丹阳"</div>'
+        });
+      }, 200);
+    }, 4800);
+
+    // 提示用户去 My·待办跟踪 看完整列表
+    setTimeout(() => {
+      hideNotifPop();
+      toast('💡 完整列表见「My · 待办跟踪」→「我发出的」视角');
+    }, 7200);
+  }, 280);
 }
 
 /* ==========================================================
