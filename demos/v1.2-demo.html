@@ -190,112 +190,155 @@
     border-bottom: 0; padding-bottom: 0; margin-bottom: 0;
   }
 
+  /* ====================================================
+     B 版定稿 v3 · 模块（首条 + 树形竖线 + 子回复）
+     设计原则：
+       - 字号梯度参考真实 Nexus：作者名稍大、正文略大于作者
+       - 竖线走 GitHub PR 树形：首条→拐弯下→T 字分到每个回复→末尾收束
+       - 子回复用 L 形从父回复继续延伸下来
+  ==================================================== */
+  .topic { padding-bottom: 48px; margin-bottom: 48px;
+    border-bottom: 1px solid #f1f3f5;
+  }
+  .topic:last-child {
+    border-bottom: 0; padding-bottom: 0; margin-bottom: 0;
+  }
+
   /* ---- 首条（顶格） ---- */
   .lead {
     display: flex; gap: 12px;
     position: relative;
   }
   .lead .avatar {
-    width: 36px; height: 36px; flex-shrink: 0;
+    width: 38px; height: 38px; flex-shrink: 0;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 13.5px; font-weight: 600;
+    font-size: 14px; font-weight: 600;
     z-index: 2;
     background: #fff;
   }
-  .lead .body { flex: 1; min-width: 0; padding-top: 4px; }
+  .lead .body { flex: 1; min-width: 0; padding-top: 5px; }
   .lead .author {
-    font-size: 14px; font-weight: 600; color: #1F2328;
+    font-size: 14.5px; font-weight: 600; color: #1F2328;
     margin-bottom: 4px;
   }
-  .lead .role { color: #9ca3af; font-weight: 400; margin-left: 4px; font-size: 12px; }
+  .lead .role { color: #9ca3af; font-weight: 400; margin-left: 4px; font-size: 12.5px; }
   .lead .text {
-    font-size: 15.5px; line-height: 1.75;
+    font-size: 15px; line-height: 1.75;
     font-weight: 500; color: #1F2328;
   }
 
-  /* ---- 回复区（缩进 1 层 = 与首条头像对齐 +20px） ---- */
-  /* 关键：所有回复都从首条头像中线那根竖线下来 */
+  /* ---- 回复树容器（缩进 1 层 + 主线起点） ---- */
   .replies {
-    margin-top: 14px;
-    padding-left: 48px; /* 36 头像 + 12 gap = 48；让回复从首条 body 那一列开始 */
     position: relative;
+    padding-left: 19px; /* 头像中线 = 38/2 = 19，竖线锚定在这 */
+    margin-top: 6px;
   }
-  /* 主竖线：从首条头像底部一直延伸到本模块最后一条回复头像顶部 */
+
+  /* 单条回复 */
+  .reply {
+    position: relative;
+    display: flex; gap: 12px;
+    padding: 10px 0 10px 22px; /* 左缩进给 T 字横画 22px */
+    min-height: 32px;
+  }
+
+  /* 树形主竖线：从首条头像中线下来，直贯到最后一条回复 */
+  /* 用 .replies::before 画从首条接上的"上半弧"，再用一个 .tree-line 画整体竖线 */
   .replies::before {
     content: '';
     position: absolute;
-    left: 17px;          /* 36/2 - 1 = 17，对齐头像中线（线宽 2） */
-    top: -10px;          /* 从首条头像底部接上来 */
-    bottom: 14px;        /* 距底端留点空 */
+    left: 0;
+    top: -8px;
+    bottom: 16px;        /* 末端在最后一条回复的中线位置收束 */
     width: 2px;
     background: #e6e8eb;
   }
 
-  .reply {
-    display: flex; gap: 12px;
-    padding-bottom: 18px;
-    position: relative;
+  /* 每条回复左侧的 T 字横线（从主竖线分叉到头像） */
+  .reply::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 26px;            /* 对齐头像中线 */
+    width: 22px;
+    height: 2px;
+    background: #e6e8eb;
   }
-  .reply:last-child { padding-bottom: 0; }
+
+  /* 最后一条回复 + 没有子回复时：让主竖线在最后一条 T 字处自然收束 */
+  .reply:last-child::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 26px;
+    bottom: 0;
+    width: 2px;
+    background: #fff; /* 用白色盖掉主竖线下半段 */
+  }
+  /* 但如果最后一条有子回复，则不收束，让线继续 */
+  .reply:last-child:has(.sub-reply)::after { display: none; }
+
   .reply .avatar {
-    width: 32px; height: 32px; flex-shrink: 0;
+    width: 30px; height: 30px; flex-shrink: 0;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 12.5px; font-weight: 500;
+    font-size: 12.5px; font-weight: 600;
     background: #fff;
     z-index: 2;
-    /* 把头像往左拉 16px，这样头像中线正好压在竖线上 */
-    margin-left: -16px;
   }
-  .reply .body { flex: 1; min-width: 0; padding-top: 3px; }
+  .reply .body { flex: 1; min-width: 0; padding-top: 4px; }
   .reply .author {
-    font-size: 12.5px; font-weight: 600; color: #1F2328;
+    font-size: 13.5px; font-weight: 600; color: #1F2328;
     margin-bottom: 3px;
   }
-  .reply .role { color: #9ca3af; font-weight: 400; margin-left: 4px; font-size: 11px; }
+  .reply .role { color: #9ca3af; font-weight: 400; margin-left: 4px; font-size: 11.5px; }
   .reply .ts { color: #d1d5db; font-weight: 400; font-size: 11px; margin-left: 6px; }
   .reply .text {
     font-size: 14px; line-height: 1.7; color: #1F2328;
   }
 
-  /* ---- 子回复（缩进 2 层） ---- */
+  /* ---- 子回复（在 .reply .body 内部继续往下挂） ---- */
   .sub-reply {
-    margin-left: 32px;
-    margin-top: 10px;
-    padding-bottom: 0;
     position: relative;
-    display: flex; gap: 12px;
+    display: flex; gap: 10px;
+    padding: 10px 0 6px 22px;
+    margin-top: 8px;
+    margin-left: -8px;
   }
-  .sub-reply .avatar {
-    width: 28px; height: 28px; flex-shrink: 0;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11.5px; font-weight: 500;
-    background: #fff;
-    z-index: 2;
-    margin-left: 0;
-  }
-  .sub-reply .body { flex: 1; min-width: 0; padding-top: 3px; }
-  .sub-reply .author { font-size: 11.5px; font-weight: 600; }
-  .sub-reply .role { color: #9ca3af; font-weight: 400; margin-left: 4px; font-size: 10.5px; }
-  .sub-reply .text { font-size: 13px; line-height: 1.65; }
-
-  /* 子回复 L 形拐角（用 SVG-like 画法，保证像素级连通） */
+  /* 子回复主竖线：在父回复 body 内左侧延一段下来 */
   .sub-reply::before {
     content: '';
     position: absolute;
-    left: -16px;
-    top: -10px;
-    width: 16px;
-    height: 24px;
-    border-left: 2px solid #e6e8eb;
-    border-bottom: 2px solid #e6e8eb;
-    border-bottom-left-radius: 8px;
-    /* 关键：把竖线向上延伸到能与主竖线对齐的位置，且保证转弯处不留缝 */
+    left: 0;
+    top: -8px;
+    bottom: 14px;
+    width: 2px;
+    background: #e6e8eb;
   }
-  /* 子回复后还有兄弟（同层后续）时，主竖线从子回复 L 上方继续 */
-  /* 当前 demo 不复杂，先做单条子回复演示 */
+  /* 子回复 T 字 */
+  .sub-reply::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 22px;
+    width: 22px;
+    height: 2px;
+    background: #e6e8eb;
+  }
+
+  .sub-reply .avatar {
+    width: 26px; height: 26px; flex-shrink: 0;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11.5px; font-weight: 600;
+    background: #fff;
+    z-index: 2;
+  }
+  .sub-reply .body { flex: 1; min-width: 0; padding-top: 3px; }
+  .sub-reply .author { font-size: 12.5px; font-weight: 600; }
+  .sub-reply .role { color: #9ca3af; font-weight: 400; margin-left: 4px; font-size: 11px; }
+  .sub-reply .text { font-size: 13.5px; line-height: 1.65; }
 
   /* ---- 富内容：链接、@提及、附件（v1.2 全面降权，避免抢内容焦点） ---- */
   .mention {
@@ -357,43 +400,85 @@
   .attach-file:hover .name { border-bottom-color: #93c5fd; }
   .attach-file .size { color: #9ca3af; font-size: 11px; }
 
-  /* ---- 每条悬浮才显示的操作菜单 ---- */
-  .reply, .sub-reply, .lead {
-    /* 给位置 hover 用 */
-  }
-  .msg-menu {
+  /* ---- 每条悬浮才显示的操作菜单（v1.2 增强版） ---- */
+  .msg-actions {
     position: absolute;
-    right: 0; top: 0;
+    right: 0; top: 4px;
+    display: flex; gap: 2px;
     opacity: 0;
-    transition: opacity .15s;
+    transform: translateY(-2px);
+    transition: opacity .15s, transform .15s;
+    background: #fff;
+    border: 1px solid #e6e8eb;
+    border-radius: 8px;
+    padding: 2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
-  .lead:hover .msg-menu,
-  .reply:hover .msg-menu,
-  .sub-reply:hover .msg-menu {
+  .lead:hover .msg-actions,
+  .reply:hover .msg-actions,
+  .sub-reply:hover .msg-actions {
     opacity: 1;
+    transform: translateY(0);
   }
-  .msg-menu .btn {
-    background: #fff; border: 1px solid #e6e8eb;
-    border-radius: 6px;
-    padding: 3px 8px;
+  .msg-actions .act {
+    background: transparent; border: 0;
+    padding: 5px 8px;
     cursor: pointer;
-    font-size: 13px; color: #6b7280;
+    font-size: 13px;
+    color: #6b7280;
+    border-radius: 5px;
+    display: inline-flex; align-items: center; gap: 4px;
+    line-height: 1;
   }
-  .msg-menu .btn:hover { background: #f5f6f8; color: #1F2328; }
+  .msg-actions .act:hover { background: #f5f6f8; color: #1F2328; }
+  .msg-actions .act.like:hover { color: #c2410c; }
+  .msg-actions .act.todo:hover { color: #2563eb; }
+  .msg-actions .act .label {
+    font-size: 11.5px;
+    color: inherit;
+  }
+  /* 点赞数 / 待办数 chip（如果已点过显示） */
+  .msg-actions .act .count {
+    font-size: 11px; color: #9ca3af;
+    margin-left: 2px;
+  }
+  .msg-actions .act.active.like { color: #c2410c; background: #fff7ed; }
+  .msg-actions .act.active.todo { color: #2563eb; background: #eff6ff; }
 
   /* ====================================================
-     发起讨论框（沿用 v1.1 浅灰底）
+     发起讨论框（v1.2 · 置顶 + 白底虚线 · 像 X 那样邀请输入）
   ==================================================== */
   .new-msg {
-    margin-top: 32px;
-    background: #f5f6f8;
-    border: 1px solid #e6e8eb;
+    margin: 0 0 32px;
+    background: #fff;
+    border: 1.5px dashed #c7d2fe;
     border-radius: 12px;
     padding: 14px 16px;
     display: flex; gap: 12px; align-items: flex-start;
-    transition: background .2s, border-color .2s;
+    transition: background .2s, border-color .2s, border-style .2s;
+    cursor: text;
+    position: relative;
   }
-  .new-msg:focus-within { background: #fff; border-color: #2563eb; }
+  .new-msg:hover { border-color: #93c5fd; background: #fafbff; }
+  .new-msg:focus-within {
+    background: #fff;
+    border: 1.5px solid #2563eb;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.06);
+  }
+  /* 左上角徽标提示 */
+  .new-msg::before {
+    content: '✨ 加入讨论';
+    position: absolute;
+    top: -8px; left: 14px;
+    background: #fff;
+    padding: 0 6px;
+    font-size: 11px; color: #6b7280;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .new-msg:focus-within::before {
+    color: #2563eb;
+  }
   .new-msg .avatar {
     width: 32px; height: 32px; flex-shrink: 0;
     border-radius: 50%;
@@ -612,6 +697,22 @@
         💬 讨论 <span class="count">8</span>
       </div>
 
+    <!-- ============ 发起讨论框（v1.2 · 置顶） ============ -->
+    <div class="new-msg">
+      <div class="avatar">钟</div>
+      <div class="input">
+        <textarea placeholder="我也来参加讨论…" oninput="autoGrow(this); toggleSend(this)" onkeydown="handleSend(event, this)"></textarea>
+        <div class="toolbar">
+          <button class="tool" title="@提及" onclick="toast('@ 选人面板')">@</button>
+          <button class="tool" title="链接" onclick="toast('插入链接')">🔗</button>
+          <button class="tool" title="附件" onclick="toast('上传附件')">📎</button>
+          <button class="tool" title="图片" onclick="toast('插入图片')">🖼</button>
+          <button class="send" id="sendBtn" disabled onclick="toast('已发送 · 信息流转 ✓')">发起</button>
+        </div>
+      </div>
+    </div>
+
+
       <!-- ============================================================
            话题 1 · 红点已读机制
       ============================================================ -->
@@ -627,7 +728,11 @@
               我倾向"<strong>停留 &gt; 3s 或滚动到底部</strong>"才算已读。<span class="mention">@肖迈</span>
             </div>
           </div>
-          <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 标记已解决 · 复制链接')">⋯</button></div>
+          <div class="msg-actions">
+              <button class="act like" onclick="toggleLike(this)" title="点赞"><span>👍</span></button>
+              <button class="act todo" onclick="toast('已转为待办，跟踪中…')" title="转待办"><span>📌</span></button>
+              <button class="act" onclick="toast('· · ·  标记已解决 · 复制链接 · 引用')" title="更多">⋯</button>
+            </div>
         </div>
 
         <!-- 回复区（缩进 1 层） -->
@@ -643,7 +748,11 @@
                 <a class="link" href="#">Slack 的 unread 设计文档</a>。
               </div>
             </div>
-            <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 复制链接')">⋯</button></div>
+            <div class="msg-actions">
+              <button class="act like" onclick="toggleLike(this)" title="点赞"><span>👍</span></button>
+              <button class="act todo" onclick="toast('已转为待办，跟踪中…')" title="转待办"><span>📌</span></button>
+              <button class="act" onclick="toast('· · ·  标记已解决 · 复制链接 · 引用')" title="更多">⋯</button>
+            </div>
           </div>
 
           <div class="reply">
@@ -661,7 +770,11 @@
                 </div>
               </div>
             </div>
-            <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 复制链接')">⋯</button></div>
+            <div class="msg-actions">
+              <button class="act like" onclick="toggleLike(this)" title="点赞"><span>👍</span></button>
+              <button class="act todo" onclick="toast('已转为待办，跟踪中…')" title="转待办"><span>📌</span></button>
+              <button class="act" onclick="toast('· · ·  标记已解决 · 复制链接 · 引用')" title="更多">⋯</button>
+            </div>
           </div>
 
           <div class="reply">
@@ -672,7 +785,11 @@
                 后端也可以加一个"最后阅读位点"字段，滚动到底就持久化。配合前端 observer 双保险。
               </div>
             </div>
-            <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 复制链接')">⋯</button></div>
+            <div class="msg-actions">
+              <button class="act like" onclick="toggleLike(this)" title="点赞"><span>👍</span></button>
+              <button class="act todo" onclick="toast('已转为待办，跟踪中…')" title="转待办"><span>📌</span></button>
+              <button class="act" onclick="toast('· · ·  标记已解决 · 复制链接 · 引用')" title="更多">⋯</button>
+            </div>
           </div>
 
           <div class="reply">
@@ -698,11 +815,19 @@
                     </a>
                   </div>
                 </div>
-                <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 复制链接')">⋯</button></div>
+                <div class="msg-actions">
+              <button class="act like" onclick="toggleLike(this)" title="点赞"><span>👍</span></button>
+              <button class="act todo" onclick="toast('已转为待办，跟踪中…')" title="转待办"><span>📌</span></button>
+              <button class="act" onclick="toast('· · ·  标记已解决 · 复制链接 · 引用')" title="更多">⋯</button>
+            </div>
               </div>
 
             </div>
-            <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 标记已解决 · 复制链接')">⋯</button></div>
+            <div class="msg-actions">
+              <button class="act like" onclick="toggleLike(this)" title="点赞"><span>👍</span></button>
+              <button class="act todo" onclick="toast('已转为待办，跟踪中…')" title="转待办"><span>📌</span></button>
+              <button class="act" onclick="toast('· · ·  标记已解决 · 复制链接 · 引用')" title="更多">⋯</button>
+            </div>
           </div>
 
         </div>
@@ -723,7 +848,11 @@
               我个人倾向哪个更稳就用哪个，长期维护成本敏感。
             </div>
           </div>
-          <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 复制链接')">⋯</button></div>
+          <div class="msg-actions">
+              <button class="act like" onclick="toggleLike(this)" title="点赞"><span>👍</span></button>
+              <button class="act todo" onclick="toast('已转为待办，跟踪中…')" title="转待办"><span>📌</span></button>
+              <button class="act" onclick="toast('· · ·  标记已解决 · 复制链接 · 引用')" title="更多">⋯</button>
+            </div>
         </div>
 
         <!-- 回复区 -->
@@ -745,7 +874,11 @@
                 </a>
               </div>
             </div>
-            <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 复制链接')">⋯</button></div>
+            <div class="msg-actions">
+              <button class="act like" onclick="toggleLike(this)" title="点赞"><span>👍</span></button>
+              <button class="act todo" onclick="toast('已转为待办，跟踪中…')" title="转待办"><span>📌</span></button>
+              <button class="act" onclick="toast('· · ·  标记已解决 · 复制链接 · 引用')" title="更多">⋯</button>
+            </div>
           </div>
 
           <div class="reply">
@@ -757,7 +890,11 @@
                 可以看下 <a class="link" href="#">larksuite/oapi-sdk-go</a> 这个开源 SDK。
               </div>
             </div>
-            <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 复制链接')">⋯</button></div>
+            <div class="msg-actions">
+              <button class="act like" onclick="toggleLike(this)" title="点赞"><span>👍</span></button>
+              <button class="act todo" onclick="toast('已转为待办，跟踪中…')" title="转待办"><span>📌</span></button>
+              <button class="act" onclick="toast('· · ·  标记已解决 · 复制链接 · 引用')" title="更多">⋯</button>
+            </div>
           </div>
 
           <div class="reply">
@@ -768,7 +905,11 @@
                 那这块就这么定，<span class="mention">@李培伦</span> 这周出技术方案？
               </div>
             </div>
-            <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 复制链接')">⋯</button></div>
+            <div class="msg-actions">
+              <button class="act like" onclick="toggleLike(this)" title="点赞"><span>👍</span></button>
+              <button class="act todo" onclick="toast('已转为待办，跟踪中…')" title="转待办"><span>📌</span></button>
+              <button class="act" onclick="toast('· · ·  标记已解决 · 复制链接 · 引用')" title="更多">⋯</button>
+            </div>
           </div>
 
         </div>
@@ -776,20 +917,6 @@
 
     </div>
 
-    <!-- ============ 发起讨论框 ============ -->
-    <div class="new-msg">
-      <div class="avatar">钟</div>
-      <div class="input">
-        <textarea placeholder="我也来参加讨论…" oninput="autoGrow(this); toggleSend(this)" onkeydown="handleSend(event, this)"></textarea>
-        <div class="toolbar">
-          <button class="tool" title="@提及" onclick="toast('@ 选人面板')">@</button>
-          <button class="tool" title="链接" onclick="toast('插入链接')">🔗</button>
-          <button class="tool" title="附件" onclick="toast('上传附件')">📎</button>
-          <button class="tool" title="图片" onclick="toast('插入图片')">🖼</button>
-          <button class="send" id="sendBtn" disabled onclick="toast('已发送 · 信息流转 ✓')">发起</button>
-        </div>
-      </div>
-    </div>
 
   </main>
 
@@ -873,6 +1000,23 @@
       t.value = '';
       autoGrow(t);
       toggleSend(t);
+    }
+  }
+
+  function toggleLike(btn) {
+    btn.classList.toggle('active');
+    if (btn.classList.contains('active')) {
+      btn.dataset.count = (parseInt(btn.dataset.count || '0') + 1);
+      const span = btn.querySelector('span');
+      let cnt = btn.querySelector('.count');
+      if (!cnt) { cnt = document.createElement('span'); cnt.className = 'count'; btn.appendChild(cnt); }
+      cnt.textContent = btn.dataset.count;
+      toast('已点赞');
+    } else {
+      btn.dataset.count = Math.max(0, parseInt(btn.dataset.count || '0') - 1);
+      const cnt = btn.querySelector('.count');
+      if (cnt && parseInt(btn.dataset.count) === 0) cnt.remove();
+      else if (cnt) cnt.textContent = btn.dataset.count;
     }
   }
 </script>
