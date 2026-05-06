@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SSV Nexus · v1.2 · Event 讨论区</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #f5f6f8;
+    color: #1F2328;
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: #2563eb; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ====================================================
+     顶栏（沿用 v1.1）
+  ==================================================== */
+  .topbar {
+    height: 52px; background: #1F2328; color: #fff;
+    display: flex; align-items: center; padding: 0 24px;
+    position: sticky; top: 0; z-index: 50;
+    gap: 16px;
+  }
+  .topbar .logo {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: #fff; color: #1F2328;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 15px;
+  }
+  .topbar .brand { font-weight: 600; font-size: 15px; }
+  .topbar .slogan { color: #9ca3af; font-size: 12px; margin-left: 6px; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 18px; }
+  .topbar .bell { position: relative; cursor: pointer; font-size: 16px; }
+  .topbar .bell .dot {
+    position: absolute; top: -2px; right: -2px;
+    width: 6px; height: 6px; background: #ef4444; border-radius: 50%;
+  }
+  .topbar .me { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .topbar .me .avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #bbf7d0; color: #065f46;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11.5px; font-weight: 600;
+  }
+
+  /* ====================================================
+     主布局：sidebar + main + aside
+  ==================================================== */
+  .layout {
+    display: grid;
+    grid-template-columns: 220px 1fr 320px;
+    min-height: calc(100vh - 52px);
+  }
+
+  /* ---- 左侧目录 ---- */
+  .sidebar {
+    background: #fff;
+    border-right: 1px solid #e6e8eb;
+    padding: 20px 14px;
+  }
+  .sidebar h4 {
+    margin: 0 8px 10px;
+    font-size: 11px; font-weight: 600; color: #9ca3af;
+    letter-spacing: 0.08em;
+  }
+  .nav-item {
+    padding: 7px 10px; font-size: 13px; color: #1F2328;
+    border-radius: 6px; cursor: pointer;
+    margin-bottom: 2px; display: flex; align-items: center; gap: 8px;
+  }
+  .nav-item:hover { background: #fafbfc; }
+  .nav-item.active { background: #f5f6f8; font-weight: 500; }
+  .nav-item .ico { color: #9ca3af; font-size: 11px; width: 8px; }
+  .nav-item.active .ico { color: #2563eb; }
+  .nav-section { margin-top: 18px; }
+  .nav-pill {
+    margin-left: auto; font-size: 10.5px; background: #f5f6f8; color: #6b7280;
+    padding: 1px 6px; border-radius: 999px;
+  }
+  .nav-pill.hot { background: #fef2f2; color: #dc2626; }
+
+  /* ---- 中间内容 ---- */
+  .main {
+    padding: 28px 36px 80px;
+    background: #f5f6f8;
+    min-width: 0;
+  }
+  .breadcrumb {
+    font-size: 12.5px; color: #6b7280; margin-bottom: 14px;
+  }
+  .breadcrumb a { color: #6b7280; }
+  .breadcrumb .sep { margin: 0 6px; color: #d1d5db; }
+
+  /* ====================================================
+     Event 正文区（内容 + 元信息）
+  ==================================================== */
+  .event {
+    background: #fff;
+    border: 1px solid #e6e8eb;
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+  }
+  .event-meta {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12.5px; color: #6b7280;
+    margin-bottom: 14px;
+  }
+  .event-meta .pill {
+    background: #f5f6f8; color: #4b5563;
+    padding: 2px 8px; border-radius: 4px; font-size: 11.5px;
+  }
+  .event-meta .pill.live { background: #ecfdf5; color: #059669; }
+  .event-meta .ts { margin-left: auto; }
+
+  .event h1 {
+    font-size: 22px; font-weight: 600;
+    margin: 0 0 12px; letter-spacing: -0.01em;
+    color: #1F2328;
+  }
+  .event-author {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 18px;
+  }
+  .event-author .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #c7d2fe; color: #3730a3;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 500;
+  }
+  .event-author .info { font-size: 13px; }
+  .event-author .name { font-weight: 600; color: #1F2328; }
+  .event-author .role { color: #9ca3af; }
+
+  .event-body {
+    font-size: 15px; line-height: 1.85;
+    color: #1F2328;
+  }
+  .event-body p { margin: 0 0 14px; }
+  .event-body strong { color: #1F2328; font-weight: 600; }
+  .event-body ul { padding-left: 20px; margin: 6px 0 14px; }
+  .event-body li { margin-bottom: 6px; }
+  .event-body .em-link {
+    color: #2563eb;
+    border-bottom: 1px solid #bfdbfe;
+  }
+  .event-body .em-link:hover { border-bottom-color: #2563eb; text-decoration: none; }
+
+  /* ====================================================
+     讨论区 · 整体
+  ==================================================== */
+  .discuss-wrap {
+    background: #fff;
+    border: 1px solid #e6e8eb;
+    border-radius: 12px;
+    padding: 24px 28px 20px;
+  }
+  .discuss-head {
+    font-size: 13px; font-weight: 600; color: #6b7280;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f1f3f5;
+    margin-bottom: 28px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .discuss-head .count {
+    background: #f5f6f8; color: #4b5563;
+    font-size: 11px; font-weight: 500;
+    padding: 1px 8px; border-radius: 999px;
+    text-transform: none; letter-spacing: normal;
+  }
+
+  /* ====================================================
+     B 版定稿 · 模块（首条 + 回复 + 子回复）
+     设计原则：
+       - 不再用蓝色短杠 / 「· 首条」徽标
+       - 首条字号 14.5px / 加粗（500）
+       - 回复字号 13.5px / 普通
+       - 模块间距 48px + 1px 横线
+       - 竖线 2px 浅灰，转弯处与主线像素级连通
+       - 层级缩进：首条不缩 / 首回复及之后缩进 1 层 / 子回复缩进 2 层
+  ==================================================== */
+  .topic { padding-bottom: 48px; margin-bottom: 48px;
+    border-bottom: 1px solid #f1f3f5;
+  }
+  .topic:last-child {
+    border-bottom: 0; padding-bottom: 0; margin-bottom: 0;
+  }
+
+  /* ---- 首条（顶格） ---- */
+  .lead {
+    display: flex; gap: 12px;
+    position: relative;
+  }
+  .lead .avatar {
+    width: 36px; height: 36px; flex-shrink: 0;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13.5px; font-weight: 600;
+    z-index: 2;
+    background: #fff;
+  }
+  .lead .body { flex: 1; min-width: 0; padding-top: 4px; }
+  .lead .author {
+    font-size: 13.5px; font-weight: 600; color: #1F2328;
+    margin-bottom: 3px;
+  }
+  .lead .role { color: #9ca3af; font-weight: 400; margin-left: 6px; }
+  .lead .text {
+    font-size: 14.5px; line-height: 1.75;
+    font-weight: 500; color: #1F2328;
+  }
+
+  /* ---- 回复区（缩进 1 层 = 与首条头像对齐 +20px） ---- */
+  /* 关键：所有回复都从首条头像中线那根竖线下来 */
+  .replies {
+    margin-top: 14px;
+    padding-left: 48px; /* 36 头像 + 12 gap = 48；让回复从首条 body 那一列开始 */
+    position: relative;
+  }
+  /* 主竖线：从首条头像底部一直延伸到本模块最后一条回复头像顶部 */
+  .replies::before {
+    content: '';
+    position: absolute;
+    left: 17px;          /* 36/2 - 1 = 17，对齐头像中线（线宽 2） */
+    top: -10px;          /* 从首条头像底部接上来 */
+    bottom: 14px;        /* 距底端留点空 */
+    width: 2px;
+    background: #e6e8eb;
+  }
+
+  .reply {
+    display: flex; gap: 12px;
+    padding-bottom: 18px;
+    position: relative;
+  }
+  .reply:last-child { padding-bottom: 0; }
+  .reply .avatar {
+    width: 32px; height: 32px; flex-shrink: 0;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12.5px; font-weight: 500;
+    background: #fff;
+    z-index: 2;
+    /* 把头像往左拉 16px，这样头像中线正好压在竖线上 */
+    margin-left: -16px;
+  }
+  .reply .body { flex: 1; min-width: 0; padding-top: 3px; }
+  .reply .author {
+    font-size: 13px; font-weight: 600; color: #1F2328;
+    margin-bottom: 2px;
+  }
+  .reply .role { color: #9ca3af; font-weight: 400; margin-left: 6px; }
+  .reply .ts { color: #d1d5db; font-weight: 400; font-size: 11.5px; margin-left: 6px; }
+  .reply .text {
+    font-size: 13.5px; line-height: 1.7; color: #1F2328;
+  }
+
+  /* ---- 子回复（缩进 2 层） ---- */
+  .sub-reply {
+    margin-left: 32px;
+    margin-top: 10px;
+    padding-bottom: 0;
+    position: relative;
+    display: flex; gap: 12px;
+  }
+  .sub-reply .avatar {
+    width: 28px; height: 28px; flex-shrink: 0;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11.5px; font-weight: 500;
+    background: #fff;
+    z-index: 2;
+    margin-left: 0;
+  }
+  .sub-reply .body { flex: 1; min-width: 0; padding-top: 3px; }
+  .sub-reply .author { font-size: 12.5px; font-weight: 600; }
+  .sub-reply .role { color: #9ca3af; font-weight: 400; margin-left: 6px; }
+  .sub-reply .text { font-size: 13px; line-height: 1.65; }
+
+  /* 子回复 L 形拐角（用 SVG-like 画法，保证像素级连通） */
+  .sub-reply::before {
+    content: '';
+    position: absolute;
+    left: -16px;
+    top: -10px;
+    width: 16px;
+    height: 24px;
+    border-left: 2px solid #e6e8eb;
+    border-bottom: 2px solid #e6e8eb;
+    border-bottom-left-radius: 8px;
+    /* 关键：把竖线向上延伸到能与主竖线对齐的位置，且保证转弯处不留缝 */
+  }
+  /* 子回复后还有兄弟（同层后续）时，主竖线从子回复 L 上方继续 */
+  /* 当前 demo 不复杂，先做单条子回复演示 */
+
+  /* ---- 富内容：链接、@提及、附件 ---- */
+  .mention {
+    color: #2563eb; background: #eff6ff;
+    padding: 1px 5px; border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .mention:hover { background: #dbeafe; }
+  .link {
+    color: #2563eb;
+    border-bottom: 1px solid #bfdbfe;
+  }
+  .link:hover { border-bottom-color: #2563eb; text-decoration: none; }
+
+  .attach-grid {
+    margin-top: 8px;
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .attach-img {
+    display: block; max-width: 280px; max-height: 180px;
+    border-radius: 8px; border: 1px solid #e6e8eb;
+    object-fit: cover;
+    cursor: pointer;
+  }
+  .attach-img.placeholder {
+    width: 280px; height: 160px;
+    background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: #92400e; font-size: 12.5px; font-weight: 500;
+    text-align: center;
+  }
+  .attach-file {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 8px 12px;
+    border: 1px solid #e6e8eb; border-radius: 8px;
+    font-size: 12.5px; color: #4b5563;
+    background: #fafbfc;
+    text-decoration: none;
+    max-width: 320px;
+  }
+  .attach-file:hover { background: #f5f6f8; text-decoration: none; }
+  .attach-file .ico {
+    width: 32px; height: 32px; flex-shrink: 0;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    background: #fff; border: 1px solid #f1f3f5;
+  }
+  .attach-file .meta { display: flex; flex-direction: column; min-width: 0; }
+  .attach-file .name {
+    color: #1F2328; font-weight: 500;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .attach-file .size { color: #9ca3af; font-size: 11px; }
+
+  /* ---- 每条悬浮才显示的操作菜单 ---- */
+  .reply, .sub-reply, .lead {
+    /* 给位置 hover 用 */
+  }
+  .msg-menu {
+    position: absolute;
+    right: 0; top: 0;
+    opacity: 0;
+    transition: opacity .15s;
+  }
+  .lead:hover .msg-menu,
+  .reply:hover .msg-menu,
+  .sub-reply:hover .msg-menu {
+    opacity: 1;
+  }
+  .msg-menu .btn {
+    background: #fff; border: 1px solid #e6e8eb;
+    border-radius: 6px;
+    padding: 3px 8px;
+    cursor: pointer;
+    font-size: 13px; color: #6b7280;
+  }
+  .msg-menu .btn:hover { background: #f5f6f8; color: #1F2328; }
+
+  /* ====================================================
+     发起讨论框（沿用 v1.1 浅灰底）
+  ==================================================== */
+  .new-msg {
+    margin-top: 32px;
+    background: #f5f6f8;
+    border: 1px solid #e6e8eb;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex; gap: 12px; align-items: flex-start;
+    transition: background .2s, border-color .2s;
+  }
+  .new-msg:focus-within { background: #fff; border-color: #2563eb; }
+  .new-msg .avatar {
+    width: 32px; height: 32px; flex-shrink: 0;
+    border-radius: 50%;
+    background: #bbf7d0; color: #065f46;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600;
+  }
+  .new-msg .input {
+    flex: 1; min-width: 0;
+  }
+  .new-msg textarea {
+    width: 100%;
+    border: 0; outline: 0; resize: none;
+    font-family: inherit;
+    font-size: 14px; line-height: 1.7;
+    background: transparent;
+    color: #1F2328;
+    min-height: 24px;
+    padding: 4px 0;
+  }
+  .new-msg textarea::placeholder { color: #9ca3af; }
+  .new-msg .toolbar {
+    display: flex; align-items: center; gap: 4px;
+    margin-top: 6px;
+  }
+  .new-msg .tool {
+    background: transparent; border: 0; cursor: pointer;
+    color: #6b7280; padding: 4px 8px; border-radius: 6px;
+    font-size: 13px;
+  }
+  .new-msg .tool:hover { background: #fff; color: #1F2328; }
+  .new-msg .send {
+    margin-left: auto;
+    background: #1F2328; color: #fff;
+    border: 0; padding: 6px 14px; border-radius: 8px;
+    cursor: pointer; font-size: 13px; font-weight: 500;
+  }
+  .new-msg .send:disabled { background: #d1d5db; cursor: not-allowed; }
+
+  /* ====================================================
+     右侧 AI 总结栏
+  ==================================================== */
+  .aside {
+    background: #fff;
+    border-left: 1px solid #e6e8eb;
+    padding: 24px 22px;
+  }
+  .aside h4 {
+    margin: 0 0 6px;
+    font-size: 11.5px; font-weight: 600; color: #9ca3af;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .aside .ai-tip {
+    font-size: 11.5px; color: #9ca3af;
+    margin-bottom: 14px;
+  }
+  .ai-card {
+    background: linear-gradient(135deg, #fafbff 0%, #fdfaff 100%);
+    border: 1px solid #e0e7ff;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+  }
+  .ai-card .ai-topic {
+    font-size: 13px; font-weight: 600;
+    color: #1F2328; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .ai-card .ai-topic .badge {
+    background: #ecfdf5; color: #059669;
+    font-size: 10.5px; font-weight: 500;
+    padding: 1px 6px; border-radius: 4px;
+    margin-left: auto;
+  }
+  .ai-card .ai-topic .badge.active {
+    background: #fef3c7; color: #92400e;
+  }
+  .ai-card .ai-section {
+    margin-bottom: 8px;
+  }
+  .ai-card .ai-section:last-child { margin-bottom: 0; }
+  .ai-card .ai-label {
+    font-size: 10.5px; color: #9ca3af;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 3px;
+  }
+  .ai-card .ai-content {
+    font-size: 12.5px; line-height: 1.65; color: #4b5563;
+  }
+  .ai-card .ai-content strong { color: #1F2328; font-weight: 500; }
+
+  .ai-regen {
+    margin-top: 14px;
+    width: 100%;
+    background: #fff; border: 1px solid #e6e8eb;
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: 12px; color: #6b7280;
+    cursor: pointer;
+  }
+  .ai-regen:hover { background: #fafbfc; color: #2563eb; }
+
+  /* ====================================================
+     toast
+  ==================================================== */
+  .toast {
+    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+    background: #1F2328; color: #fff;
+    padding: 8px 16px; border-radius: 8px;
+    font-size: 12.5px;
+    z-index: 999;
+    opacity: 0; transition: opacity .2s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  /* ====================================================
+     响应式：窄屏隐藏右栏
+  ==================================================== */
+  @media (max-width: 1280px) {
+    .layout { grid-template-columns: 220px 1fr; }
+    .aside { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- =========== 顶栏 =========== -->
+<div class="topbar">
+  <div class="logo">N</div>
+  <div class="brand">SSV Nexus</div>
+  <div class="slogan">透明即上下文，上下文即生产力</div>
+  <div class="topbar-right">
+    <div class="bell" onclick="toast('通知中心 · v1.2')">🔔<span class="dot"></span></div>
+    <div class="me"><div class="avatar">钟</div><span>钟嘉辉</span></div>
+  </div>
+</div>
+
+<!-- =========== 主布局 =========== -->
+<div class="layout">
+
+  <!-- 左侧目录 -->
+  <aside class="sidebar">
+    <h4>TOPICS</h4>
+    <div class="nav-item active"><span class="ico">●</span>所有</div>
+    <div class="nav-item"><span class="ico">○</span>SSV Nexus 产品进展<span class="nav-pill hot">3</span></div>
+    <div class="nav-item"><span class="ico">○</span>红点已读机制</div>
+    <div class="nav-item"><span class="ico">○</span>飞书集成</div>
+    <div class="nav-item"><span class="ico">○</span>Q3 OKR</div>
+
+    <div class="nav-section">
+      <h4>MY · 来看</h4>
+      <div class="nav-item"><span class="ico">@</span>有人 @ 我看<span class="nav-pill">2</span></div>
+      <div class="nav-item"><span class="ico">○</span>我参与的</div>
+    </div>
+
+    <div class="nav-section">
+      <h4>OTHERS</h4>
+      <div class="nav-item"><span class="ico">🔔</span>通知中心</div>
+      <div class="nav-item"><span class="ico">⚙</span>设置</div>
+    </div>
+  </aside>
+
+  <!-- 中间内容 -->
+  <main class="main">
+
+    <div class="breadcrumb">
+      <a href="#">所有</a><span class="sep">›</span><a href="#">SSV Nexus 产品进展</a><span class="sep">›</span>
+      <span style="color:#1F2328;">v1.1 上线观察 + 后续规划</span>
+    </div>
+
+    <!-- ============ Event 正文 ============ -->
+    <article class="event">
+      <div class="event-meta">
+        <span class="pill live">● 进行中</span>
+        <span class="pill">Event #4</span>
+        <span class="ts">发布于 5 月 6 日 · 阅读 23 / 28</span>
+      </div>
+
+      <h1>v1.1 上线观察 + 后续 v1.2 规划</h1>
+
+      <div class="event-author">
+        <div class="avatar">王</div>
+        <div class="info">
+          <div class="name">王昕 <span class="role">· SSV 产品</span></div>
+        </div>
+      </div>
+
+      <div class="event-body">
+        <p>大家好，<strong>v1.1 已经上线一周</strong>。这周我做了一轮简单的访谈和数据观察，把发现整理在这里，请各位看一下后给意见。</p>
+
+        <p>📊 <strong>数据侧</strong>：</p>
+        <ul>
+          <li>讨论区打开率：<strong>从 38% 提升到 52%</strong>，混合态 C 让"看到讨论氛围"的时间窗变长</li>
+          <li>首条讨论发起率：<strong>+17%</strong>，"我也来参加讨论" 的引导文案有效降低门槛</li>
+          <li>但"标记已解决"使用率非常低，<strong>一周只有 6 次</strong></li>
+        </ul>
+
+        <p>💬 <strong>用户访谈</strong>：访谈了 4 位活跃用户后我发现，<strong>大家对"Thread"这个概念是困惑的</strong>。原话："我点进去看到一堆白底卡片，不太确定是评论还是任务"——这条反馈非常重要。</p>
+
+        <p>🎯 <strong>v1.2 我建议这样调整</strong>（详见 <a class="em-link" href="#">requirement-v1.2.md</a>）：</p>
+        <ul>
+          <li><strong>概念回归</strong>：不再使用 Thread，回到 Topic + Event 两层</li>
+          <li><strong>视觉降噪</strong>：去掉所有状态 chip 和 meta，让注意力回到"讲了什么"</li>
+          <li><strong>用 @ 驱动「来看」列表</strong>：替换原 My 待办，更轻量</li>
+          <li><strong>富内容</strong>：发言里支持 @ 人、链接、图片、文件</li>
+        </ul>
+
+        <p>麻烦 <span class="mention">@钟嘉辉</span> <span class="mention">@肖迈</span> <span class="mention">@李丹阳</span> 看下，下面留两个讨论方向，我先抛砖：</p>
+      </div>
+    </article>
+
+    <!-- ============ 讨论区 ============ -->
+    <div class="discuss-wrap">
+      <div class="discuss-head">
+        💬 讨论 <span class="count">8</span>
+      </div>
+
+      <!-- ============================================================
+           话题 1 · 红点已读机制
+      ============================================================ -->
+      <div class="topic">
+
+        <!-- 首条 -->
+        <div class="lead">
+          <div class="avatar" style="background:#bbf7d0;color:#065f46;">钟</div>
+          <div class="body">
+            <div class="author">钟嘉辉<span class="role">· 技术架构</span></div>
+            <div class="text">
+              想再讨论下红点消失逻辑：现在是用户点击 Topic 即清除未读，但如果他只是一扫而过没真正阅读，红点就丢了，后续新动态他反而感知不到。
+              我倾向"<strong>停留 &gt; 3s 或滚动到底部</strong>"才算已读。<span class="mention">@肖迈</span>
+            </div>
+          </div>
+          <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 标记已解决 · 复制链接')">⋯</button></div>
+        </div>
+
+        <!-- 回复区（缩进 1 层） -->
+        <div class="replies">
+
+          <div class="reply">
+            <div class="avatar" style="background:#c7d2fe;color:#3730a3;">王</div>
+            <div class="body">
+              <div class="author">王昕<span class="role">· SSV 产品</span></div>
+              <div class="text">
+                同感。红点本身意义也要重新定义——是"有未读新内容"还是"有需要你处理的事"。
+                前者靠滚动/停留就能清，后者必须主动行为才能清。可以参考
+                <a class="link" href="#">Slack 的 unread 设计文档</a>。
+              </div>
+            </div>
+            <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 复制链接')">⋯</button></div>
+          </div>
+
+          <div class="reply">
+            <div class="avatar" style="background:#fecaca;color:#991b1b;">丹</div>
+            <div class="body">
+              <div class="author">李丹阳<span class="role">· 前端</span></div>
+              <div class="text">
+                技术上可以做：停留 3s + 可见范围 ≥60% 计为已读。用 IntersectionObserver 实现，成本不高。
+              </div>
+              <div class="attach-grid">
+                <div class="attach-img placeholder" onclick="toast('全屏预览：红点已读-方案示意.png')">🖼 红点已读-方案示意.png<br/><span style="font-size:11px;opacity:.7;">点击查看大图</span></div>
+              </div>
+            </div>
+            <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 复制链接')">⋯</button></div>
+          </div>
+
+          <div class="reply">
+            <div class="avatar" style="background:#ddd6fe;color:#5b21b6;">培</div>
+            <div class="body">
+              <div class="author">李培伦<span class="role">· 后端</span></div>
+              <div class="text">
+                后端也可以加一个"最后阅读位点"字段，滚动到底就持久化。配合前端 observer 双保险。
+              </div>
+            </div>
+            <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 复制链接')">⋯</button></div>
+          </div>
+
+          <div class="reply">
+            <div class="avatar" style="background:#fde68a;color:#92400e;">肖</div>
+            <div class="body">
+              <div class="author">肖迈<span class="role">· 维护者</span></div>
+              <div class="text">
+                结论确认：<strong>前端 observer + 后端位点</strong>。<span class="mention">@钟嘉辉</span> 这周排期？
+              </div>
+
+              <!-- 子回复（缩进 2 层） -->
+              <div class="sub-reply">
+                <div class="avatar" style="background:#bbf7d0;color:#065f46;">钟</div>
+                <div class="body">
+                  <div class="author">钟嘉辉<span class="role">· 技术架构</span></div>
+                  <div class="text">
+                    收到，本周排期，周五前出 PRD。
+                    <a class="attach-file" style="margin-top:8px;">
+                      <div class="ico">📄</div>
+                      <div class="meta">
+                        <div class="name">红点已读-PRD-v0.1.pdf</div>
+                        <div class="size">1.2 MB · 已签收</div>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+                <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 复制链接')">⋯</button></div>
+              </div>
+
+            </div>
+            <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 标记已解决 · 复制链接')">⋯</button></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ============================================================
+           话题 2 · 飞书集成方案
+      ============================================================ -->
+      <div class="topic">
+
+        <!-- 首条 -->
+        <div class="lead">
+          <div class="avatar" style="background:#c7d2fe;color:#3730a3;">王</div>
+          <div class="body">
+            <div class="author">王昕<span class="role">· SSV 产品</span></div>
+            <div class="text">
+              另外说一下飞书集成方案。我们之前调研过一轮，<span class="mention">@李培伦</span> 你看 webhook 还是 OpenAPI 哪个更适合？
+              我个人倾向哪个更稳就用哪个，长期维护成本敏感。
+            </div>
+          </div>
+          <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 复制链接')">⋯</button></div>
+        </div>
+
+        <!-- 回复区 -->
+        <div class="replies">
+
+          <div class="reply">
+            <div class="avatar" style="background:#ddd6fe;color:#5b21b6;">培</div>
+            <div class="body">
+              <div class="author">李培伦<span class="role">· 后端</span></div>
+              <div class="text">
+                调研下来 OpenAPI 更稳，webhook 经常丢消息（飞书侧没有重试机制）。
+                但 OpenAPI 要做 token 刷新、限流、错误降级一整套，工作量稍大。完整对比在这里：
+              </div>
+              <div class="attach-grid">
+                <a class="attach-file">
+                  <div class="ico">📄</div>
+                  <div class="meta">
+                    <div class="name">飞书集成-技术方案对比.pdf</div>
+                    <div class="size">560 KB</div>
+                  </div>
+                </a>
+              </div>
+            </div>
+            <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 复制链接')">⋯</button></div>
+          </div>
+
+          <div class="reply">
+            <div class="avatar" style="background:#fde68a;color:#92400e;">肖</div>
+            <div class="body">
+              <div class="author">肖迈<span class="role">· 维护者</span></div>
+              <div class="text">
+                同意 OpenAPI。token 刷新封装成 SDK 后续也能复用到其他第三方集成里。
+                可以看下 <a class="link" href="#">larksuite/oapi-sdk-go</a> 这个开源 SDK。
+              </div>
+            </div>
+            <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 复制链接')">⋯</button></div>
+          </div>
+
+          <div class="reply">
+            <div class="avatar" style="background:#c7d2fe;color:#3730a3;">王</div>
+            <div class="body">
+              <div class="author">王昕<span class="role">· SSV 产品</span></div>
+              <div class="text">
+                那这块就这么定，<span class="mention">@李培伦</span> 这周出技术方案？
+              </div>
+            </div>
+            <div class="msg-menu"><button class="btn" onclick="toast('···  转待办 · 复制链接')">⋯</button></div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============ 发起讨论框 ============ -->
+    <div class="new-msg">
+      <div class="avatar">钟</div>
+      <div class="input">
+        <textarea placeholder="我也来参加讨论…" oninput="autoGrow(this); toggleSend(this)" onkeydown="handleSend(event, this)"></textarea>
+        <div class="toolbar">
+          <button class="tool" title="@提及" onclick="toast('@ 选人面板')">@</button>
+          <button class="tool" title="链接" onclick="toast('插入链接')">🔗</button>
+          <button class="tool" title="附件" onclick="toast('上传附件')">📎</button>
+          <button class="tool" title="图片" onclick="toast('插入图片')">🖼</button>
+          <button class="send" id="sendBtn" disabled onclick="toast('已发送 · 信息流转 ✓')">发起</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 右侧 AI 总结栏 -->
+  <aside class="aside">
+    <h4>AI 总结</h4>
+    <div class="ai-tip">基于本 Event 下 8 条讨论 · 实时生成</div>
+
+    <div class="ai-card">
+      <div class="ai-topic">
+        话题 1 · 红点已读机制
+        <span class="badge">已收敛</span>
+      </div>
+      <div class="ai-section">
+        <div class="ai-label">分歧</div>
+        <div class="ai-content">
+          点击 vs 停留——<strong>钟嘉辉、王昕</strong>主张"点击不算已读"，需要更高门槛。
+        </div>
+      </div>
+      <div class="ai-section">
+        <div class="ai-label">结论</div>
+        <div class="ai-content">
+          <strong>前端 observer + 后端位点</strong> 双保险。停留 3s + 可见 ≥60% 计已读。
+        </div>
+      </div>
+      <div class="ai-section">
+        <div class="ai-label">行动项</div>
+        <div class="ai-content">
+          钟嘉辉本周排期，周五前出 PRD（已附 v0.1）。
+        </div>
+      </div>
+    </div>
+
+    <div class="ai-card">
+      <div class="ai-topic">
+        话题 2 · 飞书集成
+        <span class="badge active">进行中</span>
+      </div>
+      <div class="ai-section">
+        <div class="ai-label">关键判断</div>
+        <div class="ai-content">
+          <strong>OpenAPI 优于 webhook</strong>（稳定性优先）。需做 token 刷新封装。
+        </div>
+      </div>
+      <div class="ai-section">
+        <div class="ai-label">行动项</div>
+        <div class="ai-content">
+          李培伦本周出完整技术方案。
+        </div>
+      </div>
+    </div>
+
+    <button class="ai-regen" onclick="toast('AI 重新生成中…')">↻ 重新生成</button>
+  </aside>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let toastTimer;
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 1800);
+  }
+
+  function autoGrow(t) {
+    t.style.height = 'auto';
+    t.style.height = Math.min(t.scrollHeight, 200) + 'px';
+  }
+  function toggleSend(t) {
+    document.getElementById('sendBtn').disabled = !t.value.trim();
+  }
+  function handleSend(e, t) {
+    if (e.key === 'Enter' && !e.shiftKey && !e.metaKey && !e.ctrlKey) {
+      e.preventDefault();
+      if (t.value.trim()) toast('已发送 · 信息流转 ✓');
+      t.value = '';
+      autoGrow(t);
+      toggleSend(t);
+    }
+  }
+</script>
+
+</body>
+</html>
