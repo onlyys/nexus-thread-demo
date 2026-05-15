@@ -1,138 +1,125 @@
-# SSV Nexus · 讨论模块升级 Demo
+# Nexus — 组织级信息连接平台
 
-> Nexus 评论区 → 讨论区 升级原型仓库。
-> 📦 **当前开发中：v1.2.0**（2026-05-07 定稿 · 等待开发评审）
-> 📌 **最新冻结版本：v1.1.0**（2026-05-06）—— Thread 化 + 我也来参加讨论独立卡片
-> 📄 当前需求文档：[v1.2（定稿）](docs/requirement-v1.2.md)
+> **异步 · 半结晶 · AI 增厚**  
+> 解决项目间 / 团队间的信息断裂问题，让组织知道彼此在做什么。
 
 ---
 
-## 🚀 在线预览
+## 项目概述
 
-### 主线（v1.2 · 当前开发）
+Nexus 是面向 20-200 人规模组织的信息共享、沉淀与发现平台。它不替代 Odin / WeThink / 企微等一线生产工具，而是作为**下游聚合层**——把散落在不同团队、不同工具里的信息碎片，通过 AI 自动建立关联、翻译语境、预警风险。
 
-| Demo | 链接 |
-|---|---|
-| 🎯 **v1.2 Event 讨论区**（定稿） | [v1.2-demo.html](https://onlyys.github.io/nexus-thread-demo/demos/v1.2-demo.html) |
-| 🔍 v1.2 视觉方向对比（归档） | [v1.2-compare.html](https://onlyys.github.io/nexus-thread-demo/demos/v1.2-compare.html) |
-| 🧵 v1.2 前的 Thread Demo（历史） | [thread-demo.html](https://onlyys.github.io/nexus-thread-demo/demos/thread-demo.html) |
-| 🔔 通知中心 | [notification-demo.html](https://onlyys.github.io/nexus-thread-demo/demos/notification-demo.html) |
-| 📡 通知触达配置 | [reach-demo.html](https://onlyys.github.io/nexus-thread-demo/demos/reach-demo.html) |
+### 核心定位
 
-### AI 洞察（Chat Insight）
-
-| Demo | 链接 |
-|---|---|
-| ✦ **AI 洞察方案对比**（卡片 vs 全文字） | [chat-insight-compare.html](https://onlyys.github.io/nexus-thread-demo/demos/chat-insight-compare.html) |
-| 📄 Chat Insight 设计方案文档 | [chat-insight-design.md](https://onlyys.github.io/nexus-thread-demo/docs/chat-insight-design.md) |
-
-### 历史版本（已冻结 · 可回看对比）
-
-| 版本 | 时间 | 核心改动 | 入口 |
-|---|---|---|---|
-| **v1.1.0** | 2026-05-06 | Thread 化 + 混合态 C + 标记已解决 + My 待办 + AI 总结右栏 | [v1.1 demo →](https://onlyys.github.io/nexus-thread-demo/demos/v1.1/thread-demo.html) |
-| **v1.0.0** | 2026-04 月 | 评论改名"讨论" 9 处文案 | [v1.0 说明页 →](https://onlyys.github.io/nexus-thread-demo/demos/v1.0/index.html) |
-
----
-
-## 🎯 v1.2 核心变化
-
-> **定位修正**：Nexus 是信息透明 / 信息呈现 / AI 辅助决策平台，**不是研发辅助工具**。
-
-| 改动 | 方向 |
-|---|---|
-| **撤销 Thread 概念** | 全站只有 Topic + Event，不再有"话题束"白底卡片 |
-| **视觉降噪** | 讨论区靠字体字号+树形竖线表达结构，不靠边框/卡片 |
-| **Meta 全隐藏** | 状态 chip (`✅ 已转为待办` 等) 全部移除；时间戳 hover 才显 |
-| **树形竖线** | GitHub PR 风 —— 首条下来 T 字分叉到每条回复，末端收束 |
-| **输入框置顶** | X 风格 —— 讨论区第一眼就是输入框（白底虚线 + ✨ 加入讨论） |
-| **点赞 + 转待办浮层** | hover 才显、白底浮层、不占 layout，不抢内容 |
-| **「来看」列表** | 替代 v1.1 My 待办 —— @ 驱动的信息请求，回了就闭环 |
-| **署名简化** | `Brant 【钟嘉辉】` 取代 `钟嘉辉 · 技术架构` |
-| **富内容降权** | 图片浅灰占位 / 文件 inline 链接 / @ 去底色 |
-
-详细见 [requirement-v1.2.md](docs/requirement-v1.2.md)。
-
----
-
-## 📁 目录结构
-
-```
-nexus-thread-demo/
-├── README.md
-├── demos/
-│   ├── v1.2-demo.html                ← ⭐ v1.2 主 demo（定稿）
-│   ├── v1.2-compare.html             ← v1.2 视觉方向对比（归档）
-│   ├── thread-demo.html              ← v1.1 遗留（保留）
-│   ├── chat-insight-compare.html     ← ✦ AI 洞察方案对比
-│   ├── notification-demo.html
-│   ├── reach-demo.html
-│   ├── v1.1/                         ← v1.1.0 冻结副本
-│   │   ├── thread-demo.html
-│   │   ├── notification-demo.html
-│   │   └── reach-demo.html
-│   └── v1.0/
-│       └── index.html                ← v1.0 文字说明页
-└── docs/
-    ├── requirement-v1.2.md           ← ⭐ 当前定稿
-    ├── requirement-v1.1.md           ← v1.1 历史
-    ├── requirement-v1.0.md           ← v1.0 历史
-    ├── chat-insight-design.md        ← ✦ AI 洞察设计方案
-    ├── v1.1/requirement.md           ← 冻结副本
-    └── v1.0/requirement.md           ← 冻结副本
-```
-
----
-
-## 🎨 设计系统（v1.2 强化 · 向字号要层次）
-
-核心 token：
-
-| Token | 值 | 用途 |
+| | 现有工具 | Nexus |
 |---|---|---|
-| `#1f2328` | 墨黑 | 主文字 |
-| `#f5f6f8` | 冷米白 | 页面底色 |
-| `#e6e8eb` | 分隔线 / 树形竖线 | 2px |
-| `#2563eb` | 品牌蓝 | 链接 / @ |
-| `#c7d2fe` | 浅蓝虚线 | 发起框邀请感 |
-| `#dbeafe` | 极淡蓝 | 链接下划线（降权）|
-| `#9ca3af` | 中灰 | 辅助文字（【中文名】）|
-
-字号梯度（v1.2 新定）：
-
-```
-Event 标题 26 → Event 正文 15.5
-  ↓
-首条 text 15 · 首条 author 14.5
-  ↓
-回复 text 14 · 回复 author 13.5
-  ↓
-子回复 text 13.5 · 子回复 author 12.5
-```
-
-**原则**：text 永远 ≥ author，让"讲了什么"大于"谁说的"。
+| 解决什么 | 把事做好（项目内执行） | 让组织知道你在做什么（跨项目/跨团队透明） |
+| 信息形态 | 实时协作 | 异步结晶 |
+| 关系 | 加法，不是替代 | 聚合层，不是新入口 |
 
 ---
 
-## 🔁 版本管理约定
+## AI 三大角色
 
-- **冻结**：每个正式版本 `vX.Y.Z` 完成时打 Git tag，并把 demo 复制到 `demos/vX.Y/` 子目录形成线上副本
-- **主线**：`demos/v1.2-demo.html` 是当前最新状态
-- **回看**：任何历史版本都可通过 `demos/vX.Y/` URL 永久访问
+Nexus 的 AI 从**信息断裂**这一核心问题倒推，只做三件事：
 
-### 已发布版本一览
+### 1. 连接 — 跨源连接器
 
-| 版本 | Tag | 发布日期 | 主题 |
-|---|---|---|---|
-| v1.0.0 | — | 2026-04 月 | 评论 → 讨论 文案改名（9 处） |
-| v1.1.0 | `v1.1.0` | 2026-05-06 | Thread 化讨论区（已被 v1.2 撤销） |
-| v1.2.0 | 🔵 定稿 | 2026-05-07 | 撤 Thread + 视觉降噪 + 树形竖线 + 「来看」列表 |
+把分散在不同团队、不同工具里的信息碎片，自动建立关联。
+
+> 张明团队做受助人画像，林敏团队做标签架构，王芳团队做捐赠者聚类——三个团队不知道彼此在做本质相同的底层工作。AI 看得到。
+
+### 2. 翻译 — 跨语境翻译器
+
+技术团队说「标签体系重构」，业务团队说「用户画像升级」，管理层想知道「这两件事是不是一个项目」。AI 把不同团队的表述映射到统一的组织语义空间。
+
+### 3. 信号预警 — 组织级信号检测器
+
+项目停更 14 天没人注意，上游评审已通过但下游还在等——这些信号淹没在日常信息流里。AI 持续监测信息流中的异常模式，主动预警。
 
 ---
 
-## 🔗 相关资料
+## AI 产品密度：5 层能力矩阵
 
-- 🎨 [Nexus 参考原型](https://github.com/mx9702098-glitch/ssv-nexus-prototype)
-- 👤 需求提出：brantli(李哲) · 2026-04-29
-- ✏️ 设计：西比柚（onlyys）
-- 📅 v1.0 发布：2026-04-30 · v1.1 冻结：2026-05-06 · v1.2 定稿：2026-05-07
+AI 在信息生命周期的**每个节点**都有介入，不是最后加一个「AI 总结」按钮，而是全链路增厚：
+
+| 层次 | 能力 | 做什么 | AI 角色 |
+|:---:|------|--------|:-------:|
+| L1 | **增厚每条信息** | 发布时自动补充上下文（OKR、历史、关联团队） | 连接 + 翻译 |
+| L2 | **维护知识图谱** | 持续维护项目-人-目标关系图，新信息自动更新 | 连接 |
+| L3 | **主动生成洞察** | 扫描跨团队信息流，发现协同机会和信息断裂 | 连接 + 预警 |
+| L4 | **时间线追踪** | 监测进展节奏，检测卡点和异常停滞 | 预警 |
+| L5 | **角色化重建** | 同一信息按消费者角色重建叙事结构 | 翻译 |
+
+5 层是**密度递增**关系：L1 → L2 → L3 → L4 → L5，每一层让前一层更有价值。
+
+---
+
+## 交互原型 Demo
+
+所有 Demo 均为纯 HTML 文件，浏览器直接打开即可预览。
+
+| Demo | 文件 | 说明 |
+|------|------|------|
+| Chat Insight（方案 A） | [`demos/nexus-slide-a-visual.html`](demos/nexus-slide-a-visual.html) | 结构化卡片式洞察呈现 |
+| Chat Insight（对话式） | [`demos/nexus-chat-insight.html`](demos/nexus-chat-insight.html) | 对话式 AI 洞察交互 |
+| 方案 A/B 对比 | [`demos/nexus-chat-insight-compare.html`](demos/nexus-chat-insight-compare.html) | 结构化卡片 vs 全文字的对比 |
+| VP 驾驶舱 | [`demos/nexus-vp-dashboard.html`](demos/nexus-vp-dashboard.html) | 管理者视图：组织脉搏总览 |
+| TL 工作台 | [`demos/nexus-tl-workbench.html`](demos/nexus-tl-workbench.html) | 团队负责人视图：团队脉搏 |
+| IC 视图 | [`demos/nexus-ic-view.html`](demos/nexus-ic-view.html) | 普通员工视图：与我相关 |
+| 汇报展示集 | [`demos/nexus-slides-showcase.html`](demos/nexus-slides-showcase.html) | 全部方案的汇报展示合集 |
+
+### 快速预览
+
+```bash
+# macOS
+open demos/nexus-vp-dashboard.html
+
+# 或用任意浏览器打开 demos/ 下的 HTML 文件
+```
+
+---
+
+## 设计文档
+
+| 文档 | 说明 |
+|------|------|
+| [**方案说明 v2**](docs/design-spec-v2.md) | 最新版设计方案：AI 三角色 + 5 层密度 + Demo 解读 |
+| [方案说明 v1](docs/design-spec-v1.md) | 初版设计方案 |
+| [善擎参考资料](docs/shanqing-reference.md) | 善擎（ShanQing）产品架构参考，用于对照 Nexus 设计 |
+
+---
+
+## 设计原则
+
+1. **发布必须抵消已有工作** — 发了就不用另写周报
+2. **管理者先行** — 老板先发，降低社交压力
+3. **场景框定** — 不做空白画布，预设场景消除「不知道发什么」焦虑
+4. **极低摩擦输入** — MCP 一键导入会议记录 / OKR
+
+---
+
+## 目录结构
+
+```
+nexus-design/
+├── README.md                 # 本文件
+├── docs/
+│   ├── design-spec-v2.md     # 方案说明（最新）
+│   ├── design-spec-v1.md     # 方案说明（初版）
+│   └── shanqing-reference.md # 善擎参考资料
+└── demos/
+    ├── nexus-chat-insight.html
+    ├── nexus-chat-insight-compare.html
+    ├── nexus-slide-a-visual.html
+    ├── nexus-slides-showcase.html
+    ├── nexus-vp-dashboard.html
+    ├── nexus-tl-workbench.html
+    └── nexus-ic-view.html
+```
+
+---
+
+## License
+
+Internal use only. © 2026
