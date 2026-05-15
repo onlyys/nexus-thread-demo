@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus · TL 工作台 — 团队脉搏</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  :root {
+    --bg: #FAFAF8; --surface: #FFFFFF; --ink: #1A1918;
+    --ink-sec: #4A4845; --ink-muted: #8A8784; --ink-faint: #B5B2AE;
+    --border: #E8E6E1; --border-subtle: #F0EFEB;
+    --bg-subtle: #F4F3F0; --bg-hover: #F0EFEB; --bg-ai: #F8F7F4;
+    --blue: #2563EB; --blue-soft: #DBEAFE; --blue-light: #EFF6FF;
+    --emerald: #059669; --emerald-light: #ECFDF5;
+    --amber: #D97706; --amber-light: #FFFBEB;
+    --rose: #E11D48; --rose-light: #FFF1F2;
+    --violet: #7C3AED; --violet-light: #F5F3FF;
+    --indigo: #4F46E5; --cyan: #0891B2;
+    --shadow-card: 0 1px 3px rgba(0,0,0,.04), 0 0 0 1px rgba(0,0,0,.02);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,.08);
+    --radius-md: 10px; --radius-lg: 14px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:"Inter",-apple-system,"PingFang SC",sans-serif; background:var(--bg); color:var(--ink); -webkit-font-smoothing:antialiased; }
+
+  /* ===== TOPBAR ===== */
+  .topbar { position:sticky;top:0;z-index:100;height:48px;background:var(--ink);display:flex;align-items:center;padding:0 24px; }
+  .topbar .logo { width:28px;height:28px;border-radius:6px;background:#fff;color:var(--ink);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px; }
+  .topbar .brand { font-weight:600;font-size:15px;color:#fff;margin-left:10px; }
+  .topbar .slogan { color:rgba(255,255,255,0.4);font-size:12px;margin-left:8px; }
+  .topbar-tabs { display:flex;gap:4px;margin-left:32px; }
+  .topbar-tab { padding:6px 16px;border-radius:980px;font-size:12px;font-weight:500;color:rgba(255,255,255,0.5);cursor:pointer;transition:all 0.2s; }
+  .topbar-tab:hover { color:#fff; }
+  .topbar-tab.active { background:rgba(255,255,255,0.12);color:#fff; }
+  .topbar-right { margin-left:auto;display:flex;align-items:center;gap:14px; }
+  .topbar-right .role-badge { font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:rgba(5,150,105,0.2);color:#86efac; }
+  .topbar-right .user { font-size:12px;color:rgba(255,255,255,0.6); }
+
+  /* ===== LAYOUT ===== */
+  .layout { display:grid; grid-template-columns:220px 1fr 340px; min-height:calc(100vh - 48px); }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar { background:var(--surface);border-right:1px solid var(--border);padding:20px 14px; }
+  .sidebar h4 { margin:0 8px 10px;font-size:11px;font-weight:600;color:var(--ink-muted);letter-spacing:0.08em; }
+  .nav-item { padding:7px 10px;font-size:13px;color:var(--ink);border-radius:6px;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px; }
+  .nav-item:hover { background:var(--bg-hover); }
+  .nav-item.active { background:var(--bg-subtle);font-weight:500; }
+  .nav-item .ico { color:var(--ink-muted);font-size:11px;width:16px;text-align:center; }
+  .nav-item.active .ico { color:var(--blue); }
+  .nav-pill { margin-left:auto;font-size:10px;background:var(--bg-subtle);color:var(--ink-muted);padding:1px 6px;border-radius:999px; }
+  .nav-pill.hot { background:var(--rose-light);color:var(--rose); }
+  .nav-pill.new { background:var(--violet-light);color:var(--violet); }
+  .nav-section { margin-top:18px; }
+
+  /* ===== MAIN ===== */
+  .main-content { padding:28px 32px 80px;background:var(--bg);min-width:0; }
+  .header { display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px; }
+  .header h1 { font-size:26px;font-weight:700;letter-spacing:-0.5px; }
+  .header .period { font-size:13px;color:var(--ink-muted); }
+
+  /* ===== CARDS ===== */
+  .stats { display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px; }
+  .stat-card { background:var(--surface);border-radius:var(--radius-md);padding:16px 18px;box-shadow:var(--shadow-card); }
+  .stat-card .label { font-size:11px;font-weight:600;color:var(--ink-muted);margin-bottom:6px;letter-spacing:0.04em; }
+  .stat-card .value { font-size:28px;font-weight:700;letter-spacing:-0.5px; }
+  .stat-card .sub { font-size:11px;color:var(--ink-muted);margin-top:4px; }
+
+  .section-title { font-size:16px;font-weight:700;letter-spacing:-0.2px;margin:24px 0 12px;display:flex;align-items:center;gap:8px; }
+  .section-title .ai-badge { font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;background:var(--violet-light);color:var(--violet); }
+
+  /* ===== MEMBER HEALTH ===== */
+  .member-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px; }
+  .member-card { background:var(--surface);border-radius:var(--radius-md);padding:14px 16px;box-shadow:var(--shadow-card);display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:all 0.15s;border:1px solid transparent; }
+  .member-card:hover { border-color:var(--border);background:var(--bg-hover); }
+  .member-avatar { width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0; }
+  .member-info { flex:1;min-width:0; }
+  .member-name { font-size:13px;font-weight:600;margin-bottom:2px; }
+  .member-role { font-size:11px;color:var(--ink-muted); }
+  .member-status { margin-top:6px;font-size:12px;line-height:1.5;color:var(--ink-sec); }
+  .member-tag { display:inline-block;font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;margin-left:4px; }
+  .member-tag.active { background:var(--emerald-light);color:var(--emerald); }
+  .member-tag.normal { background:var(--blue-light);color:var(--blue); }
+  .member-tag.silent { background:var(--rose-light);color:var(--rose); }
+
+  /* ===== FEED ===== */
+  .feed-item { background:var(--surface);border-radius:var(--radius-md);padding:18px 20px;box-shadow:var(--shadow-card);margin-bottom:10px; }
+  .feed-header { display:flex;align-items:center;gap:10px;margin-bottom:8px; }
+  .feed-avatar { width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0; }
+  .feed-author { font-size:13px;font-weight:600; }
+  .feed-team { font-size:11px;color:var(--ink-muted); }
+  .feed-time { margin-left:auto;font-size:11px;color:var(--ink-faint); }
+  .feed-body { font-size:14px;line-height:1.7;color:var(--ink-sec);margin-bottom:10px; }
+  .feed-enrichment { background:var(--bg-ai);border:1px solid #e0e7ff;border-radius:8px;padding:10px 14px; }
+  .feed-enrichment-title { font-size:11px;font-weight:600;color:var(--violet);margin-bottom:4px; }
+  .feed-enrichment-content { font-size:12px;line-height:1.65;color:var(--ink-sec); }
+  .feed-enrichment-content .link { color:var(--blue);cursor:pointer;border-bottom:1px solid var(--blue-soft); }
+
+  /* ===== CROSS-TEAM ===== */
+  .cross-card { background:linear-gradient(135deg,#fafbff 0%,#fdfaff 100%);border:1px solid #e0e7ff;border-radius:var(--radius-md);padding:16px 18px;margin-bottom:10px; }
+  .cross-header { display:flex;align-items:center;gap:8px;margin-bottom:8px; }
+  .cross-icon { width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--violet),var(--indigo));display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff; }
+  .cross-title { font-size:13px;font-weight:600; }
+  .cross-time { margin-left:auto;font-size:10px;color:var(--ink-muted); }
+  .cross-body { font-size:12.5px;line-height:1.65;color:var(--ink-sec); }
+  .cross-actions { display:flex;gap:8px;margin-top:10px; }
+  .cross-btn { padding:5px 12px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s; }
+  .cross-btn.primary { background:var(--ink);color:#fff; }
+  .cross-btn.primary:hover { opacity:0.85; }
+  .cross-btn.ghost { background:transparent;color:var(--ink-sec);border:1px solid var(--border); }
+  .cross-btn.ghost:hover { background:var(--bg-hover); }
+
+  /* ===== RIGHT PANEL (AI) ===== */
+  .ai-panel { background:var(--surface);border-left:1px solid var(--border);padding:20px 18px;overflow-y:auto; }
+  .ai-panel h4 { margin:0 0 6px;font-size:11px;font-weight:600;color:var(--ink-muted);letter-spacing:0.08em; }
+  .ai-panel .ai-tip { font-size:11px;color:var(--ink-muted);margin-bottom:14px; }
+
+  .ai-briefing { background:linear-gradient(135deg,#fafbff 0%,#fdfaff 100%);border:1px solid #e0e7ff;border-radius:var(--radius-md);padding:16px;margin-bottom:14px; }
+  .ai-briefing-header { display:flex;align-items:center;gap:8px;margin-bottom:10px; }
+  .ai-briefing-icon { width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--violet),var(--indigo));display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff; }
+  .ai-briefing-title { font-size:14px;font-weight:600; }
+  .ai-briefing-body { font-size:13px;line-height:1.75;color:var(--ink-sec); }
+  .ai-briefing-body p { margin-bottom:8px; }
+  .ai-briefing-body .em { color:var(--violet);font-weight:500; }
+  .ai-briefing-body .warn { color:var(--amber);font-weight:500; }
+  .ai-briefing-body .risk { color:var(--rose);font-weight:500; }
+  .ai-briefing-body ul { padding-left:18px;margin:6px 0; }
+  .ai-briefing-body li { margin-bottom:4px; }
+
+  .ai-section { margin-bottom:16px; }
+  .ai-section-title { font-size:12px;font-weight:600;color:var(--ink-sec);margin-bottom:8px;display:flex;align-items:center;gap:6px; }
+  .ai-section-title .badge { font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px;background:var(--violet-light);color:var(--violet); }
+
+  .ai-learn-card { background:var(--bg-subtle);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:background 0.15s; }
+  .ai-learn-card:hover { background:var(--bg-hover); }
+  .ai-learn-card .title { font-size:12px;font-weight:600;margin-bottom:3px; }
+  .ai-learn-card .desc { font-size:11px;color:var(--ink-muted);line-height:1.5; }
+  .ai-learn-card .from { font-size:10px;color:var(--violet);margin-top:4px; }
+
+  .todo-item { display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border-subtle); }
+  .todo-item:last-child { border-bottom:none; }
+  .todo-check { width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border);cursor:pointer;flex-shrink:0;margin-top:1px;transition:all 0.15s; }
+  .todo-check:hover { border-color:var(--blue); }
+  .todo-check.done { background:var(--emerald);border-color:var(--emerald); }
+  .todo-text { font-size:12px;line-height:1.5;color:var(--ink-sec);flex:1; }
+  .todo-text .source { color:var(--violet);font-size:10px; }
+
+  /* ===== OKR Progress ===== */
+  .okr-item { margin-bottom:14px; }
+  .okr-name { font-size:12px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:6px; }
+  .okr-track { height:6px;background:var(--bg-subtle);border-radius:3px;overflow:hidden;margin-bottom:3px; }
+  .okr-fill { height:100%;border-radius:3px;transition:width 1s ease-out; }
+  .okr-meta { font-size:10px;color:var(--ink-muted);display:flex;justify-content:space-between; }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .fade-up { animation:fadeUp 0.5s ease-out forwards; }
+  .fade-up-d1 { animation-delay:0.1s;opacity:0; }
+  .fade-up-d2 { animation-delay:0.2s;opacity:0; }
+  .fade-up-d3 { animation-delay:0.3s;opacity:0; }
+
+  @media(max-width:1280px) { .layout{grid-template-columns:1fr;} .sidebar,.ai-panel{display:none;} }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">N</div>
+  <div class="brand">Nexus</div>
+  <div class="slogan">团队工作台 · TL 视图</div>
+  <div class="topbar-tabs">
+    <div class="topbar-tab active">我的团队</div>
+    <div class="topbar-tab">组织动态</div>
+    <div class="topbar-tab">目标地图</div>
+  </div>
+  <div class="topbar-right">
+    <div class="role-badge">TL</div>
+    <div class="user">张明 · 公益产品组</div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h4>我的团队</h4>
+    <div class="nav-item active"><span class="ico">●</span>团队总览</div>
+    <div class="nav-item"><span class="ico">○</span>受助人群画像 v2 <span class="nav-pill hot">2</span></div>
+    <div class="nav-item"><span class="ico">○</span>一块走 2026 春季</div>
+    <div class="nav-item"><span class="ico">○</span>社区养老试点</div>
+    <div class="nav-item"><span class="ico">○</span>XX 捐赠合作</div>
+
+    <div class="nav-section">
+      <h4>AI 发现</h4>
+      <div class="nav-item"><span class="ico">💡</span>跨团队协同 <span class="nav-pill new">1</span></div>
+      <div class="nav-item"><span class="ico">📚</span>可学习经验 <span class="nav-pill">3</span></div>
+    </div>
+
+    <div class="nav-section">
+      <h4>MY</h4>
+      <div class="nav-item"><span class="ico">@</span>有人 @ 我 <span class="nav-pill hot">2</span></div>
+      <div class="nav-item"><span class="ico">📌</span>我的待办 <span class="nav-pill">4</span></div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+    <div class="header fade-up">
+      <h1>公益产品组 · 团队脉搏</h1>
+      <div class="period">2026 Q2 · W20</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats fade-up fade-up-d1">
+      <div class="stat-card">
+        <div class="label">团队成员</div>
+        <div class="value">6</div>
+        <div class="sub">活跃 5 · 请假 1</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">本周发布</div>
+        <div class="value" style="color:var(--emerald);">12</div>
+        <div class="sub">+3 vs 上周 · 全组织排名 #1</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">OKR 进度</div>
+        <div class="value">68%</div>
+        <div class="sub">3/5 个 KR 进度正常</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">AI 信号</div>
+        <div class="value" style="color:var(--violet);">3</div>
+        <div class="sub">1 个协同机会 · 2 个学习建议</div>
+      </div>
+    </div>
+
+    <!-- Team Member Health -->
+    <div class="section-title fade-up fade-up-d2">
+      团队成员动态
+      <span class="ai-badge">AI 追踪</span>
+    </div>
+    <div class="member-grid fade-up fade-up-d2">
+      <div class="member-card">
+        <div class="member-avatar" style="background:var(--blue);">陈</div>
+        <div class="member-info">
+          <div class="member-name">陈小明 <span class="member-tag active">活跃</span></div>
+          <div class="member-role">前端开发</div>
+          <div class="member-status">本周发布 4 条 · 正在做受助人群画像前端页面</div>
+        </div>
+      </div>
+      <div class="member-card">
+        <div class="member-avatar" style="background:var(--emerald);">刘</div>
+        <div class="member-info">
+          <div class="member-name">刘思涵 <span class="member-tag active">活跃</span></div>
+          <div class="member-role">数据分析师</div>
+          <div class="member-status">本周发布 3 条 · 完成 12 省数据清洗</div>
+        </div>
+      </div>
+      <div class="member-card">
+        <div class="member-avatar" style="background:var(--violet);">王</div>
+        <div class="member-info">
+          <div class="member-name">王佳琪 <span class="member-tag normal">正常</span></div>
+          <div class="member-role">产品设计</div>
+          <div class="member-status">本周发布 2 条 · 在做标签体系方案设计</div>
+        </div>
+      </div>
+      <div class="member-card">
+        <div class="member-avatar" style="background:var(--amber);">赵</div>
+        <div class="member-info">
+          <div class="member-name">赵天宇 <span class="member-tag normal">正常</span></div>
+          <div class="member-role">后端开发</div>
+          <div class="member-status">本周发布 2 条 · 在对接合作方数据接口</div>
+        </div>
+      </div>
+      <div class="member-card">
+        <div class="member-avatar" style="background:var(--cyan);">孙</div>
+        <div class="member-info">
+          <div class="member-name">孙浩然 <span class="member-tag active">活跃</span></div>
+          <div class="member-role">项目经理</div>
+          <div class="member-status">本周发布 1 条 · 在协调一块走春季活动</div>
+        </div>
+      </div>
+      <div class="member-card">
+        <div class="member-avatar" style="background:var(--ink-faint);">周</div>
+        <div class="member-info">
+          <div class="member-name">周婷 <span class="member-tag silent">请假</span></div>
+          <div class="member-role">测试工程师</div>
+          <div class="member-status">本周请假 · 下周一回</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cross-Team Opportunity -->
+    <div class="section-title fade-up fade-up-d3">
+      跨团队协同机会
+      <span class="ai-badge">AI 发现</span>
+    </div>
+    <div class="cross-card fade-up fade-up-d3">
+      <div class="cross-header">
+        <div class="cross-icon">💡</div>
+        <div class="cross-title">你的团队在做的「标签体系设计」和另外两个团队有重叠</div>
+        <div class="cross-time">AI · 2 小时前发现</div>
+      </div>
+      <div class="cross-body">
+        <strong>你的团队：</strong>王佳琪正在设计受助人群标签体系。<br>
+        <strong>数据中台组（李哲）：</strong>正在重构标签系统架构（选定 Iceberg），本周完成技术选型。<br>
+        <strong>用户增长组（王芳）：</strong>在做捐赠者行为聚类，也需要标签定义。<br><br>
+        <strong style="color:var(--violet);">AI 建议：</strong>让王佳琪和数据中台的李哲先对齐标签 schema，这样你的画像方案可以直接用中台 6 周后的新架构，避免后期迁移成本。
+      </div>
+      <div class="cross-actions">
+        <button class="cross-btn primary">发起对齐讨论</button>
+        <button class="cross-btn ghost">查看详情</button>
+        <button class="cross-btn ghost">稍后提醒</button>
+      </div>
+    </div>
+
+    <!-- Team Feed -->
+    <div class="section-title">团队信息流（AI 增厚后）</div>
+    <div class="feed-item fade-up fade-up-d1">
+      <div class="feed-header">
+        <div class="feed-avatar" style="background:var(--emerald);">刘</div>
+        <div>
+          <div class="feed-author">刘思涵</div>
+          <div class="feed-team">受助人群画像 v2</div>
+        </div>
+        <div class="feed-time">今天 14:30</div>
+      </div>
+      <div class="feed-body">
+        12 省数据清洗完成。数据质量比预期好，缺失率从 23% 降到 4%。下一步：和佳琪对齐标签方案后开始特征工程。
+      </div>
+      <div class="feed-enrichment">
+        <div class="feed-enrichment-title">✦ AI 增厚</div>
+        <div class="feed-enrichment-content">
+          <strong>对你的意义：</strong>数据清洗提前完成，标签设计成为关键路径。建议本周内让佳琪和中台对齐。<br>
+          <strong>其他团队参考：</strong>用户增长组上月做过类似数据清洗，缺失率从 30% 降到 5%，用的是异常值自动填充方案。<span class="link">查看经验 →</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="feed-item fade-up fade-up-d2">
+      <div class="feed-header">
+        <div class="feed-avatar" style="background:var(--blue);">陈</div>
+        <div>
+          <div class="feed-author">陈小明</div>
+          <div class="feed-team">受助人群画像 v2</div>
+        </div>
+        <div class="feed-time">今天 11:15</div>
+      </div>
+      <div class="feed-body">
+        画像展示页面完成 80%，主要卡在标签筛选组件的交互。参考了 antd 的 cascader 但不完全适用，自己写了一个。
+      </div>
+      <div class="feed-enrichment">
+        <div class="feed-enrichment-title">✦ AI 增厚</div>
+        <div class="feed-enrichment-content">
+          <strong>可学习经验：</strong>应急响应组的李培伦上个月做过类似的标签筛选组件，支持多级联动和模糊搜索。<span class="link">查看代码 →</span><br>
+          <strong>对你的决策：</strong>如果小明的组件复用李培伦的方案，预计可省 2-3 天工期。
+        </div>
+      </div>
+    </div>
+
+    <div class="feed-item fade-up fade-up-d3">
+      <div class="feed-header">
+        <div class="feed-avatar" style="background:var(--amber);">赵</div>
+        <div>
+          <div class="feed-author">赵天宇</div>
+          <div class="feed-team">合作方数据回传</div>
+        </div>
+        <div class="feed-time">昨天 17:00</div>
+      </div>
+      <div class="feed-body">
+        XX 基金会的接口终于通了，但数据格式和约定不一致。需要额外 3 天做格式转换和校验逻辑。
+      </div>
+      <div class="feed-enrichment">
+        <div class="feed-enrichment-title">✦ AI 增厚</div>
+        <div class="feed-enrichment-content">
+          <strong>风险提示：</strong>这个 3 天延迟可能影响数据回传标准化项目的里程碑（原定本周完成）。<br>
+          <strong>历史经验：</strong>去年 Q3 捐赠运营组处理过类似的格式不一致问题，用了一个通用转换中间件，将适配时间从 5 天缩短到 1.5 天。<span class="link">查看方案 →</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Right Panel: AI Briefing -->
+  <aside class="ai-panel">
+    <h4>AI 团队简报</h4>
+    <div class="ai-tip">基于本周团队 12 条发布 + 跨团队信息 · 实时生成</div>
+
+    <div class="ai-briefing">
+      <div class="ai-briefing-header">
+        <div class="ai-briefing-icon">✦</div>
+        <div class="ai-briefing-title">本周要点 · TL 视角</div>
+      </div>
+      <div class="ai-briefing-body">
+        <p>你的团队本周是<span class="em">全组织最活跃</span>的团队（12 条更新，#1）。</p>
+        <p>关键进展：受助人群画像 v2 数据清洗<span class="em">提前完成</span>，下一步标签设计成为关键路径。</p>
+        <p>需要你关注的：</p>
+        <ul>
+          <li>标签体系设计和<span class="em">数据中台、用户增长</span>有重叠，建议本周对齐</li>
+          <li>合作方数据回传<span class="warn">延迟 3 天</span>，可能影响里程碑</li>
+          <li>陈小明的标签筛选组件可参考<span class="em">应急响应组的方案</span>省 2-3 天</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- OKR Progress -->
+    <div class="ai-section">
+      <div class="ai-section-title">
+        Q2 OKR 进度
+        <span class="badge">AI 追踪</span>
+      </div>
+      <div class="okr-item">
+        <div class="okr-name">KR1: 画像覆盖 15 省数据</div>
+        <div class="okr-track"><div class="okr-fill" style="width:80%;background:var(--emerald);"></div></div>
+        <div class="okr-meta"><span>已完成 12/15 省</span><span style="color:var(--emerald);">进度正常</span></div>
+      </div>
+      <div class="okr-item">
+        <div class="okr-name">KR2: 标签体系上线</div>
+        <div class="okr-track"><div class="okr-fill" style="width:30%;background:var(--amber);"></div></div>
+        <div class="okr-meta"><span>方案设计中</span><span style="color:var(--amber);">需加速</span></div>
+      </div>
+      <div class="okr-item">
+        <div class="okr-name">KR3: 一块走春季活动完成</div>
+        <div class="okr-track"><div class="okr-fill" style="width:90%;background:var(--emerald);"></div></div>
+        <div class="okr-meta"><span>收尾阶段</span><span style="color:var(--emerald);">进度正常</span></div>
+      </div>
+      <div class="okr-item">
+        <div class="okr-name">KR4: 合作方数据标准化率 ≥80%</div>
+        <div class="okr-track"><div class="okr-fill" style="width:55%;background:var(--amber);"></div></div>
+        <div class="okr-meta"><span>当前 55%</span><span style="color:var(--amber);">有延迟风险</span></div>
+      </div>
+      <div class="okr-item">
+        <div class="okr-name">KR5: 社区养老试点 NPS ≥70</div>
+        <div class="okr-track"><div class="okr-fill" style="width:72%;background:var(--emerald);"></div></div>
+        <div class="okr-meta"><span>当前 NPS 72</span><span style="color:var(--emerald);">已达标</span></div>
+      </div>
+    </div>
+
+    <!-- Learnable -->
+    <div class="ai-section">
+      <div class="ai-section-title">
+        可学习经验
+        <span class="badge">AI 推荐</span>
+      </div>
+      <div class="ai-learn-card">
+        <div class="title">标签筛选组件 — 多级联动 + 模糊搜索</div>
+        <div class="desc">应急响应组李培伦上月实现，支持 3 级标签联动，已在生产环境运行。</div>
+        <div class="from">来源：应急响应组 · 与陈小明当前任务高度相关</div>
+      </div>
+      <div class="ai-learn-card">
+        <div class="title">合作方数据格式适配中间件</div>
+        <div class="desc">去年 Q3 捐赠运营组开发，通用 JSON/CSV 格式转换，适配时间从 5 天→1.5 天。</div>
+        <div class="from">来源：捐赠运营组 · 与赵天宇当前任务高度相关</div>
+      </div>
+      <div class="ai-learn-card">
+        <div class="title">数据清洗异常值自动填充方案</div>
+        <div class="desc">用户增长组上月使用，将缺失率从 30% 降到 5%，基于统计推断。</div>
+        <div class="from">来源：用户增长组 · 可作为刘思涵的参考</div>
+      </div>
+    </div>
+
+    <!-- AI Todo -->
+    <div class="ai-section">
+      <div class="ai-section-title">
+        AI 建议待办
+        <span class="badge">AI 生成</span>
+      </div>
+      <div class="todo-item">
+        <div class="todo-check" onclick="this.classList.toggle('done')"></div>
+        <div class="todo-text">让佳琪和数据中台的李哲对齐标签 schema <span class="source">· 来自 AI 协同发现</span></div>
+      </div>
+      <div class="todo-item">
+        <div class="todo-check" onclick="this.classList.toggle('done')"></div>
+        <div class="todo-text">让小明看看应急响应组的标签筛选组件 <span class="source">· 来自 AI 经验推荐</span></div>
+      </div>
+      <div class="todo-item">
+        <div class="todo-check" onclick="this.classList.toggle('done')"></div>
+        <div class="todo-text">跟进赵天宇的接口适配进度，考虑引入通用转换中间件 <span class="source">· 来自 AI 风险检测</span></div>
+      </div>
+      <div class="todo-item">
+        <div class="todo-check" onclick="this.classList.toggle('done')"></div>
+        <div class="todo-text">回应 VP Catherine 的画像方向对齐邀请 <span class="source">· 来自 @ 提及</span></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+</body>
+</html>
