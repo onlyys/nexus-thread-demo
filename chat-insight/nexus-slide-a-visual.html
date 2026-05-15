@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus AI — 方案 A 优化</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  :root {
+    --bg: #F5F5F7; --surface: #FFFFFF; --ink: #1A1918;
+    --ink-sec: #4A4845; --ink-muted: #8A8784; --ink-faint: #B5B2AE;
+    --border: #E8E6E1; --border-subtle: #F0EFEB;
+    --bg-subtle: #F4F3F0; --bg-hover: #F0EFEB; --bg-ai: #F8F7F4;
+    --blue: #2563EB; --blue-soft: #DBEAFE; --blue-light: #EFF6FF;
+    --emerald: #059669; --emerald-light: #ECFDF5;
+    --amber: #D97706; --amber-light: #FFFBEB;
+    --rose: #E11D48; --rose-light: #FFF1F2;
+    --violet: #7C3AED; --violet-light: #F5F3FF;
+    --indigo: #4F46E5;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: "Inter", -apple-system, "PingFang SC", sans-serif;
+    background: #E8E8ED;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .chat-window {
+    width: 520px;
+    background: var(--bg-subtle);
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+  }
+
+  /* Header */
+  .chat-header {
+    background: var(--ink);
+    padding: 14px 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .chat-header .icon {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--violet), var(--indigo));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #fff;
+  }
+  .chat-header .title { font-size: 15px; font-weight: 600; color: #fff; }
+  .chat-header .sub { font-size: 11px; color: rgba(255,255,255,0.35); }
+
+  /* Body */
+  .chat-body { padding: 18px 16px; display: flex; flex-direction: column; gap: 14px; }
+
+  /* User msg */
+  .msg-user {
+    align-self: flex-end;
+    background: var(--ink); color: #fff;
+    padding: 10px 16px; border-radius: 16px 16px 4px 16px;
+    font-size: 13px; font-weight: 500;
+    max-width: 80%;
+  }
+
+  /* AI Response */
+  .msg-ai {
+    display: flex; gap: 10px; align-self: flex-start;
+  }
+  .msg-ai-avatar {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--violet), var(--indigo));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: #fff;
+  }
+  .msg-ai-content {
+    flex: 1; min-width: 0;
+  }
+  .msg-ai-text {
+    background: var(--surface);
+    border-radius: 4px 16px 16px 16px;
+    padding: 12px 16px;
+    font-size: 13px; color: var(--ink-sec); line-height: 1.5;
+    box-shadow: 0 1px 3px rgba(0,0,0,.03);
+    margin-bottom: 10px;
+  }
+
+  /* ===== SIGNAL CARD: CONNECTION ===== */
+  .signal-card {
+    background: var(--surface);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    margin-bottom: 10px;
+  }
+  .signal-card-header {
+    padding: 10px 14px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 700;
+  }
+  .signal-card-header .emoji { font-size: 16px; }
+
+  /* Connection visual */
+  .conn-visual {
+    padding: 6px 14px 14px;
+    position: relative;
+  }
+  .conn-nodes {
+    display: flex; justify-content: space-around; align-items: flex-start;
+    position: relative; z-index: 2;
+  }
+  .conn-node {
+    text-align: center; width: 120px;
+  }
+  .conn-dot {
+    width: 40px; height: 40px; border-radius: 50%;
+    margin: 0 auto 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 800; color: #fff;
+  }
+  .conn-name { font-size: 11px; font-weight: 600; color: var(--ink); }
+  .conn-task { font-size: 10px; color: var(--ink-muted); margin-top: 2px; }
+
+  /* Connection lines (SVG) */
+  .conn-lines {
+    position: absolute; top: 24px; left: 0; right: 0;
+    height: 40px; z-index: 1;
+  }
+  .conn-lines svg { width: 100%; height: 100%; }
+
+  /* Center hub */
+  .conn-hub {
+    display: flex; flex-direction: column; align-items: center;
+    margin-top: 10px;
+  }
+  .conn-hub-label {
+    background: var(--violet-light);
+    color: var(--violet);
+    font-size: 10px; font-weight: 700;
+    padding: 4px 12px; border-radius: 980px;
+    border: 1.5px dashed #c4b5fd;
+  }
+  .conn-action {
+    margin-top: 8px;
+    font-size: 11px; color: var(--ink-sec);
+    padding: 6px 14px;
+    background: var(--bg-subtle);
+    border-radius: 8px;
+    text-align: center;
+    line-height: 1.5;
+  }
+  .conn-action strong { color: var(--ink); }
+
+  /* ===== SIGNAL CARD: BREAK ===== */
+  .break-visual {
+    padding: 6px 14px 14px;
+  }
+  .break-timeline {
+    display: flex; align-items: stretch; gap: 0;
+    position: relative;
+  }
+  .break-step {
+    flex: 1; text-align: center;
+    position: relative;
+    padding-top: 28px;
+  }
+  .break-step .dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    z-index: 2;
+  }
+  .break-step .dot.ok { background: var(--emerald); }
+  .break-step .dot.warn { background: var(--amber); }
+  .break-step .dot.fail { background: var(--rose); }
+  .break-step .dot.fix {
+    background: #fff; border: 2px solid var(--violet);
+    width: 16px; height: 16px;
+  }
+  .break-step .dot.fix::after {
+    content: '✦'; position: absolute;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-size: 8px; color: var(--violet);
+  }
+  .break-label { font-size: 10px; font-weight: 600; color: var(--ink); }
+  .break-date { font-size: 9px; color: var(--ink-faint); margin-top: 1px; }
+
+  /* Line between dots */
+  .break-line-track {
+    position: absolute; top: 6px; left: 0; right: 0; height: 2px;
+    z-index: 1;
+  }
+  .break-line-track .line {
+    height: 100%;
+  }
+
+  /* Break indicator */
+  .break-indicator {
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; margin-top: 10px;
+    padding: 6px 12px;
+    background: var(--rose-light);
+    border-radius: 8px;
+    border-left: 3px solid var(--rose);
+  }
+  .break-indicator .text { font-size: 11px; color: var(--rose); font-weight: 600; }
+  .break-fix {
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; margin-top: 6px;
+    padding: 6px 12px;
+    background: var(--violet-light);
+    border-radius: 8px;
+    border-left: 3px solid var(--violet);
+  }
+  .break-fix .text { font-size: 11px; color: var(--violet); font-weight: 500; }
+
+  /* Chips */
+  .chips { padding: 0 16px 16px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    padding: 6px 14px; border-radius: 980px;
+    font-size: 11px; font-weight: 500;
+    background: var(--surface); color: var(--ink-sec);
+    border: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<div class="chat-window">
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="icon">✦</div>
+    <div>
+      <div class="title">Nexus AI</div>
+      <div class="sub">追踪 12 个团队 · 37 个项目 · 本周 23 条更新</div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="chat-body">
+    <!-- User -->
+    <div class="msg-user">最近有没有需要我关注的事？</div>
+
+    <!-- AI -->
+    <div class="msg-ai">
+      <div class="msg-ai-avatar">✦</div>
+      <div class="msg-ai-content">
+        <div class="msg-ai-text">发现 2 个需要关注的信号：</div>
+
+        <!-- Signal 1: Connection -->
+        <div class="signal-card">
+          <div class="signal-card-header" style="background:var(--violet-light);color:var(--violet);">
+            <span class="emoji">💡</span> 跨团队协同机会 · 用户画像方向
+          </div>
+          <div class="conn-visual">
+            <div class="conn-nodes">
+              <div class="conn-node">
+                <div class="conn-dot" style="background:var(--blue);">张</div>
+                <div class="conn-name">公益产品组</div>
+                <div class="conn-task">受助人群画像</div>
+              </div>
+              <div class="conn-node">
+                <div class="conn-dot" style="background:var(--indigo);">李</div>
+                <div class="conn-name">数据中台组</div>
+                <div class="conn-task">标签架构重构</div>
+              </div>
+              <div class="conn-node">
+                <div class="conn-dot" style="background:var(--emerald);">王</div>
+                <div class="conn-name">用户增长组</div>
+                <div class="conn-task">捐赠者聚类</div>
+              </div>
+            </div>
+            <!-- Lines -->
+            <svg style="width:100%;height:24px;margin-top:-8px;" viewBox="0 0 480 24" fill="none">
+              <path d="M80,4 Q240,28 240,20" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="4,3" fill="none"/>
+              <path d="M400,4 Q240,28 240,20" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="4,3" fill="none"/>
+              <path d="M80,4 Q240,4 400,4" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="4,3" fill="none"/>
+            </svg>
+            <div class="conn-hub">
+              <div class="conn-hub-label">⚡ 统一标签定义</div>
+            </div>
+            <div class="conn-action">
+              三方切入同一问题但<strong>未对话</strong>。建议拉 30min 对齐。
+            </div>
+          </div>
+        </div>
+
+        <!-- Signal 2: Break -->
+        <div class="signal-card">
+          <div class="signal-card-header" style="background:var(--rose-light);color:var(--rose);">
+            <span class="emoji">⚠️</span> 信息断裂 · 乡村教育振兴计划
+          </div>
+          <div class="break-visual">
+            <!-- Timeline -->
+            <div style="position:relative;padding:0 20px;">
+              <div class="break-line-track">
+                <div class="line" style="background: linear-gradient(90deg, var(--emerald) 0%, var(--emerald) 40%, var(--rose) 40%, var(--rose) 70%, var(--violet) 70%);border-radius:2px;"></div>
+              </div>
+              <div class="break-timeline">
+                <div class="break-step">
+                  <div class="dot ok"></div>
+                  <div class="break-label">提交评审</div>
+                  <div class="break-date">4/28</div>
+                </div>
+                <div class="break-step">
+                  <div class="dot ok"></div>
+                  <div class="break-label">评审通过</div>
+                  <div class="break-date">5/9</div>
+                </div>
+                <div class="break-step">
+                  <div class="dot fail"></div>
+                  <div class="break-label" style="color:var(--rose);">14天静默</div>
+                  <div class="break-date">5/14</div>
+                </div>
+                <div class="break-step">
+                  <div class="dot fix"></div>
+                  <div class="break-label" style="color:var(--violet);">AI 建议</div>
+                  <div class="break-date">现在</div>
+                </div>
+              </div>
+            </div>
+            <div class="break-indicator">
+              <span class="text">结论已出但未流转至项目组 — 信息断裂</span>
+            </div>
+            <div class="break-fix">
+              <span class="text">✦ 提醒刘强查看评审结论，项目可恢复推进</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chips -->
+  <div class="chips">
+    <span class="chip">深入了解画像协同</span>
+    <span class="chip">追踪教育项目</span>
+    <span class="chip">本周组织有什么变化？</span>
+  </div>
+</div>
+
+</body>
+</html>
