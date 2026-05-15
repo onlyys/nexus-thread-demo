@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus · IC 视图 — 与我相关</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  :root {
+    --bg: #FAFAF8; --surface: #FFFFFF; --ink: #1A1918;
+    --ink-sec: #4A4845; --ink-muted: #8A8784; --ink-faint: #B5B2AE;
+    --border: #E8E6E1; --border-subtle: #F0EFEB;
+    --bg-subtle: #F4F3F0; --bg-hover: #F0EFEB; --bg-ai: #F8F7F4;
+    --blue: #2563EB; --blue-soft: #DBEAFE; --blue-light: #EFF6FF;
+    --emerald: #059669; --emerald-light: #ECFDF5;
+    --amber: #D97706; --amber-light: #FFFBEB;
+    --rose: #E11D48; --rose-light: #FFF1F2;
+    --violet: #7C3AED; --violet-light: #F5F3FF;
+    --indigo: #4F46E5; --cyan: #0891B2;
+    --shadow-card: 0 1px 3px rgba(0,0,0,.04), 0 0 0 1px rgba(0,0,0,.02);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,.08);
+    --radius-md: 10px; --radius-lg: 14px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:"Inter",-apple-system,"PingFang SC",sans-serif; background:var(--bg); color:var(--ink); -webkit-font-smoothing:antialiased; }
+
+  /* TOPBAR */
+  .topbar { position:sticky;top:0;z-index:100;height:48px;background:var(--ink);display:flex;align-items:center;padding:0 24px; }
+  .topbar .logo { width:28px;height:28px;border-radius:6px;background:#fff;color:var(--ink);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px; }
+  .topbar .brand { font-weight:600;font-size:15px;color:#fff;margin-left:10px; }
+  .topbar .slogan { color:rgba(255,255,255,0.4);font-size:12px;margin-left:8px; }
+  .topbar-tabs { display:flex;gap:4px;margin-left:32px; }
+  .topbar-tab { padding:6px 16px;border-radius:980px;font-size:12px;font-weight:500;color:rgba(255,255,255,0.5);cursor:pointer;transition:all 0.2s; }
+  .topbar-tab:hover { color:#fff; }
+  .topbar-tab.active { background:rgba(255,255,255,0.12);color:#fff; }
+  .topbar-right { margin-left:auto;display:flex;align-items:center;gap:14px; }
+  .topbar-right .role-badge { font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:rgba(8,145,178,0.2);color:#67e8f9; }
+  .topbar-right .user { font-size:12px;color:rgba(255,255,255,0.6); }
+
+  /* LAYOUT */
+  .layout { display:grid; grid-template-columns:200px 1fr 320px; min-height:calc(100vh - 48px); }
+
+  /* SIDEBAR */
+  .sidebar { background:var(--surface);border-right:1px solid var(--border);padding:20px 12px; }
+  .sidebar h4 { margin:0 8px 10px;font-size:11px;font-weight:600;color:var(--ink-muted);letter-spacing:0.08em; }
+  .nav-item { padding:7px 10px;font-size:13px;color:var(--ink);border-radius:6px;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px; }
+  .nav-item:hover { background:var(--bg-hover); }
+  .nav-item.active { background:var(--bg-subtle);font-weight:500; }
+  .nav-item .ico { color:var(--ink-muted);font-size:11px;width:16px;text-align:center; }
+  .nav-item.active .ico { color:var(--blue); }
+  .nav-pill { margin-left:auto;font-size:10px;background:var(--bg-subtle);color:var(--ink-muted);padding:1px 6px;border-radius:999px; }
+  .nav-pill.hot { background:var(--rose-light);color:var(--rose); }
+  .nav-pill.ai { background:var(--violet-light);color:var(--violet); }
+  .nav-section { margin-top:18px; }
+
+  /* MAIN */
+  .main-content { padding:24px 28px 80px;background:var(--bg);min-width:0; }
+
+  /* MORNING BRIEFING */
+  .morning-briefing {
+    background: linear-gradient(135deg, #fafbff 0%, #fdfaff 100%);
+    border: 1px solid #e0e7ff;
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .mb-header { display:flex;align-items:center;gap:10px;margin-bottom:14px; }
+  .mb-icon { width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--violet),var(--indigo));display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff; }
+  .mb-title { font-size:18px;font-weight:700;letter-spacing:-0.3px; }
+  .mb-sub { font-size:12px;color:var(--ink-muted); }
+  .mb-time { margin-left:auto;font-size:11px;color:var(--ink-faint); }
+  .mb-body { font-size:14px;line-height:1.8;color:var(--ink-sec); }
+  .mb-body p { margin-bottom:8px; }
+  .mb-body .em { color:var(--violet);font-weight:500; }
+  .mb-body .link { color:var(--blue);cursor:pointer;border-bottom:1px solid var(--blue-soft); }
+  .mb-body ul { padding-left:18px;margin:8px 0; }
+  .mb-body li { margin-bottom:6px; }
+  .mb-section { margin-top:16px;padding-top:14px;border-top:1px solid rgba(124,58,237,0.1); }
+  .mb-section-title { font-size:12px;font-weight:600;color:var(--violet);margin-bottom:8px;display:flex;align-items:center;gap:6px; }
+
+  /* FEED */
+  .section-title { font-size:16px;font-weight:700;letter-spacing:-0.2px;margin:24px 0 12px;display:flex;align-items:center;gap:8px; }
+  .section-title .ai-badge { font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;background:var(--violet-light);color:var(--violet); }
+
+  .feed-item { background:var(--surface);border-radius:var(--radius-md);padding:18px 20px;box-shadow:var(--shadow-card);margin-bottom:10px;transition:all 0.15s;border:1px solid transparent; }
+  .feed-item:hover { border-color:var(--border); }
+  .feed-header { display:flex;align-items:center;gap:10px;margin-bottom:8px; }
+  .feed-avatar { width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0; }
+  .feed-meta { flex:1; }
+  .feed-author { font-size:13px;font-weight:600; }
+  .feed-team { font-size:11px;color:var(--ink-muted); }
+  .feed-time { font-size:11px;color:var(--ink-faint); }
+  .feed-relevance { font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:var(--blue-light);color:var(--blue);margin-left:auto; }
+  .feed-body { font-size:14px;line-height:1.7;color:var(--ink-sec);margin-bottom:10px; }
+  .feed-enrichment { background:var(--bg-ai);border:1px solid #e0e7ff;border-radius:8px;padding:10px 14px; }
+  .feed-enrichment-title { font-size:11px;font-weight:600;color:var(--violet);margin-bottom:4px; }
+  .feed-enrichment-content { font-size:12px;line-height:1.65;color:var(--ink-sec); }
+  .feed-enrichment-content .link { color:var(--blue);cursor:pointer;border-bottom:1px solid var(--blue-soft); }
+  .feed-reactions { display:flex;gap:6px;margin-top:10px; }
+  .feed-react { background:var(--surface);border:1px solid var(--border);padding:4px 10px;border-radius:16px;font-size:11px;color:var(--ink-sec);cursor:pointer;transition:all 0.15s; }
+  .feed-react:hover { background:var(--bg-hover);border-color:var(--ink-faint); }
+  .feed-react.active { background:var(--blue-light);border-color:var(--blue-soft);color:var(--blue); }
+
+  /* CONTEXT PANEL */
+  .context-panel { background:var(--surface);border-left:1px solid var(--border);padding:20px 16px;overflow-y:auto; }
+  .context-panel h4 { margin:0 0 6px;font-size:11px;font-weight:600;color:var(--ink-muted);letter-spacing:0.08em; }
+
+  /* My Focus */
+  .focus-card { background:var(--bg-subtle);border-radius:8px;padding:12px 14px;margin-bottom:8px; }
+  .focus-title { font-size:13px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:6px; }
+  .focus-desc { font-size:12px;color:var(--ink-sec);line-height:1.5; }
+  .focus-progress { margin-top:6px; }
+  .focus-bar { height:5px;background:var(--border-subtle);border-radius:3px;overflow:hidden; }
+  .focus-fill { height:100%;border-radius:3px; }
+  .focus-meta { font-size:10px;color:var(--ink-muted);margin-top:3px;display:flex;justify-content:space-between; }
+
+  /* Learn cards */
+  .learn-card { background:linear-gradient(135deg,#fafbff 0%,#fdfaff 100%);border:1px solid #e0e7ff;border-radius:8px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all 0.15s; }
+  .learn-card:hover { border-color:#c4b5fd; }
+  .learn-title { font-size:12px;font-weight:600;margin-bottom:3px; }
+  .learn-desc { font-size:11px;color:var(--ink-sec);line-height:1.5; }
+  .learn-from { font-size:10px;color:var(--violet);margin-top:4px;display:flex;align-items:center;gap:4px; }
+  .learn-match { font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px;background:var(--emerald-light);color:var(--emerald);margin-left:auto; }
+
+  /* Timeline */
+  .timeline-item { display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-subtle); }
+  .timeline-item:last-child { border:none; }
+  .timeline-dot { width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0; }
+  .timeline-content { flex:1; }
+  .timeline-text { font-size:12px;line-height:1.5;color:var(--ink-sec); }
+  .timeline-time { font-size:10px;color:var(--ink-faint);margin-top:2px; }
+
+  /* Publish Box */
+  .publish-box { background:var(--surface);border-radius:var(--radius-md);padding:16px;box-shadow:var(--shadow-card);margin-bottom:16px; }
+  .publish-box textarea { width:100%;border:none;outline:none;resize:none;font-family:inherit;font-size:14px;line-height:1.7;background:transparent;color:var(--ink);min-height:60px; }
+  .publish-box textarea::placeholder { color:var(--ink-faint); }
+  .publish-bar { display:flex;align-items:center;gap:6px;margin-top:8px; }
+  .pub-tool { background:transparent;border:none;cursor:pointer;color:var(--ink-muted);padding:4px 8px;border-radius:6px;font-size:13px; }
+  .pub-tool:hover { background:var(--bg-hover);color:var(--ink); }
+  .pub-send { margin-left:auto;background:var(--ink);color:#fff;border:none;padding:6px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500; }
+  .pub-send:hover { opacity:0.85; }
+  .pub-send:disabled { background:var(--ink-faint);cursor:not-allowed; }
+  .pub-hint { font-size:11px;color:var(--ink-faint);margin-top:6px;display:flex;align-items:center;gap:4px; }
+  .pub-hint .ai-tag { font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px;background:var(--violet-light);color:var(--violet); }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .fade-up { animation:fadeUp 0.5s ease-out forwards; }
+  .fade-up-d1 { animation-delay:0.1s;opacity:0; }
+  .fade-up-d2 { animation-delay:0.2s;opacity:0; }
+  .fade-up-d3 { animation-delay:0.3s;opacity:0; }
+
+  @media(max-width:1200px) { .layout{grid-template-columns:1fr;} .sidebar,.context-panel{display:none;} }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">N</div>
+  <div class="brand">Nexus</div>
+  <div class="slogan">与我相关 · IC 视图</div>
+  <div class="topbar-tabs">
+    <div class="topbar-tab active">与我相关</div>
+    <div class="topbar-tab">团队动态</div>
+    <div class="topbar-tab">组织广场</div>
+    <div class="topbar-tab">学习</div>
+  </div>
+  <div class="topbar-right">
+    <div class="role-badge">IC</div>
+    <div class="user">陈小明 · 公益产品组 · 前端开发</div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h4>FEED</h4>
+    <div class="nav-item active"><span class="ico">●</span>与我相关</div>
+    <div class="nav-item"><span class="ico">○</span>团队全部</div>
+    <div class="nav-item"><span class="ico">○</span>组织广场</div>
+
+    <div class="nav-section">
+      <h4>我的项目</h4>
+      <div class="nav-item"><span class="ico">📂</span>受助人群画像 v2 <span class="nav-pill hot">3</span></div>
+      <div class="nav-item"><span class="ico">📂</span>一块走春季</div>
+    </div>
+
+    <div class="nav-section">
+      <h4>AI 为你发现</h4>
+      <div class="nav-item"><span class="ico">📚</span>可学习经验 <span class="nav-pill ai">2</span></div>
+      <div class="nav-item"><span class="ico">🔗</span>相关讨论 <span class="nav-pill">1</span></div>
+    </div>
+
+    <div class="nav-section">
+      <h4>MY</h4>
+      <div class="nav-item"><span class="ico">@</span>有人 @ 我 <span class="nav-pill hot">1</span></div>
+      <div class="nav-item"><span class="ico">📌</span>我的待办 <span class="nav-pill">2</span></div>
+      <div class="nav-item"><span class="ico">📝</span>我的发布</div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Morning Briefing -->
+    <div class="morning-briefing fade-up">
+      <div class="mb-header">
+        <div class="mb-icon">✦</div>
+        <div>
+          <div class="mb-title">早安，小明</div>
+          <div class="mb-sub">这是 AI 为你生成的今日简报</div>
+        </div>
+        <div class="mb-time">5月14日 · 周三</div>
+      </div>
+      <div class="mb-body">
+        <p>你当前在做的<span class="em">受助人群画像前端页面</span>进展到 80%。今天有几个和你直接相关的事情：</p>
+        <ul>
+          <li>刘思涵完成了 12 省数据清洗，意味着<span class="em">你的前端展示可以开始接真实数据</span>了</li>
+          <li>你昨天发布的标签筛选组件遇到的问题，AI 发现<span class="em">应急响应组的李培伦上月做过类似组件</span>，支持多级联动和模糊搜索 <span class="link">查看他的方案 →</span></li>
+          <li>张明（你的 TL）被 VP 邀请参加用户画像方向对齐会，可能影响标签体系方案方向</li>
+        </ul>
+
+        <div class="mb-section">
+          <div class="mb-section-title">💡 学习机会</div>
+          <p>数据中台组本周做了 Iceberg vs Delta Lake 的选型对比评估。如果你对数据基础设施感兴趣，他们的评估文档写得很好。<span class="link">查看评估文档 →</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Publish -->
+    <div class="publish-box fade-up fade-up-d1">
+      <textarea placeholder="分享你的进展、想法、或遇到的问题..." oninput="this.parentElement.querySelector('.pub-send').disabled = !this.value.trim()"></textarea>
+      <div class="publish-bar">
+        <button class="pub-tool" title="@提及">@</button>
+        <button class="pub-tool" title="链接">🔗</button>
+        <button class="pub-tool" title="附件">📎</button>
+        <button class="pub-tool" title="代码">{ }</button>
+        <button class="pub-send" disabled>发布</button>
+      </div>
+      <div class="pub-hint">
+        <span class="ai-tag">AI</span>
+        发布后 AI 将自动增厚（标注关联、生成上下文），你的 TL 和相关同事会收到通知。发了这条 = 不用再写周报里的这部分。
+      </div>
+    </div>
+
+    <!-- Feed: 与我相关 -->
+    <div class="section-title fade-up fade-up-d1">
+      与我相关的动态
+      <span class="ai-badge">AI 为你筛选</span>
+    </div>
+
+    <div class="feed-item fade-up fade-up-d1">
+      <div class="feed-header">
+        <div class="feed-avatar" style="background:var(--emerald);">刘</div>
+        <div class="feed-meta">
+          <div class="feed-author">刘思涵 <span class="feed-team">· 公益产品组</span></div>
+          <div class="feed-time">今天 14:30</div>
+        </div>
+        <div class="feed-relevance">直接相关</div>
+      </div>
+      <div class="feed-body">
+        12 省数据清洗完成。数据质量比预期好，缺失率从 23% 降到 4%。下一步：和佳琪对齐标签方案后开始特征工程。
+      </div>
+      <div class="feed-enrichment">
+        <div class="feed-enrichment-title">✦ AI · 为你标注</div>
+        <div class="feed-enrichment-content">
+          <strong>对你的影响：</strong>数据已就绪，你的画像前端页面可以开始接真实数据做联调了。之前用的 mock 数据需要替换。<br>
+          <strong>建议行动：</strong>和思涵确认数据接口文档是否更新，然后开始联调。
+        </div>
+      </div>
+      <div class="feed-reactions">
+        <span class="feed-react active" onclick="this.classList.toggle('active')">👍 赞 <span>3</span></span>
+        <span class="feed-react" onclick="this.classList.toggle('active')">💪 加油</span>
+        <span class="feed-react" onclick="this.classList.toggle('active')">回复</span>
+      </div>
+    </div>
+
+    <div class="feed-item fade-up fade-up-d2">
+      <div class="feed-header">
+        <div class="feed-avatar" style="background:var(--violet);">王</div>
+        <div class="feed-meta">
+          <div class="feed-author">王佳琪 <span class="feed-team">· 公益产品组</span></div>
+          <div class="feed-time">今天 10:00</div>
+        </div>
+        <div class="feed-relevance">团队相关</div>
+      </div>
+      <div class="feed-body">
+        标签体系方案初稿完成，设计了 3 级标签结构：大类（8个）→ 子类（约 40 个）→ 属性标签（可扩展）。准备和中台对齐后定稿。@张明 @陈小明 看下前端渲染是否 OK？
+      </div>
+      <div class="feed-enrichment">
+        <div class="feed-enrichment-title">✦ AI · 为你标注</div>
+        <div class="feed-enrichment-content">
+          <strong>对你的影响：</strong>这个 3 级标签结构决定了你的标签筛选组件需要支持 cascader（级联选择）。你昨天自己写的那个可以覆盖。<br>
+          <strong>参考：</strong>应急响应组李培伦的组件已支持 3 级联动，可以直接参考。<span class="link">查看组件 →</span>
+        </div>
+      </div>
+      <div class="feed-reactions">
+        <span class="feed-react" onclick="this.classList.toggle('active')">👍 赞 <span>1</span></span>
+        <span class="feed-react" onclick="this.classList.toggle('active')">回复</span>
+      </div>
+    </div>
+
+    <div class="feed-item fade-up fade-up-d3">
+      <div class="feed-header">
+        <div class="feed-avatar" style="background:var(--blue);">李</div>
+        <div class="feed-meta">
+          <div class="feed-author">李哲 <span class="feed-team">· 数据中台组</span></div>
+          <div class="feed-time">今天 15:30</div>
+        </div>
+        <div class="feed-relevance" style="background:var(--violet-light);color:var(--violet);">AI 关联</div>
+      </div>
+      <div class="feed-body">
+        数据中台重构方案确定了，最终选择 Iceberg 替换 Hive。Iceberg 在我们的场景下查询性能提升 40%，且生态兼容性更好。预计 6 周完成迁移。
+      </div>
+      <div class="feed-enrichment">
+        <div class="feed-enrichment-title">✦ AI · 为什么推给你</div>
+        <div class="feed-enrichment-content">
+          <strong>关联原因：</strong>你做的画像前端最终要从数据中台读取数据。Iceberg 的列式存储对前端大数据量展示更友好（支持谓词下推，分页查询更快）。<br>
+          <strong>学习机会：</strong>李哲的选型评估文档里有 Iceberg 查询 API 的用法，你后续联调可能用到。<span class="link">查看文档 →</span>
+        </div>
+      </div>
+      <div class="feed-reactions">
+        <span class="feed-react" onclick="this.classList.toggle('active')">👍 赞 <span>5</span></span>
+        <span class="feed-react" onclick="this.classList.toggle('active')">🤔 学到了</span>
+        <span class="feed-react" onclick="this.classList.toggle('active')">回复</span>
+      </div>
+    </div>
+
+    <!-- Organization-level interesting -->
+    <div class="section-title fade-up fade-up-d3">
+      组织里的有趣事
+      <span class="ai-badge">AI 精选 · 非必读</span>
+    </div>
+    <div class="feed-item fade-up fade-up-d3" style="opacity:0.85;">
+      <div class="feed-header">
+        <div class="feed-avatar" style="background:var(--amber);">赵</div>
+        <div class="feed-meta">
+          <div class="feed-author">赵鹏 <span class="feed-team">· 安全评审组</span></div>
+          <div class="feed-time">5月9日</div>
+        </div>
+        <div class="feed-relevance" style="background:var(--bg-subtle);color:var(--ink-muted);">扩展阅读</div>
+      </div>
+      <div class="feed-body">
+        完成了乡村教育振兴计划的安全评审，结论：合规通过。这次评审尝试了新的自动化合规检查工具，将评审周期从 2 周缩短到 5 天。
+      </div>
+      <div class="feed-enrichment">
+        <div class="feed-enrichment-title">✦ AI · 为什么推给你</div>
+        <div class="feed-enrichment-content">
+          <strong>间接相关：</strong>自动化合规检查工具的思路对你做前端自动化测试可能有启发——同样是用规则引擎替代人工检查。<br>
+          <strong>非必读。</strong>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Right Panel: Context -->
+  <aside class="context-panel">
+    <!-- My Focus -->
+    <h4>我的焦点</h4>
+    <div class="focus-card">
+      <div class="focus-title">
+        📌 受助人群画像前端页面
+      </div>
+      <div class="focus-desc">画像展示页面开发，含标签筛选、数据可视化、响应式布局</div>
+      <div class="focus-progress">
+        <div class="focus-bar"><div class="focus-fill" style="width:80%;background:var(--emerald);"></div></div>
+        <div class="focus-meta"><span>进度 80%</span><span style="color:var(--emerald);">正常</span></div>
+      </div>
+    </div>
+    <div class="focus-card">
+      <div class="focus-title">
+        🔧 标签筛选组件
+      </div>
+      <div class="focus-desc">自研多级联动标签筛选，支持模糊搜索</div>
+      <div class="focus-progress">
+        <div class="focus-bar"><div class="focus-fill" style="width:60%;background:var(--amber);"></div></div>
+        <div class="focus-meta"><span>进度 60%</span><span style="color:var(--amber);">有替代方案</span></div>
+      </div>
+    </div>
+
+    <!-- AI recommended learnings -->
+    <div style="margin-top:18px;">
+      <h4>AI 学习推荐</h4>
+      <div style="font-size:11px;color:var(--ink-muted);margin-bottom:10px;">基于你当前任务 + 组织内其他团队经验</div>
+
+      <div class="learn-card">
+        <div class="learn-title">标签筛选组件 — 多级联动方案</div>
+        <div class="learn-desc">应急响应组李培伦实现的 3 级标签联动组件，支持模糊搜索、键盘导航、异步加载。已在生产环境运行 1 个月。</div>
+        <div class="learn-from">
+          ✦ 来源：应急响应组
+          <span class="learn-match">高匹配度</span>
+        </div>
+      </div>
+      <div class="learn-card">
+        <div class="learn-title">Iceberg 列式存储前端查询优化</div>
+        <div class="learn-desc">数据中台的 Iceberg 方案支持谓词下推和分页优化，对大数据量的前端展示友好。</div>
+        <div class="learn-from">
+          ✦ 来源：数据中台组
+          <span class="learn-match">相关</span>
+        </div>
+      </div>
+      <div class="learn-card">
+        <div class="learn-title">前端自动化规则引擎思路</div>
+        <div class="learn-desc">安全评审组的自动化合规检查工具，用规则引擎替代人工检查，思路可迁移到前端测试。</div>
+        <div class="learn-from">
+          ✦ 来源：安全评审组
+          <span class="learn-match" style="background:var(--amber-light);color:var(--amber);">启发性</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- My task timeline -->
+    <div style="margin-top:18px;">
+      <h4>我的任务时间线</h4>
+      <div style="font-size:11px;color:var(--ink-muted);margin-bottom:10px;">AI 基于你的发布自动维护</div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:var(--emerald);"></div>
+        <div class="timeline-content">
+          <div class="timeline-text">画像展示页面完成 80%，标签筛选组件开发中</div>
+          <div class="timeline-time">今天</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:var(--blue);"></div>
+        <div class="timeline-content">
+          <div class="timeline-text">开始开发标签筛选组件，antd cascader 不适用决定自研</div>
+          <div class="timeline-time">昨天</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:var(--blue);"></div>
+        <div class="timeline-content">
+          <div class="timeline-text">画像页面主框架完成，数据可视化部分上线</div>
+          <div class="timeline-time">5月10日</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:var(--blue);"></div>
+        <div class="timeline-content">
+          <div class="timeline-text">开始接手画像前端页面开发</div>
+          <div class="timeline-time">5月5日</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick publish prompts -->
+    <div style="margin-top:18px;">
+      <h4>快捷发布</h4>
+      <div style="font-size:11px;color:var(--ink-muted);margin-bottom:10px;">AI 建议你分享这些进展（发了 = 不用写周报）</div>
+
+      <div style="padding:8px 12px;background:var(--bg-subtle);border-radius:8px;margin-bottom:6px;cursor:pointer;font-size:12px;color:var(--ink-sec);transition:background 0.15s;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='var(--bg-subtle)'">
+        💬 "画像页面进度 80%，今天开始接真实数据联调"
+      </div>
+      <div style="padding:8px 12px;background:var(--bg-subtle);border-radius:8px;margin-bottom:6px;cursor:pointer;font-size:12px;color:var(--ink-sec);transition:background 0.15s;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='var(--bg-subtle)'">
+        💬 "标签筛选组件参考了李培伦的方案，省了不少时间"
+      </div>
+    </div>
+  </aside>
+</div>
+
+</body>
+</html>
