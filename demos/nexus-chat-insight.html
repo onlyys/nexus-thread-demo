@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus AI · Chat</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  :root {
+    --bg: #F5F5F7; --surface: #FFFFFF; --ink: #1A1918;
+    --ink-sec: #4A4845; --ink-muted: #8A8784; --ink-faint: #B5B2AE;
+    --border: #E8E6E1; --border-subtle: #F0EFEB;
+    --bg-subtle: #F4F3F0; --bg-ai: #F8F7F4;
+    --blue: #2563EB; --blue-soft: #DBEAFE;
+    --emerald: #059669; --emerald-light: #ECFDF5;
+    --amber: #D97706; --amber-light: #FFFBEB;
+    --rose: #E11D48; --rose-light: #FFF1F2;
+    --violet: #7C3AED; --violet-light: #F5F3FF;
+    --indigo: #4F46E5;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: "Inter", -apple-system, "PingFang SC", sans-serif;
+    background: #E8E8ED;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    display: flex; justify-content: center;
+    padding: 40px 20px;
+  }
+
+  /* ===== CHAT WINDOW ===== */
+  .chat {
+    width: 390px;
+    min-height: 520px;
+    background: var(--bg-subtle);
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+    display: flex; flex-direction: column;
+  }
+
+  /* Header */
+  .chat-head {
+    background: var(--ink);
+    padding: 14px 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .chat-head .icon {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--violet), var(--indigo));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #fff;
+  }
+  .chat-head .title { font-size: 15px; font-weight: 600; color: #fff; }
+  .chat-head .sub { font-size: 11px; color: rgba(255,255,255,0.35); }
+
+  /* Messages */
+  .chat-body { padding: 18px 14px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+
+  /* User bubble — 整行布局，头像在右侧，气泡靠右 */
+  .msg-user {
+    display: flex; align-items: flex-start; gap: 10px;
+    justify-content: flex-end;
+  }
+  .msg-user-content {
+    background: var(--ink); color: #fff;
+    padding: 10px 16px; border-radius: 16px 16px 4px 16px;
+    font-size: 13.5px; font-weight: 500;
+  }
+  .msg-user-avatar {
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    background: var(--blue);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: #fff;
+  }
+
+  /* AI message */
+  .msg-ai {
+    display: flex; gap: 10px; align-self: flex-start;
+    max-width: 95%;
+  }
+  .msg-ai-avatar {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--violet), var(--indigo));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: #fff;
+    margin-top: 2px;
+  }
+  .msg-ai-content { flex: 1; min-width: 0; }
+
+  /* AI text bubble */
+  .ai-bubble {
+    background: var(--surface);
+    border-radius: 4px 16px 16px 16px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.03);
+    font-size: 13.5px; line-height: 1.75; color: var(--ink-sec);
+  }
+
+  /* Highlight block (purple left border) */
+  .highlight {
+    background: var(--violet-light);
+    border-left: 3px solid var(--violet);
+    border-radius: 0 8px 8px 0;
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-size: 13px; line-height: 1.75; color: var(--ink-sec);
+  }
+  .highlight strong { color: var(--violet); }
+
+  /* Red warning text */
+  .warn { color: var(--rose); font-weight: 700; }
+
+  /* Timestamp */
+  .ai-time {
+    font-size: 10px; color: var(--ink-faint);
+    margin-top: 6px; text-align: right;
+  }
+
+  /* Action chips */
+  .actions {
+    display: flex; flex-direction: column; gap: 6px;
+    margin-top: 14px;
+  }
+  .action-btn {
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer; border: none;
+    transition: all 0.15s;
+    text-align: left;
+  }
+  .action-btn.primary {
+    background: var(--ink); color: #fff;
+  }
+  .action-btn.primary:hover { opacity: 0.85; }
+  .action-btn.ghost {
+    background: var(--surface); color: var(--ink-sec);
+    border: 1px solid var(--border);
+  }
+  .action-btn.ghost:hover { background: var(--bg-subtle); }
+
+  /* Input area */
+  .chat-input {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border-subtle);
+    background: var(--surface);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .chat-input input {
+    flex: 1; height: 38px; border: none; outline: none;
+    background: var(--bg-subtle); border-radius: 980px;
+    padding: 0 16px; font-size: 13px; font-family: inherit;
+    color: var(--ink);
+  }
+  .chat-input input::placeholder { color: var(--ink-faint); }
+  .chat-input .send {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--ink); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .chat-input .send svg { width: 16px; height: 16px; }
+</style>
+</head>
+<body>
+
+<div class="chat">
+  <!-- Header -->
+  <div class="chat-head">
+    <div class="icon">✦</div>
+    <div>
+      <div class="title">Nexus AI · 本周组织洞察</div>
+      <div class="sub">生成于 5月14日 18:00</div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="chat-body">
+
+    <!-- User message -->
+    <div class="msg-user">
+      <div class="msg-user-content">本周有哪些值得关注的？</div>
+      <div class="msg-user-avatar">C</div>
+    </div>
+
+    <!-- AI message -->
+    <div class="msg-ai">
+      <div class="msg-ai-avatar">✦</div>
+      <div class="msg-ai-content">
+        <div class="ai-bubble">
+          本周检测到一个值得注意的模式：
+
+          <div class="highlight">
+            <strong>跨团队协同机会：</strong>公益产品组（张明团队）、数据中台组（林敏团队）和用户增长组（王芳团队）本周分别提到了「用户画像标签体系」相关工作——公益产品组在做受助人群画像，数据中台在重构标签系统架构，用户增长在做捐赠者行为聚类。三个团队在不同层面切入同一个底层问题，但目前没有看到跨团队讨论。
+          </div>
+
+          此外：乡村教育项目组（刘强负责）已 <span class="warn">14 天未更新进展</span>，上次状态是「等待合作方安全评审结论」。根据安全评审团队（赵鹏负责）上周的发布，评审已于 5 月 9 日完成并出具结论，但该结论尚未流转至乡村教育项目组。
+
+          <div class="actions">
+            <button class="action-btn primary">深入了解画像协同</button>
+            <button class="action-btn ghost">追踪乡村教育卡点</button>
+            <button class="action-btn ghost">忽略本条</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Input -->
+  <div class="chat-input">
+    <input placeholder="追问关于这条洞察的任何问题...">
+    <button class="send">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</div>
+
+</body>
+</html>
