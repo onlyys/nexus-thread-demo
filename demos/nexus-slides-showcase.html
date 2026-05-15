@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus AI — 汇报展示方案集</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  :root {
+    --bg: #F5F5F7;
+    --surface: #FFFFFF;
+    --ink: #1A1918;
+    --ink-sec: #4A4845;
+    --ink-muted: #8A8784;
+    --ink-faint: #B5B2AE;
+    --border: #E8E6E1;
+    --border-subtle: #F0EFEB;
+    --bg-subtle: #F4F3F0;
+    --bg-ai: #F8F7F4;
+    --blue: #2563EB;
+    --blue-soft: #DBEAFE;
+    --blue-light: #EFF6FF;
+    --emerald: #059669;
+    --emerald-light: #ECFDF5;
+    --amber: #D97706;
+    --amber-light: #FFFBEB;
+    --rose: #E11D48;
+    --rose-light: #FFF1F2;
+    --violet: #7C3AED;
+    --violet-light: #F5F3FF;
+    --indigo: #4F46E5;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: "Inter", -apple-system, "PingFang SC", sans-serif;
+    background: #E8E8ED;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== PAGE NAV ===== */
+  .page-nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(30,30,30,0.95);
+    backdrop-filter: blur(20px);
+    padding: 12px 32px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .page-nav-title {
+    font-size: 14px; font-weight: 600; color: #fff;
+  }
+  .page-nav-tabs { display: flex; gap: 4px; margin-left: 24px; }
+  .page-nav-tab {
+    padding: 6px 16px; border-radius: 980px;
+    font-size: 12px; font-weight: 500;
+    color: rgba(255,255,255,0.5); cursor: pointer;
+    transition: all 0.2s; text-decoration: none;
+  }
+  .page-nav-tab:hover { color: #fff; }
+  .page-nav-tab.active { background: rgba(255,255,255,0.12); color: #fff; }
+
+  /* ===== SLIDE ===== */
+  .slide {
+    max-width: 1120px;
+    margin: 40px auto;
+    background: var(--surface);
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+  .slide-header {
+    padding: 32px 40px 20px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .slide-label {
+    font-size: 11px; font-weight: 700; color: var(--violet);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .slide-title {
+    font-size: 24px; font-weight: 800; letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+  .slide-sub {
+    font-size: 13px; color: var(--ink-muted);
+  }
+  .slide-body { padding: 32px 40px 40px; }
+
+  /* ========================================================
+     方案 A：Chatbot 对话截图式
+  ======================================================== */
+  .chat-window {
+    background: var(--bg-subtle);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .chat-win-header {
+    background: var(--ink);
+    padding: 14px 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .chat-win-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--violet), var(--indigo));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: #fff;
+  }
+  .chat-win-title { font-size: 14px; font-weight: 600; color: #fff; }
+  .chat-win-sub { font-size: 11px; color: rgba(255,255,255,0.4); }
+  .chat-win-body { padding: 20px 18px; display: flex; flex-direction: column; gap: 14px; }
+
+  .chat-msg { display: flex; gap: 10px; max-width: 95%; }
+  .chat-msg.ai { align-self: flex-start; }
+  .chat-msg.user { align-self: flex-end; flex-direction: row-reverse; }
+  .chat-msg-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .chat-msg.ai .chat-msg-avatar { background: linear-gradient(135deg, var(--violet), var(--indigo)); font-size: 14px; }
+  .chat-msg.user .chat-msg-avatar { background: var(--ink); }
+  .chat-msg-bubble {
+    border-radius: 14px; padding: 12px 16px;
+    font-size: 13px; line-height: 1.7;
+  }
+  .chat-msg.ai .chat-msg-bubble {
+    background: var(--surface); color: var(--ink);
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    border-top-left-radius: 4px;
+  }
+  .chat-msg.user .chat-msg-bubble {
+    background: var(--ink); color: #fff;
+    border-top-right-radius: 4px;
+  }
+  .chat-embed {
+    background: var(--bg-ai); border: 1px solid #e0e7ff;
+    border-radius: 10px; padding: 12px 14px;
+    margin-top: 10px;
+  }
+  .chat-embed-title {
+    font-size: 12px; font-weight: 700; color: var(--violet);
+    margin-bottom: 6px; display: flex; align-items: center; gap: 4px;
+  }
+  .chat-embed-row {
+    display: flex; justify-content: space-between;
+    padding: 3px 0; font-size: 12px;
+  }
+  .chat-embed-row .val { font-weight: 600; color: var(--blue); }
+  .chat-embed-action {
+    margin-top: 8px; font-size: 11px; color: var(--ink-sec); line-height: 1.6;
+    padding-top: 8px; border-top: 1px solid rgba(124,58,237,0.08);
+  }
+  .chat-win-chips {
+    padding: 0 18px 16px;
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .chat-chip {
+    padding: 5px 12px; border-radius: 980px;
+    font-size: 11px; font-weight: 500;
+    background: var(--surface); color: var(--ink-sec);
+    border: 1px solid var(--border);
+  }
+
+  /* ========================================================
+     方案 B：增厚前后对比
+  ======================================================== */
+  .compare-grid {
+    display: grid; grid-template-columns: 1fr 48px 1fr;
+    gap: 0; align-items: stretch;
+  }
+  .compare-side {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .compare-label {
+    padding: 10px 16px;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em;
+    text-align: center;
+  }
+  .compare-label.before { background: var(--bg-subtle); color: var(--ink-muted); }
+  .compare-label.after { background: linear-gradient(135deg, var(--violet-light), #ede9fe); color: var(--violet); }
+  .compare-content { padding: 20px; background: var(--surface); }
+  .compare-arrow {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: var(--violet);
+  }
+
+  .raw-post {
+    font-size: 14px; line-height: 1.8; color: var(--ink-sec);
+  }
+  .raw-post .post-author {
+    font-size: 13px; font-weight: 600; color: var(--ink);
+    margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+  }
+  .raw-post .post-author .dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--blue);
+  }
+  .raw-post .post-author .team { font-weight: 400; color: var(--ink-muted); font-size: 12px; }
+
+  .enriched-post .enrich-block {
+    background: var(--bg-ai);
+    border: 1px solid #e0e7ff;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-top: 10px;
+  }
+  .enriched-post .enrich-label {
+    font-size: 10px; font-weight: 700; color: var(--violet);
+    margin-bottom: 4px;
+    letter-spacing: 0.06em;
+  }
+  .enriched-post .enrich-text {
+    font-size: 12px; line-height: 1.6; color: var(--ink-sec);
+  }
+  .enriched-post .enrich-text strong { color: var(--ink); }
+  .enriched-post .enrich-link { color: var(--blue); font-size: 11px; }
+
+  /* ========================================================
+     方案 C：AI 组织洞察卡片
+  ======================================================== */
+  .insight-card {
+    background: linear-gradient(135deg, #fafbff 0%, #fdfaff 100%);
+    border: 1px solid #e0e7ff;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 640px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .insight-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--violet), var(--indigo), var(--blue));
+    border-radius: 16px 16px 0 0;
+  }
+  .insight-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 20px;
+  }
+  .insight-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--violet), var(--indigo));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; color: #fff;
+  }
+  .insight-meta .insight-title { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+  .insight-meta .insight-sub { font-size: 12px; color: var(--ink-muted); }
+
+  .insight-section { margin-bottom: 18px; }
+  .insight-section:last-child { margin-bottom: 0; }
+  .insight-section-title {
+    font-size: 11px; font-weight: 700; color: var(--violet);
+    letter-spacing: 0.08em; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .insight-section-title .line {
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, rgba(124,58,237,0.15), transparent);
+  }
+  .insight-body {
+    font-size: 14px; line-height: 1.8; color: var(--ink-sec);
+  }
+  .insight-body p { margin-bottom: 6px; }
+  .insight-highlight {
+    background: var(--violet-light);
+    border-left: 3px solid var(--violet);
+    padding: 10px 14px;
+    border-radius: 0 8px 8px 0;
+    margin: 10px 0;
+    font-size: 13px; line-height: 1.7;
+  }
+  .insight-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 10px; margin: 16px 0;
+  }
+  .insight-stat {
+    text-align: center;
+    padding: 12px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 10px;
+  }
+  .insight-stat .num { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+  .insight-stat .label { font-size: 11px; color: var(--ink-muted); margin-top: 2px; }
+
+  .insight-footer {
+    margin-top: 20px; padding-top: 16px;
+    border-top: 1px solid rgba(124,58,237,0.1);
+    font-size: 11px; color: var(--ink-faint);
+    display: flex; justify-content: space-between;
+  }
+
+  /* ========================================================
+     方案 D：三角色并排
+  ======================================================== */
+  .role-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .role-col {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .role-header {
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .role-header .role-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: #fff;
+  }
+  .role-header .role-name { font-size: 14px; font-weight: 700; }
+  .role-header .role-desc { font-size: 11px; color: var(--ink-muted); }
+  .role-body { padding: 0 16px 16px; }
+
+  .role-item {
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 12px; line-height: 1.6;
+    color: var(--ink-sec);
+  }
+  .role-item .role-item-label {
+    font-size: 10px; font-weight: 700; color: var(--violet);
+    margin-bottom: 3px;
+    letter-spacing: 0.06em;
+  }
+  .role-item.alert { background: var(--amber-light); border-left: 3px solid var(--amber); }
+  .role-item.connect { background: var(--violet-light); border-left: 3px solid var(--violet); }
+  .role-item.learn { background: var(--blue-light); border-left: 3px solid var(--blue); }
+  .role-item.action { background: var(--emerald-light); border-left: 3px solid var(--emerald); }
+  .role-item.risk { background: var(--rose-light); border-left: 3px solid var(--rose); }
+
+  .role-divider {
+    font-size: 10px; font-weight: 600; color: var(--ink-faint);
+    padding: 6px 12px; letter-spacing: 0.06em;
+  }
+
+  /* Same event label */
+  .same-event {
+    text-align: center;
+    padding: 12px;
+    background: var(--bg-subtle);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 12px; color: var(--ink-sec);
+    border: 1px dashed var(--border);
+  }
+  .same-event strong { color: var(--ink); }
+
+  /* ===== SEPARATOR ===== */
+  .page-sep {
+    max-width: 1120px; margin: 0 auto;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 11px; color: var(--ink-faint);
+    letter-spacing: 0.1em;
+  }
+</style>
+</head>
+<body>
+
+<!-- Page Nav -->
+<div class="page-nav">
+  <div class="page-nav-title">Nexus AI 展示方案集</div>
+  <div class="page-nav-tabs">
+    <a class="page-nav-tab active" href="#a">A · 对话式</a>
+    <a class="page-nav-tab" href="#b">B · 前后对比</a>
+    <a class="page-nav-tab" href="#c">C · 洞察卡片</a>
+    <a class="page-nav-tab" href="#d">D · 三角色并排</a>
+  </div>
+</div>
+
+<!-- ============================================================
+     方案 A：Chatbot 对话截图式
+============================================================ -->
+<div class="slide" id="a">
+  <div class="slide-header">
+    <div class="slide-label">方案 A</div>
+    <div class="slide-title">AI 对话式 — 一轮问答展现全部能力</div>
+    <div class="slide-sub">适合放在 PPT 中间，像一个"产品截图"。VP 问一个问题，AI 回答出跨团队关联、时间线追踪、行动建议。</div>
+  </div>
+  <div class="slide-body">
+    <div class="chat-window">
+      <div class="chat-win-header">
+        <div class="chat-win-icon">✦</div>
+        <div>
+          <div class="chat-win-title">Nexus AI</div>
+          <div class="chat-win-sub">组织的第 N+1 个大脑 · 追踪 12 个团队 · 37 个项目</div>
+        </div>
+      </div>
+      <div class="chat-win-body">
+        <div class="chat-msg user">
+          <div class="chat-msg-avatar">C</div>
+          <div class="chat-msg-bubble">最近有哪些团队在做类似的事？有没有需要我关注的？</div>
+        </div>
+        <div class="chat-msg ai">
+          <div class="chat-msg-avatar">✦</div>
+          <div class="chat-msg-bubble">
+            检测到 1 个跨团队重叠模式和 1 个信息断裂：
+            <div class="chat-embed">
+              <div class="chat-embed-title">💡 跨团队协同机会</div>
+              <div class="chat-embed-row"><span>公益产品组（张明）</span><span class="val">受助人群画像</span></div>
+              <div class="chat-embed-row"><span>数据中台组（李哲）</span><span class="val">标签架构重构</span></div>
+              <div class="chat-embed-row"><span>用户增长组（王芳）</span><span class="val">捐赠者行为聚类</span></div>
+              <div class="chat-embed-row" style="color:var(--violet);font-weight:600;"><span>关联点</span><span>三方均依赖统一标签定义</span></div>
+              <div class="chat-embed-action">
+                <strong>建议：</strong>三个团队从不同角度切入同一问题，目前没有跨团队讨论。建议拉 30min 对齐，避免重复建设。
+              </div>
+            </div>
+            <div class="chat-embed" style="margin-top:8px;">
+              <div class="chat-embed-title">⚠️ 信息断裂预警</div>
+              <div class="chat-embed-row"><span>乡村教育振兴计划</span><span class="val" style="color:var(--rose);">14天未更新</span></div>
+              <div class="chat-embed-row"><span>上次状态</span><span>等待安全评审</span></div>
+              <div class="chat-embed-row"><span>AI 发现</span><span class="val">评审已于 5/9 通过</span></div>
+              <div class="chat-embed-action">
+                <strong>问题：</strong>安全评审结论已出但未流转至项目组。建议提醒刘强查看评审结论，项目可恢复推进。
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="chat-win-chips">
+        <span class="chat-chip">深入了解画像协同</span>
+        <span class="chat-chip">追踪乡村教育卡点</span>
+        <span class="chat-chip">本周组织有什么变化？</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-sep">— — —</div>
+
+<!-- ============================================================
+     方案 B：增厚前后对比
+============================================================ -->
+<div class="slide" id="b">
+  <div class="slide-header">
+    <div class="slide-label">方案 B</div>
+    <div class="slide-title">信息增厚 — Before / After 对比</div>
+    <div class="slide-sub">左边是原始发布（任何人都会写的简单更新），右边是 AI 增厚后的效果。一眼看出 AI 的增量价值。</div>
+  </div>
+  <div class="slide-body">
+    <div class="compare-grid">
+      <!-- Before -->
+      <div class="compare-side">
+        <div class="compare-label before">BEFORE · 原始发布</div>
+        <div class="compare-content">
+          <div class="raw-post">
+            <div class="post-author">
+              <span class="dot"></span>
+              李哲
+              <span class="team">· 数据中台组</span>
+            </div>
+            <p>数据中台重构方案确定了，最终选择 Iceberg 替换 Hive。经过两周对比评估，Iceberg 在我们场景下查询性能提升 40%，生态兼容性更好。预计 6 周完成迁移。</p>
+            <div style="margin-top:16px;padding:10px;background:var(--bg-subtle);border-radius:8px;text-align:center;font-size:12px;color:var(--ink-faint);">
+              仅此而已。<br>看到的人不知道这和自己有什么关系。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="compare-arrow">→</div>
+
+      <!-- After -->
+      <div class="compare-side">
+        <div class="compare-label after">AFTER · AI 增厚后</div>
+        <div class="compare-content">
+          <div class="enriched-post">
+            <div class="raw-post">
+              <div class="post-author">
+                <span class="dot"></span>
+                李哲
+                <span class="team">· 数据中台组</span>
+              </div>
+              <p>数据中台重构方案确定了，最终选择 Iceberg 替换 Hive。经过两周对比评估，Iceberg 在我们场景下查询性能提升 40%，生态兼容性更好。预计 6 周完成迁移。</p>
+            </div>
+            <div class="enrich-block">
+              <div class="enrich-label">✦ 关联发现</div>
+              <div class="enrich-text">
+                <strong>推荐引擎组（王芳团队）</strong>上周提到数据湖升级阻塞，此方案将解锁该阻塞。<span class="enrich-link">查看 →</span>
+              </div>
+            </div>
+            <div class="enrich-block">
+              <div class="enrich-label">✦ 影响面</div>
+              <div class="enrich-text">
+                公益产品组、推荐引擎组、应急响应组的数据接入方式将受影响（共 <strong>3 个下游团队</strong>）。
+              </div>
+            </div>
+            <div class="enrich-block">
+              <div class="enrich-label">✦ 历史线索</div>
+              <div class="enrich-text">
+                该议题从 4/20 开始讨论，经历 <strong>3 轮方案评审</strong>。Iceberg vs Delta Lake 对比详情见 4/28 讨论帖。<span class="enrich-link">时间线 →</span>
+              </div>
+            </div>
+            <div class="enrich-block">
+              <div class="enrich-label">✦ 管理者摘要</div>
+              <div class="enrich-text">
+                数据基础设施完成关键技术选型，6 周后上线，将 <strong>解锁 2 个等待中的业务项目</strong>。
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-sep">— — —</div>
+
+<!-- ============================================================
+     方案 C：AI 组织洞察卡片
+============================================================ -->
+<div class="slide" id="c">
+  <div class="slide-header">
+    <div class="slide-label">方案 C</div>
+    <div class="slide-title">AI 组织洞察 — 像一张 AI 发出的情报简报</div>
+    <div class="slide-sub">AI 作为组织的第 N+1 个大脑，主动生成的一份周度洞察。这是只有 AI 能做到的事。</div>
+  </div>
+  <div class="slide-body">
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-icon">✦</div>
+        <div class="insight-meta">
+          <div class="insight-title">Nexus AI · 组织周度洞察</div>
+          <div class="insight-sub">2026 Q2 · 第 20 周 · 自动生成</div>
+        </div>
+      </div>
+
+      <div class="insight-stats">
+        <div class="insight-stat">
+          <div class="num" style="color:var(--emerald);">23</div>
+          <div class="label">本周信息更新</div>
+        </div>
+        <div class="insight-stat">
+          <div class="num" style="color:var(--blue);">9<span style="font-size:16px;color:var(--ink-muted);font-weight:400;">/12</span></div>
+          <div class="label">活跃团队</div>
+        </div>
+        <div class="insight-stat">
+          <div class="num" style="color:var(--violet);">3</div>
+          <div class="label">AI 发现信号</div>
+        </div>
+      </div>
+
+      <div class="insight-section">
+        <div class="insight-section-title">💡 跨团队协同机会 <span class="line"></span></div>
+        <div class="insight-highlight">
+          公益产品组、数据中台组、用户增长组本周分别在做<strong>用户画像</strong>相关工作——受助人群画像、标签系统架构、捐赠者行为聚类。三个团队从不同角度切入同一问题，但目前没有跨团队讨论。底层标签定义若不对齐，后续数据无法互通。
+        </div>
+      </div>
+
+      <div class="insight-section">
+        <div class="insight-section-title">⚠️ 信息断裂预警 <span class="line"></span></div>
+        <div class="insight-body">
+          <p>乡村教育振兴计划已 <strong style="color:var(--rose);">14 天未更新</strong>。上次状态：等待安全评审。</p>
+          <p>但安全评审团队已于 5/9 发布评审通过结论。<strong>结论未流转至项目组</strong>——典型的信息断裂。</p>
+        </div>
+      </div>
+
+      <div class="insight-section">
+        <div class="insight-section-title">📊 本周关键决策 <span class="line"></span></div>
+        <div class="insight-body">
+          <p>数据中台确定 <strong>Iceberg 方案</strong>（替换 Hive），6 周完成迁移。此决策影响 3 个下游团队，将解锁推荐引擎的数据湖升级阻塞。</p>
+        </div>
+      </div>
+
+      <div class="insight-section">
+        <div class="insight-section-title">🔇 静默团队 <span class="line"></span></div>
+        <div class="insight-body">
+          <p>乡村教育组（1 条 / 周）、捐赠运营组（1 条 / 周）持续低活跃。</p>
+        </div>
+      </div>
+
+      <div class="insight-footer">
+        <span>Nexus AI · 基于 12 个团队 · 37 个项目 · 23 条本周更新</span>
+        <span>置信度 87%</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-sep">— — —</div>
+
+<!-- ============================================================
+     方案 D：三角色并排
+============================================================ -->
+<div class="slide" id="d">
+  <div class="slide-header">
+    <div class="slide-label">方案 D</div>
+    <div class="slide-title">角色化视图 — 同一事件，三种看法</div>
+    <div class="slide-sub">同一个组织事件（数据中台选型 Iceberg），VP / TL / IC 各自看到完全不同的 AI 增厚内容。展现"角色化重建"能力。</div>
+  </div>
+  <div class="slide-body">
+    <div class="same-event">
+      <strong>同一事件：</strong>李哲（数据中台组）发布「Iceberg 替换 Hive，6 周完成迁移」
+    </div>
+    <div class="role-grid">
+      <!-- VP -->
+      <div class="role-col">
+        <div class="role-header" style="background:var(--ink);">
+          <div class="role-icon" style="background:var(--blue);">VP</div>
+          <div>
+            <div class="role-name" style="color:#fff;">VP · Catherine</div>
+            <div class="role-desc" style="color:rgba(255,255,255,0.5);">看战略和风险</div>
+          </div>
+        </div>
+        <div class="role-body" style="padding-top:14px;">
+          <div class="role-divider">AI 为你生成的视角</div>
+          <div class="role-item action">
+            <div class="role-item-label">管理者摘要</div>
+            数据基础设施完成关键技术选型，6 周后上线，将解锁 2 个等待中的业务项目。
+          </div>
+          <div class="role-item connect">
+            <div class="role-item-label">影响面</div>
+            影响 3 个下游团队的数据接入方式。推荐引擎的阻塞将解除。
+          </div>
+          <div class="role-item alert">
+            <div class="role-item-label">协同机会</div>
+            3 个团队在做用户画像方向，标签定义需要对齐。建议你推动一次对齐会。
+          </div>
+          <div class="role-item risk">
+            <div class="role-item-label">风险</div>
+            迁移期 6 周，期间下游团队数据接入可能受影响，需要有过渡方案。
+          </div>
+        </div>
+      </div>
+
+      <!-- TL -->
+      <div class="role-col">
+        <div class="role-header" style="background:var(--emerald);">
+          <div class="role-icon" style="background:rgba(255,255,255,0.2);">TL</div>
+          <div>
+            <div class="role-name" style="color:#fff;">TL · 张明</div>
+            <div class="role-desc" style="color:rgba(255,255,255,0.6);">看团队影响和协同</div>
+          </div>
+        </div>
+        <div class="role-body" style="padding-top:14px;">
+          <div class="role-divider">AI 为你生成的视角</div>
+          <div class="role-item connect">
+            <div class="role-item-label">对你团队的影响</div>
+            你团队的画像项目数据将从新架构读取。王佳琪的标签方案需要和中台对齐 schema。
+          </div>
+          <div class="role-item action">
+            <div class="role-item-label">建议行动</div>
+            让佳琪本周和李哲对齐标签 schema，基于中台新架构设计，避免 6 周后迁移。
+          </div>
+          <div class="role-item learn">
+            <div class="role-item-label">可参考</div>
+            用户增长组也在做类似标签工作（捐赠者聚类），三方对齐可避免重复建设。
+          </div>
+        </div>
+      </div>
+
+      <!-- IC -->
+      <div class="role-col">
+        <div class="role-header" style="background:var(--cyan);">
+          <div class="role-icon" style="background:rgba(255,255,255,0.2);">IC</div>
+          <div>
+            <div class="role-name" style="color:#fff;">IC · 陈小明</div>
+            <div class="role-desc" style="color:rgba(255,255,255,0.6);">看与我的工作关联</div>
+          </div>
+        </div>
+        <div class="role-body" style="padding-top:14px;">
+          <div class="role-divider">AI 为你生成的视角</div>
+          <div class="role-item action">
+            <div class="role-item-label">对你的影响</div>
+            你做的画像前端最终从中台读数据。Iceberg 的列式存储对大数据量展示更友好，分页查询更快。
+          </div>
+          <div class="role-item learn">
+            <div class="role-item-label">学习机会</div>
+            李哲的选型评估文档里有 Iceberg 查询 API 用法，你后续联调可能用到。
+          </div>
+          <div class="role-item connect">
+            <div class="role-item-label">间接关联</div>
+            你的标签筛选组件需要适配佳琪和中台对齐后的新标签结构，留意方案定稿。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-sep" style="padding:40px 0;">— END —</div>
+
+</body>
+</html>
