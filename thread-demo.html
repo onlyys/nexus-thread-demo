@@ -119,7 +119,7 @@
 
   .discuss-title { font-size: 14px; font-weight: 600; color: #1f2328; margin: 26px 0 14px; display:flex; align-items:center; gap:8px; }
   .discuss-title .count { color:#9ca3af; font-weight:400; font-size: 13px; }
-  .discuss-title .rename-tag { margin-left: auto; font-size: 11px; font-weight: 500; background:#eff6ff; color:#2563eb; padding:2px 8px; border-radius: 999px; }
+
 
   .thread { background:#fff; border: 1px solid #e6e8eb; border-radius: 12px; margin-bottom: 12px; overflow: hidden; transition: box-shadow .2s, border-color .2s; }
   .thread:hover { border-color: #d1d5db; box-shadow: 0 2px 8px rgba(0,0,0,.04); }
@@ -162,10 +162,22 @@
   /* 默认：回复区可见（不再整体 display:none） */
   .thread-replies {
     display: block;
-    padding: 0 18px 6px;
+    padding: 0 18px 6px 56px; /* 左缩进 56px：与主帖 avatar(36) + gap(12) + 微调对齐，形成层级 */
     border-top: 1px dashed #e6e8eb;
     margin-top: 4px;
     padding-top: 10px;
+    position: relative;
+  }
+  /* 左侧引导竖线：从折叠条延到底部最后一条回复，暗示"挂在主帖下" */
+  .thread-replies::before {
+    content: '';
+    position: absolute;
+    left: 35px;        /* 对齐主帖 avatar 中线 */
+    top: 12px;
+    bottom: 8px;
+    width: 2px;
+    background: #eef0f2;
+    border-radius: 1px;
   }
   /* cold 或 resolved：整体收起 */
   .thread.cold .thread-replies,
@@ -186,6 +198,10 @@
     cursor: pointer;
     user-select: none;
     letter-spacing: 0.02em;
+    margin-left: -38px; /* 抵消 thread-replies 的左缩进，保持视觉居中 */
+    position: relative;
+    z-index: 1;
+    background: #fff;   /* 盖住引导线，避免与折叠条文字打架 */
   }
   .history-collapser::before, .history-collapser::after {
     content: '';
@@ -269,6 +285,10 @@
     color: #9ca3af;
     padding: 8px 0;
     letter-spacing: 0.02em;
+    margin-left: -38px; /* 抵消 thread-replies 的左缩进，保持视觉居中 */
+    position: relative;
+    z-index: 1;
+    background: #fff;
   }
   .sys-msg::before, .sys-msg::after {
     content: '';
@@ -301,14 +321,20 @@
   .thread-reply-box .send-btn-sm { background:#1f2328; color:#fff; font-weight: 500; font-size: 12.5px; }
   .thread-reply-box .send-btn-sm:hover { background:#000; }
 
-  .new-thread { background:#fff; border: 1.5px dashed #d1d5db; border-radius: 12px; padding: 14px 18px; display:flex; gap: 12px; align-items: flex-start; margin-top: 14px; transition: border-color .2s, background .2s; }
-  .new-thread:focus-within { border-color: #2563eb; background:#fff; border-style: solid; }
+  .new-thread {
+    background:#f5f6f8;             /* 浅灰底，与上方 Thread 白底卡片形成清晰边界 */
+    border: 1px solid #e6e8eb;
+    border-radius: 12px;
+    padding: 16px 18px 14px;
+    display:flex; gap: 12px; align-items: flex-start;
+    margin-top: 28px;               /* 与上方 Thread 列表拉开距离，独立成块 */
+    transition: border-color .2s, background .2s;
+  }
+  .new-thread:focus-within { border-color: #2563eb; background:#fff; }
   .new-thread .avatar-sm { width: 36px; height: 36px; font-size: 13px; flex-shrink: 0; }
   .new-thread .nt-body { flex: 1; }
   .new-thread textarea { width: 100%; border: 0; outline: none; font-family: inherit; font-size: 13.5px; resize: none; line-height: 1.6; min-height: 24px; background: transparent; padding: 4px 0; }
   .new-thread .nt-foot { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
-  .new-thread .nt-hint { font-size: 12px; color: #9ca3af; }
-  .new-thread .nt-hint kbd { background:#f5f6f8; border:1px solid #e6e8eb; border-radius: 4px; padding: 0 5px; font-size: 11px; font-family: monospace; }
   .new-thread .send-btn { margin-left: auto; background: #1f2328; color: #fff; border: 0; padding: 7px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight:500; }
   .new-thread .send-btn:hover { background:#000; }
   .new-thread .send-btn:disabled { background:#d1d5db; cursor: not-allowed; }
@@ -706,7 +732,6 @@
 
         <div class="discuss-title">
           💬 讨论 <span class="count" id="discussCount">4</span>
-          <span class="rename-tag">v1.0 · 评论 → 讨论</span>
         </div>
 
         <div id="threadList">
@@ -730,7 +755,6 @@
               <span class="chip reply-count">💬 4 条回复</span>
               <span class="chip todo-done" id="t1-todo-chip">✅ 已转为待办</span>
               <span>最新：肖迈 · 30 分钟前</span>
-              <span class="reply-btn" onclick="toggleFullExpand('t1')">展开全部</span>
             </div>
             <div class="thread-replies" id="replies-t1">
               <div class="history-collapser" onclick="toggleFullExpand('t1')">
@@ -789,7 +813,7 @@
             <div class="thread-reply-box">
               <div class="rbox">
                 <button class="at-btn" onclick="toast('@ 菜单：见 mention-visibility-demo')">@</button>
-                <textarea rows="1" placeholder="回复此讨论... Enter 发送 · ⌘ Enter 换行"
+                <textarea rows="1" placeholder="根据王昕的思考，我也来参与讨论…"
                   oninput="autoGrow(this)"
                   onkeydown="handleThreadReplyKey(event)"></textarea>
                 <button class="send-btn-sm" onclick="sendReplyFrom(this)">发送</button>
@@ -816,7 +840,6 @@
               <span class="chip reply-count">💬 2 条回复</span>
               <span class="chip waiting">⏳ 等待回复中</span>
               <span>最新：李培轮 · 3 小时前</span>
-              <span class="reply-btn" onclick="toggleFullExpand('t2')">展开全部</span>
             </div>
             <div class="thread-replies" id="replies-t2">
               <div class="history-collapser" onclick="toggleFullExpand('t2')">
@@ -850,7 +873,7 @@
             <div class="thread-reply-box">
               <div class="rbox">
                 <button class="at-btn" onclick="toast('@ 菜单')">@</button>
-                <textarea rows="1" placeholder="回复此讨论... Enter 发送 · ⌘ Enter 换行"
+                <textarea rows="1" placeholder="加入这场讨论…"
                   oninput="autoGrow(this)"
                   onkeydown="handleThreadReplyKey(event)"></textarea>
                 <button class="send-btn-sm" onclick="sendReplyFrom(this)">发送</button>
@@ -885,7 +908,7 @@
             <div class="thread-reply-box">
               <div class="rbox">
                 <button class="at-btn" onclick="toast('@ 菜单')">@</button>
-                <textarea rows="1" placeholder="回复此讨论... Enter 发送 · ⌘ Enter 换行"
+                <textarea rows="1" placeholder="加入这场讨论…"
                   oninput="autoGrow(this)"
                   onkeydown="handleThreadReplyKey(event)"></textarea>
                 <button class="send-btn-sm" onclick="sendReplyFrom(this)">发送</button>
@@ -911,7 +934,6 @@
             <div class="thread-foot">
               <span class="chip">💬 1 条回复</span>
               <span style="color:#9ca3af;">最新：王昕 · 4 天前</span>
-              <span class="reply-btn" onclick="toggleFullExpand('t4')">展开</span>
             </div>
             <div class="thread-replies" id="replies-t4">
               <div class="reply" data-mid="t4-r1">
@@ -929,7 +951,7 @@
             <div class="thread-reply-box">
               <div class="rbox">
                 <button class="at-btn" onclick="toast('@ 菜单')">@</button>
-                <textarea rows="1" placeholder="回复此讨论... Enter 发送 · ⌘ Enter 换行"
+                <textarea rows="1" placeholder="加入这场讨论…"
                   oninput="autoGrow(this)"
                   onkeydown="handleThreadReplyKey(event)"></textarea>
                 <button class="send-btn-sm" onclick="sendReplyFrom(this)">发送</button>
@@ -943,21 +965,18 @@
         <div class="new-thread" id="newThread">
           <div class="avatar-sm" style="background:#bbf7d0;color:#065f46;">钟</div>
           <div class="nt-body">
-            <textarea id="newThreadInput" placeholder="发起讨论... 输入 @ 可提及同事，Enter 发送，⌘ Enter 换行"
+            <textarea id="newThreadInput" placeholder="我也来参加讨论…"
               oninput="autoGrow(this); toggleSend()"
               onkeydown="handleNewThreadKey(event)"></textarea>
             <div class="nt-foot">
-              <div class="nt-hint">
-                提示：输入 <kbd>@</kbd> 提及 · <kbd>Enter</kbd> 发送 · <kbd>⌘ Enter</kbd> 换行
-              </div>
               <button class="send-btn" id="newThreadSend" disabled onclick="sendNewThread()">发起讨论</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Event 待办列表（与 Thread 双向链接） -->
-      <div class="todo-block">
+      <!-- Event 待办列表（与 Thread 双向链接） · v1.1 暂时隐藏，DOM 保留以兼容 simulateBackflow 注入逻辑 -->
+      <div class="todo-block" hidden>
         <h4>📋 Event 待办 <span class="tag-count" id="todoCount">2</span></h4>
         <div id="todoList">
           <div class="todo-item" data-todo="td-1" data-mid="t1-r4">
@@ -1243,9 +1262,8 @@
           <div class="new-thread" style="margin-top:0;">
             <div class="avatar-sm" style="background:#bbf7d0;color:#065f46;">钟</div>
             <div class="nt-body">
-              <textarea readonly placeholder="发起讨论... 输入 @ 可提及同事，Enter 发送，⌘ Enter 换行" style="color:#9ca3af;"></textarea>
+              <textarea readonly placeholder="我也来参加讨论…" style="color:#9ca3af;"></textarea>
               <div class="nt-foot">
-                <div class="nt-hint">提示：输入 <kbd>@</kbd> 提及 · <kbd>Enter</kbd> 发送 · <kbd>⌘ Enter</kbd> 换行</div>
                 <button class="send-btn" disabled>发起讨论</button>
               </div>
             </div>
@@ -1826,7 +1844,7 @@ function sendNewThread() {
     '  <div class="thread-reply-box">',
     '    <div class="rbox">',
     '      <button class="at-btn" onclick="toast(\'@ 菜单\')">@</button>',
-    '      <textarea rows="1" placeholder="回复此讨论... Enter 发送 · ⌘ Enter 换行" oninput="autoGrow(this)" onkeydown="handleThreadReplyKey(event)"></textarea>',
+    '      <textarea rows="1" placeholder="加入这场讨论…" oninput="autoGrow(this)" onkeydown="handleThreadReplyKey(event)"></textarea>',
     '      <button class="send-btn-sm" onclick="sendReplyFrom(this)">发送</button>',
     '    </div>',
     '  </div>',
