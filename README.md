@@ -19,6 +19,13 @@
 | 🔔 通知中心 | [notification-demo.html](https://onlyys.github.io/nexus-thread-demo/demos/notification-demo.html) |
 | 📡 通知触达配置 | [reach-demo.html](https://onlyys.github.io/nexus-thread-demo/demos/reach-demo.html) |
 
+### AI 洞察（Chat Insight）
+
+| Demo | 链接 |
+|---|---|
+| ✦ **AI 洞察方案对比**（卡片 vs 全文字） | [chat-insight-compare.html](https://onlyys.github.io/nexus-thread-demo/demos/chat-insight-compare.html) |
+| 📄 Chat Insight 设计方案文档 | [chat-insight-design.md](https://onlyys.github.io/nexus-thread-demo/docs/chat-insight-design.md) |
+
 ### 历史版本（已冻结 · 可回看对比）
 
 | 版本 | 时间 | 核心改动 | 入口 |
@@ -57,6 +64,7 @@ nexus-thread-demo/
 │   ├── v1.2-demo.html                ← ⭐ v1.2 主 demo（定稿）
 │   ├── v1.2-compare.html             ← v1.2 视觉方向对比（归档）
 │   ├── thread-demo.html              ← v1.1 遗留（保留）
+│   ├── chat-insight-compare.html     ← ✦ AI 洞察方案对比
 │   ├── notification-demo.html
 │   ├── reach-demo.html
 │   ├── v1.1/                         ← v1.1.0 冻结副本
@@ -69,6 +77,7 @@ nexus-thread-demo/
     ├── requirement-v1.2.md           ← ⭐ 当前定稿
     ├── requirement-v1.1.md           ← v1.1 历史
     ├── requirement-v1.0.md           ← v1.0 历史
+    ├── chat-insight-design.md        ← ✦ AI 洞察设计方案
     ├── v1.1/requirement.md           ← 冻结副本
     └── v1.0/requirement.md           ← 冻结副本
 ```
