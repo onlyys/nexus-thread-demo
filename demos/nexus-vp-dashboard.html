@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus · VP 驾驶舱 — 组织脉搏</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  :root {
+    --bg: #FAFAF8;
+    --surface: #FFFFFF;
+    --ink: #1A1918;
+    --ink-sec: #4A4845;
+    --ink-muted: #8A8784;
+    --ink-faint: #B5B2AE;
+    --border: #E8E6E1;
+    --border-subtle: #F0EFEB;
+    --bg-subtle: #F4F3F0;
+    --bg-hover: #F0EFEB;
+    --bg-ai: #F8F7F4;
+    --blue: #2563EB;
+    --blue-soft: #DBEAFE;
+    --blue-light: #EFF6FF;
+    --emerald: #059669;
+    --emerald-light: #ECFDF5;
+    --amber: #D97706;
+    --amber-light: #FFFBEB;
+    --rose: #E11D48;
+    --rose-light: #FFF1F2;
+    --violet: #7C3AED;
+    --violet-light: #F5F3FF;
+    --indigo: #4F46E5;
+    --cyan: #0891B2;
+    --shadow-card: 0 1px 3px rgba(0,0,0,.04), 0 0 0 1px rgba(0,0,0,.02);
+    --shadow-md: 0 2px 8px rgba(0,0,0,.06);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,.08);
+    --radius-md: 10px;
+    --radius-lg: 14px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: "Inter", -apple-system, "PingFang SC", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== TOP BAR ===== */
+  .topbar {
+    position: sticky; top:0; z-index:100;
+    height: 48px;
+    background: var(--ink);
+    display: flex; align-items: center;
+    padding: 0 24px;
+  }
+  .topbar .logo {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: #fff; color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 15px;
+  }
+  .topbar .brand { font-weight: 600; font-size: 15px; color: #fff; margin-left: 10px; }
+  .topbar .slogan { color: rgba(255,255,255,0.4); font-size: 12px; margin-left: 8px; }
+  .topbar-tabs {
+    display: flex; gap: 4px; margin-left: 32px;
+  }
+  .topbar-tab {
+    padding: 6px 16px; border-radius: 980px;
+    font-size: 12px; font-weight: 500;
+    color: rgba(255,255,255,0.5); cursor: pointer;
+    transition: all 0.2s;
+  }
+  .topbar-tab:hover { color: #fff; }
+  .topbar-tab.active { background: rgba(255,255,255,0.12); color: #fff; }
+  .topbar-right {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .topbar-right .role-badge {
+    font-size: 10px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px;
+    background: rgba(37,99,235,0.2); color: #93c5fd;
+  }
+  .topbar-right .user { font-size: 12px; color: rgba(255,255,255,0.6); }
+
+  /* ===== MAIN ===== */
+  .main { padding: 28px; max-width: 1280px; margin: 0 auto; }
+
+  /* Header */
+  .header {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .header h1 {
+    font-size: 28px; font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .header .period {
+    font-size: 13px; color: var(--ink-muted);
+  }
+
+  /* ===== PULSE CARDS ===== */
+  .pulse-cards {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 12px; margin-bottom: 24px;
+  }
+  .pulse-card {
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.15s;
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+  }
+  .pulse-card:hover { transform: translateY(-1px); }
+  .pulse-card .label {
+    font-size: 11px; font-weight: 600; color: var(--ink-muted);
+    letter-spacing: 0.04em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .pulse-card .value {
+    font-size: 36px; font-weight: 700;
+    letter-spacing: -0.5px; line-height: 1;
+  }
+  .pulse-card .delta {
+    font-size: 12px; font-weight: 500; margin-top: 6px;
+  }
+  .pulse-card .delta.up { color: var(--emerald); }
+  .pulse-card .delta.down { color: var(--rose); }
+  .pulse-card .delta.warn { color: var(--amber); }
+  .pulse-card .sparkline {
+    position: absolute; bottom: 0; right: 0;
+    width: 80px; height: 40px; opacity: 0.15;
+  }
+  .pulse-card.dark {
+    background: var(--ink); color: #fff;
+  }
+  .pulse-card.dark .label { color: rgba(255,255,255,0.45); }
+  .pulse-card.dark .delta { color: #86efac; }
+
+  /* ===== TWO COL ===== */
+  .grid-2 {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 14px; margin-bottom: 20px;
+  }
+
+  /* ===== CARD ===== */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-card);
+  }
+  .card-title {
+    font-size: 14px; font-weight: 600;
+    letter-spacing: -0.2px; margin-bottom: 18px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .ai-badge {
+    font-size: 9px; font-weight: 600;
+    padding: 2px 6px; border-radius: 4px;
+    background: var(--violet-light); color: var(--violet);
+  }
+
+  /* ===== GOAL MAP ===== */
+  .goal-tree { list-style: none; padding: 0; }
+  .goal-item {
+    padding: 12px 14px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border: 1px solid var(--border-subtle);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .goal-item:hover { border-color: var(--border); background: var(--bg-hover); }
+  .goal-name {
+    font-size: 14px; font-weight: 600; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .goal-name .icon { font-size: 14px; }
+  .sub-projects { margin-top: 8px; padding-left: 22px; }
+  .sub-project {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--ink-sec);
+    padding: 4px 0;
+  }
+  .sub-project .status-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .sub-project .status-dot.green { background: var(--emerald); }
+  .sub-project .status-dot.amber { background: var(--amber); }
+  .sub-project .status-dot.red { background: var(--rose); }
+  .sub-project .status-dot.blue { background: var(--blue); }
+  .sub-project .ai-enrichment {
+    margin-left: auto;
+    font-size: 11px; color: var(--violet);
+    background: var(--violet-light);
+    padding: 2px 8px; border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  /* ===== ACTIVITY BARS ===== */
+  .team-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px;
+  }
+  .team-name {
+    width: 80px; font-size: 13px; font-weight: 500; color: var(--ink-sec);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .team-bar-track {
+    flex: 1; height: 22px; background: var(--bg-subtle);
+    border-radius: 6px; overflow: hidden; position: relative;
+  }
+  .team-bar-fill {
+    height: 100%; border-radius: 6px;
+    transition: width 1s ease-out;
+    display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 8px;
+    font-size: 10px; font-weight: 600; color: #fff;
+  }
+  .team-tag {
+    font-size: 10px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px;
+    width: 48px; text-align: center;
+  }
+  .team-tag.active { background: var(--emerald-light); color: var(--emerald); }
+  .team-tag.normal { background: var(--blue-light); color: var(--blue); }
+  .team-tag.silent { background: var(--rose-light); color: var(--rose); }
+
+  /* ===== SIGNALS ===== */
+  .signal-list { list-style: none; padding: 0; }
+  .signal-item {
+    display: flex; gap: 12px;
+    padding: 14px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border: 1px solid var(--border-subtle);
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+  .signal-item:hover { border-color: var(--border); background: var(--bg-hover); }
+  .signal-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .signal-icon.alert { background: var(--amber-light); }
+  .signal-icon.connect { background: var(--violet-light); }
+  .signal-icon.risk { background: var(--rose-light); }
+  .signal-icon.insight { background: var(--blue-light); }
+  .signal-body { flex: 1; min-width: 0; }
+  .signal-title {
+    font-size: 13px; font-weight: 600; margin-bottom: 3px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .signal-title .ai-tag {
+    font-size: 9px; font-weight: 600;
+    padding: 1px 5px; border-radius: 3px;
+    background: var(--violet-light); color: var(--violet);
+  }
+  .signal-desc {
+    font-size: 12px; color: var(--ink-sec); line-height: 1.6;
+  }
+  .signal-time {
+    font-size: 11px; color: var(--ink-faint);
+    margin-top: 4px;
+  }
+  .signal-action {
+    font-size: 12px; color: var(--blue); font-weight: 500;
+    align-self: center; white-space: nowrap; flex-shrink: 0;
+  }
+
+  /* ===== AI INSIGHT CARD ===== */
+  .ai-insight {
+    background: linear-gradient(135deg, #fafbff 0%, #fdfaff 100%);
+    border: 1px solid #e0e7ff;
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-card);
+  }
+  .ai-insight-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .ai-insight-header .ai-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--violet), var(--indigo));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #fff;
+  }
+  .ai-insight-header .ai-title {
+    font-size: 15px; font-weight: 600;
+  }
+  .ai-insight-header .ai-time {
+    font-size: 11px; color: var(--ink-muted);
+    margin-left: auto;
+  }
+  .ai-insight-body {
+    font-size: 14px; line-height: 1.8; color: var(--ink-sec);
+  }
+  .ai-insight-body p { margin-bottom: 10px; }
+  .ai-insight-body .highlight-box {
+    background: var(--violet-light);
+    border-left: 3px solid var(--violet);
+    padding: 10px 14px;
+    border-radius: 0 8px 8px 0;
+    margin: 12px 0;
+    font-size: 13px;
+  }
+  .ai-insight-actions {
+    display: flex; gap: 8px; margin-top: 16px;
+  }
+  .ai-insight-actions .btn {
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-size: 12px; font-weight: 500;
+    cursor: pointer; border: none;
+    transition: all 0.15s;
+  }
+  .ai-insight-actions .btn.primary {
+    background: var(--ink); color: #fff;
+  }
+  .ai-insight-actions .btn.primary:hover { opacity: 0.85; }
+  .ai-insight-actions .btn.ghost {
+    background: transparent; color: var(--ink-sec);
+    border: 1px solid var(--border);
+  }
+  .ai-insight-actions .btn.ghost:hover { background: var(--bg-hover); }
+
+  /* ===== AI ENRICHMENT FEED ===== */
+  .feed-section { margin-bottom: 20px; }
+  .feed-item {
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    box-shadow: var(--shadow-card);
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .feed-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px;
+  }
+  .feed-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .feed-author { font-size: 13px; font-weight: 600; }
+  .feed-team { font-size: 11px; color: var(--ink-muted); }
+  .feed-time { margin-left: auto; font-size: 11px; color: var(--ink-faint); }
+  .feed-body {
+    font-size: 14px; line-height: 1.7; color: var(--ink-sec);
+    margin-bottom: 12px;
+  }
+  .feed-enrichment {
+    background: var(--bg-ai);
+    border: 1px solid #e0e7ff;
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .feed-enrichment-title {
+    font-size: 11px; font-weight: 600; color: var(--violet);
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .feed-enrichment-content {
+    font-size: 12px; line-height: 1.65; color: var(--ink-sec);
+  }
+  .feed-enrichment-content .link {
+    color: var(--blue); cursor: pointer;
+    border-bottom: 1px solid var(--blue-soft);
+  }
+
+  /* ===== CHAT FLOAT ===== */
+  .chat-toggle {
+    position: fixed; bottom: 24px; right: 24px; z-index: 200;
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--violet), var(--indigo));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(124,58,237,0.35);
+    transition: transform 0.2s;
+    font-size: 24px; color: #fff;
+  }
+  .chat-toggle:hover { transform: scale(1.08); }
+
+  .chat-panel {
+    position: fixed; bottom: 92px; right: 24px; z-index: 200;
+    width: 440px; height: 580px;
+    background: var(--surface);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .chat-panel.open { display: flex; }
+  .chat-head {
+    background: var(--ink);
+    padding: 16px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .chat-head-title { font-size: 15px; font-weight: 600; color: #fff; }
+  .chat-head-sub { font-size: 11px; color: rgba(255,255,255,0.4); margin-left: 8px; }
+  .chat-close {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: rgba(255,255,255,0.5); font-size: 14px;
+  }
+  .chat-close:hover { background: rgba(255,255,255,0.2); }
+  .chat-messages {
+    flex: 1; overflow-y: auto; padding: 16px;
+    display: flex; flex-direction: column; gap: 12px;
+    background: var(--bg-ai);
+  }
+  .msg { display: flex; gap: 8px; max-width: 92%; }
+  .msg.ai { align-self: flex-start; }
+  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+  .msg-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .msg.ai .msg-avatar { background: linear-gradient(135deg, var(--violet), var(--indigo)); }
+  .msg.user .msg-avatar { background: var(--ink); }
+  .msg-bubble {
+    border-radius: 12px; padding: 10px 14px;
+    font-size: 13px; line-height: 1.6;
+  }
+  .msg.ai .msg-bubble { background: var(--surface); color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .msg.user .msg-bubble { background: var(--ink); color: #fff; }
+  .msg-bubble .card-embed {
+    background: var(--bg-subtle); border-radius: 8px; padding: 12px;
+    margin-top: 8px; font-size: 12px; line-height: 1.6;
+  }
+  .msg-bubble .card-embed .ce-title { font-weight: 600; margin-bottom: 6px; font-size: 13px; }
+  .msg-bubble .card-embed .ce-row {
+    display: flex; justify-content: space-between; padding: 2px 0;
+  }
+  .msg-bubble .card-embed .ce-val { font-weight: 600; color: var(--blue); }
+
+  .chat-input-area {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border-subtle);
+    background: var(--surface);
+  }
+  .chat-chips {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;
+  }
+  .chip {
+    padding: 5px 12px; border-radius: 980px;
+    font-size: 11px; font-weight: 500;
+    background: var(--bg-subtle); color: var(--ink-sec);
+    cursor: pointer; transition: background 0.15s;
+  }
+  .chip:hover { background: var(--bg-hover); }
+  .chat-input-row { display: flex; gap: 8px; align-items: center; }
+  .chat-input {
+    flex: 1; height: 40px; border: none; outline: none;
+    background: var(--bg-subtle); border-radius: 980px;
+    padding: 0 16px; font-size: 13px; font-family: inherit;
+  }
+  .chat-input::placeholder { color: var(--ink-faint); }
+  .chat-send {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--ink); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.15s;
+  }
+  .chat-send:hover { opacity: 0.85; }
+  .chat-send svg { width: 16px; height: 16px; }
+
+  .typing { display: flex; gap: 4px; padding: 4px 0; }
+  .typing span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--ink-muted);
+    animation: blink 1.2s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,80%,100%{opacity:0.3} 40%{opacity:1} }
+
+  /* ===== KNOWLEDGE GRAPH MINI ===== */
+  .kg-container {
+    position: relative;
+    width: 100%;
+    height: 260px;
+    background: radial-gradient(ellipse at center, var(--bg-ai) 0%, var(--surface) 100%);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .kg-node {
+    position: absolute;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 11px; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    box-shadow: var(--shadow-card);
+  }
+  .kg-node:hover { transform: scale(1.08); z-index: 10; }
+  .kg-node.hot { background: var(--violet-light); color: var(--violet); border: 1px solid #c4b5fd; }
+  .kg-node.warm { background: var(--blue-light); color: var(--blue); border: 1px solid var(--blue-soft); }
+  .kg-node.cool { background: var(--bg-subtle); color: var(--ink-sec); border: 1px solid var(--border); }
+  .kg-node.cold { background: var(--rose-light); color: var(--rose); border: 1px solid #fecdd3; }
+  .kg-link {
+    position: absolute;
+    border-top: 1.5px dashed var(--ink-faint);
+    transform-origin: 0 0;
+    z-index: 0;
+  }
+  .kg-link.strong { border-top: 2px solid var(--violet); opacity: 0.3; }
+  .kg-legend {
+    display: flex; gap: 12px; margin-top: 10px;
+    font-size: 10px; color: var(--ink-muted);
+  }
+  .kg-legend span {
+    display: flex; align-items: center; gap: 4px;
+  }
+  .kg-legend .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+
+  /* ===== SECTION TITLE ===== */
+  .section-title {
+    font-size: 18px; font-weight: 700;
+    letter-spacing: -0.3px;
+    margin: 28px 0 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title .ai-gen {
+    font-size: 10px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px;
+    background: linear-gradient(135deg, var(--violet-light), #ede9fe);
+    color: var(--violet);
+  }
+
+  /* ===== ANIMATE ===== */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fadeUp 0.5s ease-out forwards; }
+  .fade-up-d1 { animation-delay: 0.1s; opacity: 0; }
+  .fade-up-d2 { animation-delay: 0.2s; opacity: 0; }
+  .fade-up-d3 { animation-delay: 0.3s; opacity: 0; }
+  .fade-up-d4 { animation-delay: 0.4s; opacity: 0; }
+
+  /* Number animation */
+  @keyframes countUp { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</head>
+<body>
+
+<!-- ===== TOP BAR ===== -->
+<div class="topbar">
+  <div class="logo">N</div>
+  <div class="brand">Nexus</div>
+  <div class="slogan">组织脉搏 · 高管视图</div>
+  <div class="topbar-tabs">
+    <div class="topbar-tab active">组织脉搏</div>
+    <div class="topbar-tab">信息流</div>
+    <div class="topbar-tab">目标地图</div>
+    <div class="topbar-tab">知识图谱</div>
+  </div>
+  <div class="topbar-right">
+    <div class="role-badge">VP</div>
+    <div class="user">Catherine · SSV</div>
+  </div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<div class="main">
+  <div class="header fade-up">
+    <h1>组织脉搏</h1>
+    <div class="period">2026 Q2 · 第 20 周 · 5月12日 - 5月16日</div>
+  </div>
+
+  <!-- Pulse Cards -->
+  <div class="pulse-cards">
+    <div class="pulse-card fade-up fade-up-d1">
+      <div class="label">本周信息更新</div>
+      <div class="value" id="s1">0</div>
+      <div class="delta up">+8 vs 上周</div>
+      <svg class="sparkline" viewBox="0 0 80 40"><path d="M0,35 L10,30 20,32 30,25 40,20 50,22 60,15 70,10 80,8" fill="none" stroke="var(--emerald)" stroke-width="2" opacity="0.6"/></svg>
+    </div>
+    <div class="pulse-card fade-up fade-up-d2">
+      <div class="label">活跃团队</div>
+      <div class="value"><span id="s2">0</span><span style="font-size:18px;color:var(--ink-muted);font-weight:400;"> / 12</span></div>
+      <div class="delta up">较上周 +1</div>
+    </div>
+    <div class="pulse-card fade-up fade-up-d3">
+      <div class="label">待回应讨论</div>
+      <div class="value" id="s3" style="color:var(--amber);">0</div>
+      <div class="delta warn">3 条超过 48h 未回应</div>
+    </div>
+    <div class="pulse-card dark fade-up fade-up-d4">
+      <div class="label">AI 发现信号</div>
+      <div class="value" id="s4">0</div>
+      <div class="delta">2 个跨团队关联 · 1 个静默预警</div>
+    </div>
+  </div>
+
+  <!-- AI 主动洞察 -->
+  <div class="ai-insight fade-up fade-up-d2">
+    <div class="ai-insight-header">
+      <div class="ai-icon">✦</div>
+      <div>
+        <div class="ai-title">Nexus AI · 本周组织洞察</div>
+      </div>
+      <div class="ai-time">生成于 5月14日 18:00</div>
+    </div>
+    <div class="ai-insight-body">
+      <p>本周检测到一个值得注意的模式：</p>
+      <div class="highlight-box">
+        <strong>跨团队协同机会：</strong>公益产品组（张明团队）、数据中台组（李哲团队）和用户增长组（王芳团队）本周分别提到了「用户画像标签体系」相关工作——公益产品组在做受助人群画像，数据中台在重构标签系统架构，用户增长在做捐赠者行为聚类。三个团队在不同层面切入同一个底层问题，但目前没有看到跨团队讨论。
+      </div>
+      <p>此外：乡村教育项目组（刘强负责）已 <strong style="color:var(--rose);">14 天未更新进展</strong>，上次状态是「等待合作方安全评审结论」。根据安全评审团队（赵鹏负责）上周的发布，评审已于 5 月 9 日完成并出具结论，但该结论尚未流转至乡村教育项目组。</p>
+    </div>
+    <div class="ai-insight-actions">
+      <button class="btn primary" onclick="askQuestion('帮我看看用户画像这三个团队的具体进展')">深入了解画像协同</button>
+      <button class="btn ghost" onclick="askQuestion('乡村教育项目的卡点现在什么情况')">追踪乡村教育卡点</button>
+      <button class="btn ghost">忽略本条</button>
+    </div>
+  </div>
+
+  <!-- Two Column: Goal Map + Activity -->
+  <div class="grid-2">
+    <!-- Q目标进展地图 -->
+    <div class="card fade-up fade-up-d3">
+      <div class="card-title">
+        Q2 目标进展地图
+        <span class="ai-badge">AI 持续追踪</span>
+      </div>
+      <ul class="goal-tree">
+        <li class="goal-item">
+          <div class="goal-name"><span class="icon">📌</span> 战略目标 A：提升社会价值可度量性</div>
+          <div class="sub-projects">
+            <div class="sub-project">
+              <span class="status-dot green"></span>
+              SQI 评估体系 3.0
+              <span class="ai-enrichment">本周有 3 条更新</span>
+            </div>
+            <div class="sub-project">
+              <span class="status-dot amber"></span>
+              合作方数据回传标准化
+              <span class="ai-enrichment" style="background:var(--amber-light);color:var(--amber);">进度偏慢</span>
+            </div>
+            <div class="sub-project">
+              <span class="status-dot green"></span>
+              公益大数据平台二期
+            </div>
+          </div>
+        </li>
+        <li class="goal-item">
+          <div class="goal-name"><span class="icon">📌</span> 战略目标 B：扩大乡村教育覆盖</div>
+          <div class="sub-projects">
+            <div class="sub-project">
+              <span class="status-dot red"></span>
+              乡村教育振兴计划
+              <span class="ai-enrichment" style="background:var(--rose-light);color:var(--rose);">14天未更新</span>
+            </div>
+            <div class="sub-project">
+              <span class="status-dot green"></span>
+              教师培训体系升级
+            </div>
+            <div class="sub-project">
+              <span class="status-dot blue"></span>
+              远程教育基础设施
+              <span class="ai-enrichment">刚启动</span>
+            </div>
+          </div>
+        </li>
+        <li class="goal-item">
+          <div class="goal-name"><span class="icon">📌</span> 战略目标 C：技术能力建设</div>
+          <div class="sub-projects">
+            <div class="sub-project">
+              <span class="status-dot green"></span>
+              数据中台重构（Iceberg 方案）
+              <span class="ai-enrichment">本周完成技术选型</span>
+            </div>
+            <div class="sub-project">
+              <span class="status-dot green"></span>
+              推荐引擎优化
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 团队信息流活跃度 -->
+    <div class="card fade-up fade-up-d4">
+      <div class="card-title">
+        团队信息流活跃度
+        <span class="ai-badge">AI 实时监测</span>
+      </div>
+      <div style="margin-bottom: 16px;">
+        <div class="team-row">
+          <div class="team-name">公益产品组</div>
+          <div class="team-bar-track"><div class="team-bar-fill" style="width:92%;background:var(--emerald);">12</div></div>
+          <div class="team-tag active">活跃</div>
+        </div>
+        <div class="team-row">
+          <div class="team-name">数据中台组</div>
+          <div class="team-bar-track"><div class="team-bar-fill" style="width:85%;background:var(--emerald);">10</div></div>
+          <div class="team-tag active">活跃</div>
+        </div>
+        <div class="team-row">
+          <div class="team-name">用户增长组</div>
+          <div class="team-bar-track"><div class="team-bar-fill" style="width:75%;background:var(--blue);">8</div></div>
+          <div class="team-tag normal">正常</div>
+        </div>
+        <div class="team-row">
+          <div class="team-name">安全评审组</div>
+          <div class="team-bar-track"><div class="team-bar-fill" style="width:60%;background:var(--blue);">6</div></div>
+          <div class="team-tag normal">正常</div>
+        </div>
+        <div class="team-row">
+          <div class="team-name">应急响应组</div>
+          <div class="team-bar-track"><div class="team-bar-fill" style="width:50%;background:var(--blue);">5</div></div>
+          <div class="team-tag normal">正常</div>
+        </div>
+        <div class="team-row">
+          <div class="team-name">乡村教育组</div>
+          <div class="team-bar-track"><div class="team-bar-fill" style="width:8%;background:var(--rose);">1</div></div>
+          <div class="team-tag silent">静默</div>
+        </div>
+        <div class="team-row">
+          <div class="team-name">捐赠运营组</div>
+          <div class="team-bar-track"><div class="team-bar-fill" style="width:12%;background:var(--rose);">1</div></div>
+          <div class="team-tag silent">静默</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--ink-muted);border-top:1px solid var(--border-subtle);padding-top:10px;">
+        活跃 = 本周 ≥5 条更新 · 正常 = 2-4 条 · 静默 = ≤1 条
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Knowledge Graph (mini) -->
+  <div class="section-title">
+    组织知识图谱
+    <span class="ai-gen">AI 持续维护</span>
+  </div>
+  <div class="card" style="margin-bottom:20px;">
+    <div class="kg-container" id="kgContainer">
+      <!-- Nodes placed by JS -->
+    </div>
+    <div class="kg-legend">
+      <span><div class="dot" style="background:var(--violet);"></div> 热点话题</span>
+      <span><div class="dot" style="background:var(--blue);"></div> 活跃项目</span>
+      <span><div class="dot" style="background:var(--ink-muted);"></div> 一般</span>
+      <span><div class="dot" style="background:var(--rose);"></div> 需关注</span>
+      <span style="margin-left:auto;font-size:11px;">虚线 = AI 发现的关联</span>
+    </div>
+  </div>
+
+  <!-- 需要关注的信号 -->
+  <div class="section-title">
+    需要关注
+    <span class="ai-gen">AI 信号检测</span>
+  </div>
+  <ul class="signal-list">
+    <li class="signal-item fade-up fade-up-d1">
+      <div class="signal-icon connect">💡</div>
+      <div class="signal-body">
+        <div class="signal-title">
+          跨团队协同机会
+          <span class="ai-tag">AI 发现</span>
+        </div>
+        <div class="signal-desc">公益产品组、数据中台组、用户增长组都在做用户画像相关工作。底层数据定义可能重复建设，建议拉齐。</div>
+        <div class="signal-time">AI 检测于 2 小时前 · 置信度 87%</div>
+      </div>
+      <div class="signal-action" onclick="askQuestion('帮我看看用户画像这三个团队的具体进展')">深入了解 →</div>
+    </li>
+    <li class="signal-item fade-up fade-up-d2">
+      <div class="signal-icon risk">⚠️</div>
+      <div class="signal-body">
+        <div class="signal-title">
+          信息断裂预警
+          <span class="ai-tag">AI 追踪</span>
+        </div>
+        <div class="signal-desc">乡村教育振兴计划 14 天未更新。上次状态：等待安全评审。但安全评审结论已于 5/9 发布，信息未流转。</div>
+        <div class="signal-time">AI 检测于 1 小时前 · 基于时间线追踪</div>
+      </div>
+      <div class="signal-action" onclick="askQuestion('乡村教育项目的卡点现在什么情况')">追踪详情 →</div>
+    </li>
+    <li class="signal-item fade-up fade-up-d3">
+      <div class="signal-icon alert">🔔</div>
+      <div class="signal-body">
+        <div class="signal-title">
+          目标进度预警
+        </div>
+        <div class="signal-desc">战略目标 B 下的 3 个项目中，2 个本月 OKR 即将到期，但均未同步最新进展。</div>
+        <div class="signal-time">系统检测 · 基于 OKR 日历</div>
+      </div>
+      <div class="signal-action">查看目标 →</div>
+    </li>
+    <li class="signal-item fade-up fade-up-d4">
+      <div class="signal-icon insight">🧩</div>
+      <div class="signal-body">
+        <div class="signal-title">
+          信息增厚回顾
+          <span class="ai-tag">AI 增厚</span>
+        </div>
+        <div class="signal-desc">数据中台组李哲发布「Iceberg 方案确定」。AI 已自动标注：影响 3 个下游团队、关联推荐引擎阻塞问题，并生成管理者视角摘要。</div>
+        <div class="signal-time">30 分钟前</div>
+      </div>
+      <div class="signal-action">查看增厚 →</div>
+    </li>
+  </ul>
+
+  <!-- AI 增厚的信息流 (示例) -->
+  <div class="section-title">
+    最新动态（AI 增厚后）
+    <span class="ai-gen">每条内容 AI 实时增厚</span>
+  </div>
+  <div class="feed-section">
+    <div class="feed-item fade-up fade-up-d1">
+      <div class="feed-header">
+        <div class="feed-avatar" style="background:var(--blue);">李</div>
+        <div>
+          <div class="feed-author">李哲 · 数据中台组</div>
+          <div class="feed-team">技术选型</div>
+        </div>
+        <div class="feed-time">今天 15:30</div>
+      </div>
+      <div class="feed-body">
+        数据中台重构方案确定了，最终选择 Iceberg 替换 Hive。经过两周的对比评估（Iceberg vs Delta Lake），Iceberg 在我们的场景下查询性能提升 40%，且生态兼容性更好。预计 6 周完成迁移。
+      </div>
+      <div class="feed-enrichment">
+        <div class="feed-enrichment-title">✦ AI 增厚</div>
+        <div class="feed-enrichment-content">
+          <strong>关联发现：</strong>推荐引擎组（王芳团队）上周提到的数据湖升级阻塞，将因此方案解锁。<span class="link">查看王芳 5/8 发布 →</span><br>
+          <strong>影响面：</strong>公益产品组、推荐引擎组、应急响应组的数据接入方式将受影响。<br>
+          <strong>历史线索：</strong>该议题从 4/20 开始讨论，经历了 3 轮方案评审。<span class="link">查看讨论时间线 →</span><br>
+          <strong>管理者摘要：</strong>数据基础设施做了关键技术选型，6 周后上线，将解锁 2 个等待中的业务项目。
+        </div>
+      </div>
+    </div>
+
+    <div class="feed-item fade-up fade-up-d2">
+      <div class="feed-header">
+        <div class="feed-avatar" style="background:var(--emerald);">张</div>
+        <div>
+          <div class="feed-author">张明 · 公益产品组</div>
+          <div class="feed-team">项目进展</div>
+        </div>
+        <div class="feed-time">今天 11:20</div>
+      </div>
+      <div class="feed-body">
+        受助人群画像 v2 完成第一轮数据清洗，接入了 12 个省的救助数据。下一步做标签体系设计，预计下周出方案。
+      </div>
+      <div class="feed-enrichment">
+        <div class="feed-enrichment-title">✦ AI 增厚</div>
+        <div class="feed-enrichment-content">
+          <strong>跨团队关联：</strong>数据中台组正在重构标签系统架构，用户增长组也在做捐赠者行为聚类——三个团队从不同角度切入「用户画像标签体系」。<span class="link">建议对齐 →</span><br>
+          <strong>管理者摘要：</strong>画像项目数据层进展顺利，但标签设计环节可能和其他两个团队有重复建设风险。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CHAT TOGGLE ===== -->
+<div class="chat-toggle" onclick="toggleChat()">✦</div>
+
+<!-- ===== CHAT PANEL ===== -->
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head">
+    <div>
+      <span class="chat-head-title">Nexus AI</span>
+      <span class="chat-head-sub">组织的第 N+1 个大脑</span>
+    </div>
+    <div class="chat-close" onclick="toggleChat()">✕</div>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="msg ai">
+      <div class="msg-avatar">✦</div>
+      <div class="msg-bubble">
+        Catherine 你好，我是 Nexus AI。我持续在追踪组织内所有团队的信息流，为你生成角色化的洞察。
+        <div style="margin-top:8px;font-size:11px;color:var(--ink-muted);">当前追踪：12 个团队 · 37 个活跃项目 · 本周 23 条更新</div>
+      </div>
+    </div>
+  </div>
+  <div class="chat-input-area">
+    <div class="chat-chips">
+      <div class="chip" onclick="askQuestion('最近哪些团队在做类似的事')">哪些团队在做类似的事？</div>
+      <div class="chip" onclick="askQuestion('哪些目标下的项目需要我关注')">哪些项目需要我关注？</div>
+      <div class="chip" onclick="askQuestion('帮我看看上周组织里有什么重要变化')">上周有什么重要变化？</div>
+    </div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chatInput" placeholder="问我任何关于组织动态的问题..." onkeydown="if(event.key==='Enter')sendMessage()">
+      <button class="chat-send" onclick="sendMessage()">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== Animate numbers =====
+function animateNum(el, target, duration=1200) {
+  const startTime = performance.now();
+  function update(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(target * eased);
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+window.addEventListener('load', () => {
+  animateNum(document.getElementById('s1'), 23);
+  animateNum(document.getElementById('s2'), 9);
+  animateNum(document.getElementById('s3'), 5);
+  animateNum(document.getElementById('s4'), 7);
+  initKnowledgeGraph();
+});
+
+// ===== Knowledge Graph =====
+function initKnowledgeGraph() {
+  const container = document.getElementById('kgContainer');
+  const nodes = [
+    { label: '用户画像标签', x: '42%', y: '18%', type: 'hot' },
+    { label: '数据中台重构', x: '22%', y: '35%', type: 'warm' },
+    { label: 'Iceberg 迁移', x: '10%', y: '60%', type: 'warm' },
+    { label: '推荐引擎优化', x: '65%', y: '30%', type: 'warm' },
+    { label: '受助人群画像', x: '30%', y: '72%', type: 'warm' },
+    { label: '捐赠者行为聚类', x: '72%', y: '58%', type: 'warm' },
+    { label: '乡村教育振兴', x: '85%', y: '20%', type: 'cold' },
+    { label: '安全评审', x: '88%', y: '50%', type: 'cool' },
+    { label: '教师培训体系', x: '55%', y: '78%', type: 'cool' },
+    { label: '合作方数据回传', x: '15%', y: '85%', type: 'cool' },
+    { label: 'SQI 3.0', x: '48%', y: '50%', type: 'warm' },
+  ];
+
+  nodes.forEach(n => {
+    const el = document.createElement('div');
+    el.className = 'kg-node ' + n.type;
+    el.textContent = n.label;
+    el.style.left = n.x;
+    el.style.top = n.y;
+    container.appendChild(el);
+  });
+
+  // Draw some connection lines (simplified)
+  const links = [
+    [0, 4, 'strong'], [0, 5, 'strong'], [0, 1, 'strong'],
+    [1, 2, ''], [3, 5, ''], [6, 7, ''],
+    [1, 10, ''], [4, 10, ''], [3, 1, ''],
+  ];
+
+  // We use a simple approach with absolute positioned lines
+  setTimeout(() => {
+    const containerRect = container.getBoundingClientRect();
+    links.forEach(([from, to, type]) => {
+      const fromEl = container.children[from];
+      const toEl = container.children[to];
+      if (!fromEl || !toEl) return;
+
+      const fromRect = fromEl.getBoundingClientRect();
+      const toRect = toEl.getBoundingClientRect();
+
+      const x1 = fromRect.left + fromRect.width/2 - containerRect.left;
+      const y1 = fromRect.top + fromRect.height/2 - containerRect.top;
+      const x2 = toRect.left + toRect.width/2 - containerRect.left;
+      const y2 = toRect.top + toRect.height/2 - containerRect.top;
+
+      const length = Math.sqrt((x2-x1)**2 + (y2-y1)**2);
+      const angle = Math.atan2(y2-y1, x2-x1) * 180 / Math.PI;
+
+      const line = document.createElement('div');
+      line.className = 'kg-link' + (type === 'strong' ? ' strong' : '');
+      line.style.left = x1 + 'px';
+      line.style.top = y1 + 'px';
+      line.style.width = length + 'px';
+      line.style.transform = `rotate(${angle}deg)`;
+      container.appendChild(line);
+    });
+  }, 100);
+}
+
+// ===== Chat =====
+function toggleChat() {
+  document.getElementById('chatPanel').classList.toggle('open');
+}
+
+const QA = {
+  '最近哪些团队在做类似的事': {
+    text: '本周检测到 1 个明显的重叠模式：',
+    card: {
+      title: '跨团队重叠分析 · 用户画像方向',
+      rows: [
+        ['公益产品组（张明）', '受助人群画像 v2 · 数据清洗完成'],
+        ['数据中台组（李哲）', '标签系统架构重构 · Iceberg 方案'],
+        ['用户增长组（王芳）', '捐赠者行为聚类 · 模型训练中'],
+        ['关联度', '三方底层均依赖统一标签定义'],
+        ['建议', '拉 30min 对齐会，避免重复建设'],
+      ]
+    },
+    followUp: '三个团队的技术负责人分别是张明、李哲、王芳。需要我帮你草拟一个对齐会的议题吗？'
+  },
+  '帮我看看用户画像这三个团队的具体进展': {
+    text: '三个团队的用户画像相关进展详情：',
+    card: {
+      title: '用户画像 · 跨团队进展汇总',
+      rows: [
+        ['公益产品组', '受助人群画像 v2，已完成 12 省数据清洗，下周出标签方案'],
+        ['数据中台组', '标签系统架构选定 Iceberg，6 周完成，为画像提供底座'],
+        ['用户增长组', '捐赠者行为聚类，模型训练完成 70%，缺乏统一标签定义'],
+        ['重叠点', '三方都需要"标签定义层"，但各自独立设计中'],
+        ['风险', '如不对齐，后续数据无法互通，画像价值大打折扣'],
+      ]
+    },
+    followUp: '建议行动：让数据中台组牵头出统一标签 schema，其他两个团队基于此定义。这样中台 6 周后的架构升级可以直接服务画像需求。'
+  },
+  '乡村教育项目的卡点现在什么情况': {
+    text: '乡村教育振兴计划的时间线追踪：',
+    card: {
+      title: '信息时间线 · 乡村教育振兴计划',
+      rows: [
+        ['4/28', '刘强发布：进入安全评审阶段，暂停推进'],
+        ['5/2', '赵鹏（安全评审）：开始评审'],
+        ['5/9', '赵鹏发布：评审完成，结论已出具（合规通过）'],
+        ['5/14', '刘强团队：无新更新（已 14 天）'],
+        ['AI 判断', '评审结论未流转至项目组，信息断裂'],
+      ]
+    },
+    followUp: '安全评审已通过（赵鹏 5/9 发布），但刘强团队可能不知道。建议直接提醒刘强查看评审结论，项目应可恢复推进。需要我帮你 @刘强 吗？'
+  },
+  '哪些目标下的项目需要我关注': {
+    text: '按优先级排序，以下项目需要您关注：',
+    card: {
+      title: '需关注项目 · VP 视角',
+      rows: [
+        ['🔴 乡村教育振兴', '14天未更新 · 信息断裂 · 建议立即介入'],
+        ['🟡 合作方数据回传', '进度偏慢 · 影响 SQI 评估 · 需协调外部'],
+        ['🟡 捐赠运营组整体', '团队静默 · 本周仅 1 条更新'],
+        ['🟢 用户画像方向', '进展好但有重叠 · 建议组织对齐'],
+      ]
+    },
+    followUp: '红色项目建议今天处理，黄色项目建议本周内跟进。您想先从哪个开始？'
+  },
+  '帮我看看上周组织里有什么重要变化': {
+    text: '上周（5/5 - 5/11）组织要事回顾：',
+    card: {
+      title: '周度要事 · AI 角色化摘要',
+      rows: [
+        ['技术决策', '数据中台确定 Iceberg 方案，影响 3 个下游团队'],
+        ['里程碑', '公益产品组受助人群画像完成数据清洗'],
+        ['风险新增', '乡村教育进入第 2 周静默，评审结论未流转'],
+        ['协同机会', '用户画像方向 3 个团队可对齐（本周新发现）'],
+        ['团队变化', '捐赠运营组活跃度下降，从"正常"变"静默"'],
+      ]
+    },
+    followUp: '整体组织活跃度较前周提升 12%，主要贡献来自数据中台组的技术决策讨论。但乡村教育和捐赠运营两个组的静默值得关注。'
+  }
+};
+
+function findAnswer(q) {
+  for (const [key, val] of Object.entries(QA)) {
+    if (q.includes(key) || key.includes(q)) return val;
+  }
+  const keywords = {
+    '类似': '最近哪些团队在做类似的事',
+    '画像': '帮我看看用户画像这三个团队的具体进展',
+    '乡村': '乡村教育项目的卡点现在什么情况',
+    '教育': '乡村教育项目的卡点现在什么情况',
+    '卡点': '乡村教育项目的卡点现在什么情况',
+    '关注': '哪些目标下的项目需要我关注',
+    '目标': '哪些目标下的项目需要我关注',
+    '上周': '帮我看看上周组织里有什么重要变化',
+    '变化': '帮我看看上周组织里有什么重要变化',
+    '重要': '帮我看看上周组织里有什么重要变化',
+    '协同': '帮我看看用户画像这三个团队的具体进展',
+  };
+  for (const [kw, qKey] of Object.entries(keywords)) {
+    if (q.includes(kw)) return QA[qKey];
+  }
+  return null;
+}
+
+function askQuestion(q) {
+  document.getElementById('chatPanel').classList.add('open');
+  document.getElementById('chatInput').value = q;
+  sendMessage();
+}
+
+function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+
+  const messages = document.getElementById('chatMessages');
+
+  const userMsg = document.createElement('div');
+  userMsg.className = 'msg user';
+  userMsg.innerHTML = '<div class="msg-avatar">C</div><div class="msg-bubble">' + escapeHtml(q) + '</div>';
+  messages.appendChild(userMsg);
+
+  const typing = document.createElement('div');
+  typing.className = 'msg ai';
+  typing.innerHTML = '<div class="msg-avatar">✦</div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>';
+  messages.appendChild(typing);
+  messages.scrollTop = messages.scrollHeight;
+
+  setTimeout(() => {
+    messages.removeChild(typing);
+    const answer = findAnswer(q);
+    const aiMsg = document.createElement('div');
+    aiMsg.className = 'msg ai';
+
+    if (answer) {
+      let cardHtml = '';
+      if (answer.card) {
+        let rowsHtml = answer.card.rows.map(r => '<div class="ce-row"><span>' + r[0] + '</span><span class="ce-val">' + r[1] + '</span></div>').join('');
+        cardHtml = '<div class="card-embed"><div class="ce-title">' + answer.card.title + '</div>' + rowsHtml + '</div>';
+      }
+      const followHtml = answer.followUp ? '<div style="margin-top:10px;font-size:12px;line-height:1.6;color:var(--ink-sec);">' + answer.followUp + '</div>' : '';
+      aiMsg.innerHTML = '<div class="msg-avatar">✦</div><div class="msg-bubble">' + answer.text + cardHtml + followHtml + '</div>';
+    } else {
+      aiMsg.innerHTML = '<div class="msg-avatar">✦</div><div class="msg-bubble">已收到。让我扫描组织内所有团队的信息流来回答这个问题...<div style="font-size:11px;color:var(--ink-muted);margin-top:6px;">追踪中：12 个团队 · 37 个活跃项目</div></div>';
+    }
+
+    messages.appendChild(aiMsg);
+    messages.scrollTop = messages.scrollHeight;
+  }, 1200);
+}
+
+function escapeHtml(text) {
+  const d = document.createElement('div');
+  d.textContent = text;
+  return d.innerHTML;
+}
+</script>
+</body>
+</html>
