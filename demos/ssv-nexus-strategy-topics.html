@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SSV Nexus · 关键策略 1 · Topics</title>
+<style>
+:root {
+  --notion-text: #37352f;
+  --notion-text-secondary: rgba(55, 53, 47, 0.65);
+  --notion-text-tertiary: rgba(55, 53, 47, 0.45);
+  --notion-border: rgba(55, 53, 47, 0.09);
+  --notion-border-strong: rgba(55, 53, 47, 0.16);
+  --notion-hover: rgba(55, 53, 47, 0.06);
+  --notion-sidebar: #fbfbfa;
+  --notion-bg: #ffffff;
+  --notion-blue-bg: rgba(35, 131, 226, 0.14);
+  --notion-blue-text: #2383e2;
+  --notion-gray-bg: rgba(227, 226, 224, 0.5);
+  --notion-radius: 6px;
+  --font: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: var(--notion-bg);
+  color: var(--notion-text);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr) 300px;
+  min-height: 100vh;
+}
+
+.topbar {
+  grid-column: 1 / -1;
+  height: 45px;
+  border-bottom: 1px solid var(--notion-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px 0 12px;
+  background: var(--notion-bg);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+
+.logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: var(--notion-text);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.brand-name { font-size: 14px; font-weight: 600; white-space: nowrap; }
+
+.slogan {
+  color: var(--notion-text-tertiary);
+  font-size: 13px;
+  margin-left: 12px;
+  padding-left: 12px;
+  border-left: 1px solid var(--notion-border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--notion-text-secondary);
+  font-size: 13px;
+}
+
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  border-radius: var(--notion-radius);
+  cursor: pointer;
+  color: var(--notion-text-secondary);
+  font-size: 16px;
+}
+
+.icon-btn:hover { background: var(--notion-hover); }
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #c4c4c4, #9a9a9a);
+}
+
+.sidebar {
+  background: var(--notion-sidebar);
+  border-right: 1px solid var(--notion-border);
+  padding: 8px 10px 24px;
+  overflow-y: auto;
+}
+
+.group-title {
+  color: var(--notion-text-tertiary);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  margin: 18px 8px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  padding: 4px 10px;
+  border-radius: var(--notion-radius);
+  font-size: 14px;
+  color: var(--notion-text-secondary);
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.nav-item:hover { background: var(--notion-hover); }
+
+.nav-item.active {
+  background: var(--notion-text);
+  color: #fff;
+  font-weight: 500;
+}
+
+.nav-icon {
+  width: 16px;
+  text-align: center;
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.main {
+  padding: 28px 48px 64px;
+  overflow: auto;
+  background: var(--notion-bg);
+  max-width: 760px;
+}
+
+.page-top {
+  margin-bottom: 24px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--notion-text-secondary);
+  text-decoration: none;
+  margin-bottom: 12px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.back-link:hover {
+  background: var(--notion-hover);
+  color: var(--notion-text);
+}
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--notion-text-tertiary);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.breadcrumb a {
+  color: var(--notion-text-tertiary);
+  text-decoration: none;
+  border-radius: 3px;
+  padding: 1px 2px;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.breadcrumb a:hover {
+  background: var(--notion-hover);
+  color: var(--notion-text-secondary);
+}
+
+.breadcrumb .sep {
+  color: var(--notion-text-tertiary);
+  opacity: 0.6;
+  user-select: none;
+}
+
+.breadcrumb .current {
+  color: var(--notion-text-secondary);
+}
+
+.strategy-detail-title {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  color: var(--notion-text);
+}
+
+.topics-summary {
+  font-size: 12px;
+  color: var(--notion-text-tertiary);
+  margin-bottom: 20px;
+}
+
+.topics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.topic-card {
+  display: block;
+  padding: 12px 14px;
+  border: 1px solid var(--notion-border);
+  border-radius: var(--notion-radius);
+  background: rgba(55, 53, 47, 0.02);
+  text-decoration: none;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.topic-card:hover {
+  background: var(--notion-hover);
+  border-color: var(--notion-border-strong);
+}
+
+.topic-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.topic-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--notion-text);
+  line-height: 1.4;
+}
+
+.topic-badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--notion-gray-bg);
+  color: var(--notion-text-tertiary);
+  flex-shrink: 0;
+}
+
+.topic-meta {
+  font-size: 12px;
+  color: var(--notion-text-tertiary);
+}
+
+.ai-panel {
+  background: var(--notion-sidebar);
+  border-left: 1px solid var(--notion-border);
+  padding: 16px 14px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ai-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  padding: 0 4px;
+}
+
+.ai-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--notion-blue-text);
+  background: var(--notion-blue-bg);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.ai-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 16px;
+  color: var(--notion-text-tertiary);
+  font-size: 13px;
+  line-height: 1.6;
+  min-height: 280px;
+}
+
+.ai-empty .sparkle {
+  font-size: 28px;
+  margin-bottom: 12px;
+  opacity: 0.35;
+}
+
+@media (max-width: 1100px) {
+  .app { grid-template-columns: 220px 1fr; }
+  .ai-panel { display: none; }
+  .slogan { display: none; }
+}
+
+@media (max-width: 768px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .main { padding: 24px 20px 48px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">N</div>
+      <span class="brand-name">SSV Nexus</span>
+      <span class="slogan">透明即上下文，上下文即生产力</span>
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn" type="button" aria-label="通知">🔔</button>
+      <span>Hi，骆玘</span>
+      <span class="avatar" aria-hidden="true"></span>
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <div class="group-title">TOPICS</div>
+    <div class="nav-item"><span class="nav-icon">☰</span> ALL</div>
+    <div class="nav-item"><span class="nav-icon">◎</span> MY</div>
+    <div class="group-title">GOALS</div>
+    <div class="nav-item active">公益平台部</div>
+    <div class="nav-item">科技生态实验室</div>
+    <div class="nav-item">时光实验室</div>
+    <div class="nav-item">数字教育实验室</div>
+    <div class="nav-item">数字文化实验室</div>
+    <div class="nav-item">实验产品中心</div>
+    <div class="nav-item">技术架构部</div>
+    <div class="group-title">TOOLS</div>
+    <div class="nav-item"><span class="nav-icon">⚙</span> 技能</div>
+    <div class="nav-item"><span class="nav-icon">▦</span> 插件</div>
+    <div class="group-title">ADMIN</div>
+  </aside>
+
+  <main class="main">
+    <div class="page-top">
+      <a class="back-link" href="ssv-nexus-goals.html">← 返回</a>
+      <nav class="breadcrumb" aria-label="面包屑">
+        <a href="ssv-nexus-goals.html">公益平台部</a>
+        <span class="sep">›</span>
+        <a href="ssv-nexus-goals.html">夯实捐款，丰富好事产品，转型「做好事」平台</a>
+        <span class="sep">›</span>
+        <span class="current">关键策略 1</span>
+      </nav>
+      <h1 class="strategy-detail-title">丰富好事产品：捐款稳中有升，从「我信任」到「我想捐」；做好事以志愿服务为撬点，重头好事从质量提升其他好事：开放接入 SSV、司内外做好事产品；</h1>
+      <p class="topics-summary">该关键策略下共 6 条 Topic · 对你可见 6 条</p>
+    </div>
+
+    <div class="topics-list">
+      <a class="topic-card" href="#">
+        <div class="topic-card-head">
+          <span class="topic-title">月捐产品体验优化 · Q3</span>
+          <span class="topic-badge">有更新</span>
+        </div>
+        <div class="topic-meta">Mia（王晓彤） · 2026/05/25</div>
+      </a>
+      <a class="topic-card" href="#">
+        <div class="topic-card-head">
+          <span class="topic-title">好事广场开放接入方案</span>
+          <span class="topic-badge">有更新</span>
+        </div>
+        <div class="topic-meta">Jordan（周航） · 2026/05/25</div>
+      </a>
+      <a class="topic-card" href="#">
+        <div class="topic-card-head">
+          <span class="topic-title">捐款转化漏斗分析</span>
+          <span class="topic-badge">有更新</span>
+        </div>
+        <div class="topic-meta">Chen Wei（陈伟） · 2026/05/25</div>
+      </a>
+      <a class="topic-card" href="#">
+        <div class="topic-card-head">
+          <span class="topic-title">SSV 内外部产品能力对齐</span>
+          <span class="topic-badge">有更新</span>
+        </div>
+        <div class="topic-meta">Alex（张明） · 2026/05/25</div>
+      </a>
+      <a class="topic-card" href="#">
+        <div class="topic-card-head">
+          <span class="topic-title">新用户首捐路径改版</span>
+          <span class="topic-badge">有更新</span>
+        </div>
+        <div class="topic-meta">Luna（林悦） · 2026/05/25</div>
+      </a>
+      <a class="topic-card" href="#">
+        <div class="topic-card-head">
+          <span class="topic-title">机构侧捐赠数据回传规范</span>
+        </div>
+        <div class="topic-meta">Sam（孙浩） · 2026/05/24</div>
+      </a>
+    </div>
+  </main>
+
+  <aside class="ai-panel">
+    <div class="ai-title">Nexus AI <span class="ai-badge">AI</span></div>
+    <div class="ai-empty">
+      <div class="sparkle">✦</div>
+      <div>后续上线，敬请期待</div>
+    </div>
+  </aside>
+</div>
+</body>
+</html>
