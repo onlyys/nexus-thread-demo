@@ -25,6 +25,7 @@
 |---|---|
 | 🎯 **部门目标页**（公益平台部） | [ssv-nexus-goals.html](https://onlyys.github.io/nexus-thread-demo/demos/ssv-nexus-goals.html) |
 | 📋 **关键策略 · 全部 Topic** | [ssv-nexus-strategy-topics.html](https://onlyys.github.io/nexus-thread-demo/demos/ssv-nexus-strategy-topics.html) |
+| ✏️ **创建 Topic**（关联部门策略 · 弹窗选策略） | [create-topic.html](https://onlyys.github.io/nexus-thread-demo/demos/create-topic.html) |
 
 ### AI 洞察（Chat Insight）
 
